@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "819902547125",
+    "project_id": "campusassistantbd",
+    "storage_bucket": "campusassistantbd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819902547125:android:01a665b405366c72c1eafc",
+        "android_client_info": {
+          "package_name": "com.sofolit.campusassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819902547125-jmbg81jc7domi88lqg05lcdbataa5mu3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6GyOYVB353N2SjORdNaZvKThz8zapfyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819902547125-jmbg81jc7domi88lqg05lcdbataa5mu3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
