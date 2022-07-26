@@ -29,12 +29,12 @@ List kArchive = ['Library', 'Research'];
 
 const List<String> kYearList = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
-const List<String> kBatchList = [
-  'Batch 13',
-  'Batch 14',
-  'Batch 15',
-  'Batch 16',
-];
+// const List<String> kBatchList = [
+//   'Batch 13',
+//   'Batch 14',
+//   'Batch 15',
+//   'Batch 16',
+// ];
 
 const List<String> kSessionList = [
   '17-18',

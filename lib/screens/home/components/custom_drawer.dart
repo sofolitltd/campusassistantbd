@@ -105,7 +105,7 @@ class CustomDrawer extends StatelessWidget {
                           //call
                           MaterialButton(
                             onPressed: () {
-                              OpenApp.openPdf(kDeveloperMobile);
+                              OpenApp.withNumber(kDeveloperMobile);
                             },
                             minWidth: 32,
                             elevation: 4,

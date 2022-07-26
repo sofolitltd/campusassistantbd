@@ -11,11 +11,13 @@ class EditCr extends StatefulWidget {
     required this.userModel,
     required this.crModel,
     required this.docId,
+    required this.batchList,
   }) : super(key: key);
 
   final UserModel userModel;
   final CrModel crModel;
   final String docId;
+  final List<String> batchList;
 
   @override
   State<EditCr> createState() => _EditCrState();
@@ -57,6 +59,17 @@ class _EditCrState extends State<EditCr> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Edit CR'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await ref
+                  .doc(widget.docId)
+                  .delete()
+                  .then((value) => Navigator.pop(context));
+            },
+            icon: const Icon(Icons.delete_outline),
+          ),
+        ],
       ),
 
       //
@@ -143,6 +156,8 @@ class _EditCrState extends State<EditCr> {
                   prefixIcon: Icon(Icons.facebook_outlined),
                 ),
                 keyboardType: TextInputType.url,
+                minLines: 1,
+                maxLines: 3,
               ),
 
               const SizedBox(height: 16),
@@ -165,7 +180,7 @@ class _EditCrState extends State<EditCr> {
                   });
                 },
                 validator: (value) => value == null ? "Select batch" : null,
-                items: kBatchList.reversed.map((String val) {
+                items: widget.batchList.reversed.map((String val) {
                   return DropdownMenuItem(
                     value: val,
                     child: Text(val),

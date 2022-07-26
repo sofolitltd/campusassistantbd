@@ -37,6 +37,7 @@ class TeacherDetailsScreen extends StatelessWidget {
                       String shareableText =
                           '${teacherModel.name}\n${teacherModel.post}\n${teacherModel.phd}\n\nMobile: ${teacherModel.mobile}\nEmail: ${teacherModel.email}\n\nPublications: ${teacherModel.publications}\n\nInterest: ${teacherModel.interests}\n\n${teacherModel.imageUrl}';
 
+                      //
                       await Share.share(shareableText,
                           subject: 'Profile of ${teacherModel.name}');
                     },
@@ -116,7 +117,11 @@ class TeacherDetailsScreen extends StatelessWidget {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w300),
                                 ),
+
+                                //
                                 const SizedBox(height: 4),
+
+                                //
                                 if (teacherModel.phd.isNotEmpty)
                                   Text(
                                     teacherModel.phd,
@@ -151,7 +156,6 @@ class TeacherDetailsScreen extends StatelessWidget {
                                               Fluttertoast.cancel();
                                               Fluttertoast.showToast(
                                                   msg: 'No publication found');
-                                              print('no publication found');
                                             }
                                           },
                                           // color: Colors.black,
@@ -217,13 +221,14 @@ class TeacherDetailsScreen extends StatelessWidget {
                                   ),
                                 ),
 
-                                const Divider(height: 24),
-
                                 if (teacherModel.mobile.isNotEmpty)
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      const Divider(height: 24),
+
+                                      //mobile
                                       const Text(
                                         "Mobile: ",
                                         style: TextStyle(
@@ -257,14 +262,15 @@ class TeacherDetailsScreen extends StatelessWidget {
                                       fontSize: 16,
                                       fontWeight: FontWeight.w300),
                                 ),
-                                const Divider(height: 24),
 
                                 if (teacherModel.interests.isNotEmpty)
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      //
+                                      const Divider(height: 24),
+
+                                      //Interest
                                       const Text(
                                         "Field of Interest: ",
                                         style: TextStyle(

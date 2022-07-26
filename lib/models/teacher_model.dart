@@ -13,6 +13,7 @@ class TeacherModel {
   final String imageUrl;
   final String interests;
   final String publications;
+  final String token;
 
   TeacherModel({
     required this.id,
@@ -27,6 +28,7 @@ class TeacherModel {
     required this.interests,
     required this.publications,
     required this.imageUrl,
+    required this.token,
   });
 
   // fetch
@@ -44,6 +46,7 @@ class TeacherModel {
           interests: json['interests']! as String,
           publications: json['publications']! as String,
           imageUrl: json['imageUrl']! as String,
+          token: json['token']! as String,
         );
 
   //up
@@ -61,6 +64,7 @@ class TeacherModel {
       'interests': interests,
       'publications': publications,
       'imageUrl': imageUrl,
+      'token': token,
     };
   }
 }

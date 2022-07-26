@@ -22,14 +22,11 @@ class StudentScreen extends StatelessWidget {
         .collection('Universities')
         .doc(userModel.university)
         .collection('Departments')
-        .doc(userModel.department)
-        .collection('Students')
-        .doc('Batches')
-        .collection(userModel.batch);
+        .doc(userModel.department);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Friend List'),
+        title: const Text('Friends'),
         // centerTitle: true,
         titleSpacing: 0,
         elevation: 0,
@@ -41,12 +38,32 @@ class StudentScreen extends StatelessWidget {
                 color: Colors.pink[100],
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4)),
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    AllBatchList.routeName,
-                    arguments: userModel,
+                onPressed: () async {
+                  List batchList = [];
+                  await FirebaseFirestore.instance
+                      .collection('Universities')
+                      .doc(userModel.university)
+                      .collection('Departments')
+                      .doc(userModel.department)
+                      .collection('Batches')
+                      .orderBy('name')
+                      .get()
+                      .then(
+                    (QuerySnapshot snapshot) {
+                      for (var batch in snapshot.docs) {
+                        batchList.add(batch.get('name'));
+                      }
+                    },
                   );
+
+                  //
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AllBatchList(
+                                userModel: userModel,
+                                batchList: batchList,
+                              )));
                 },
                 child: const Text('All Student',
                     style: TextStyle(color: Colors.black87))),
@@ -77,7 +94,12 @@ class StudentScreen extends StatelessWidget {
 
       //
       body: StreamBuilder<QuerySnapshot>(
-        stream: ref.orderBy('orderBy', descending: false).snapshots(),
+        stream: ref
+            .collection('Students')
+            .doc('Batches')
+            .collection(userModel.batch)
+            .orderBy('orderBy', descending: false)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something wrong'));
@@ -108,6 +130,7 @@ class StudentScreen extends StatelessWidget {
                   const SizedBox(height: 12),
               itemBuilder: (BuildContext context, int index) {
                 StudentModel studentModel = StudentModel.fromJson(data[index]);
+
                 //
                 return StudentCard(
                     userModel: userModel, studentModel: studentModel);

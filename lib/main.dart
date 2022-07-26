@@ -13,7 +13,6 @@ import '/screens/dashboard/dashboard.dart';
 import '/screens/home/about/about_screen.dart';
 import '/screens/home/home.dart';
 import '/screens/home/office/office_screen.dart';
-import '/screens/home/student/all_batch_list.dart';
 import '/screens/home/student/student_screen.dart';
 import '/screens/home/teacher/teacher_screen.dart';
 import '/screens/profile/profile.dart';
@@ -96,7 +95,7 @@ Map<String, Widget Function(BuildContext)> routes = {
 
   StudentScreen.routeName: (context) => const StudentScreen(),
 
-  AllBatchList.routeName: (context) => const AllBatchList(),
+  // AllBatchList.routeName: (context) => const AllBatchList(),
 
   OfficeScreen.routeName: (context) => const OfficeScreen(),
 

@@ -24,11 +24,30 @@ class CrList extends StatelessWidget {
     return Scaffold(
       floatingActionButton: userModel.role[UserRole.admin.name]
           ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => AddCr(userModel: userModel)));
+              onPressed: () async {
+                List<String> batchList = [];
+                await FirebaseFirestore.instance
+                    .collection('Universities')
+                    .doc(userModel.university)
+                    .collection('Departments')
+                    .doc(userModel.department)
+                    .collection('Batches')
+                    .orderBy('name')
+                    .get()
+                    .then(
+                  (QuerySnapshot snapshot) {
+                    for (var batch in snapshot.docs) {
+                      batchList.add(batch.get('name'));
+                    }
+                  },
+                ).then((value) {
+                  //
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AddCr(
+                              userModel: userModel, batchList: batchList)));
+                });
               },
               child: const Icon(Icons.add),
             )

@@ -108,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    // margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(8),
@@ -306,186 +306,183 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
 
             // contact
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-              child: Column(
-                children: [
-                  //
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    minVerticalPadding: 0,
-                    leading: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent.shade100,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.contact_page_outlined,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: const Text('Contact Information'),
-                    subtitle: const Text('Email, Phone No'),
-                  ),
-
-                  //
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
+            Column(
+              children: [
+                //
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  minVerticalPadding: 0,
+                  leading: Container(
+                    height: 40,
+                    width: 40,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                      color: Colors.blueAccent.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    child: const Icon(
+                      Icons.contact_page_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                  title: const Text('Contact Information'),
+                  subtitle: const Text('Email, Phone, Hall'),
+                ),
+
+                //
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //
+                      Text(
+                        'Email',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      //
+                      Text(
+                        userModel.email,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+
+                      const Divider(),
+
+                      //
+                      Text(
+                        'Phone',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      //
+                      Text(
+                        userModel.phone,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+
+                      const Divider(),
+
+                      //
+                      Text(
+                        'Hall',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      //
+                      Text(
+                        userModel.hall,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // content
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  minVerticalPadding: 0,
+                  leading: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.mail_outline,
+                      color: Colors.white,
+                    ),
+                  ),
+                  title: const Text('Essentials'),
+                  subtitle: const Text(' Notice Group, Bookmarks '),
+                ),
+
+                //
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 0,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         //
-                        Text(
-                          'Email',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-
-                        const SizedBox(height: 2),
-
+                        // ListTile(
+                        //   onTap: () {
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             NoticeGroup(userModel: userModel),
+                        //       ),
+                        //     );
+                        //   },
+                        //   title: Text(
+                        //     'Notice Groups',
+                        //     style: Theme.of(context)
+                        //         .textTheme
+                        //         .titleMedium!
+                        //         .copyWith(fontWeight: FontWeight.w600),
+                        //   ),
+                        //   trailing: const Icon(
+                        //     Icons.arrow_forward_ios_outlined,
+                        //     size: 16,
+                        //   ),
+                        // ),
                         //
-                        Text(
-                          userModel.email,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontWeight: FontWeight.w600),
+                        // const Divider(height: 1),
+
+                        ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CourseBookMarks(
+                                  userModel: userModel,
+                                ),
+                              ),
+                            );
+                          },
+                          title: Text(
+                            'Bookmarks',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.w600),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            size: 16,
+                          ),
                         ),
-
-                        const Divider(),
-
                         //
-                        Text(
-                          'Phone',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        //
-                        Text(
-                          userModel.phone,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontWeight: FontWeight.w600),
-                        ),
-
-                        const Divider(),
-
-                        //
-                        Text(
-                          'Hall',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        //
-                        Text(
-                          userModel.hall,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontWeight: FontWeight.w600),
-                        ),
                       ],
                     ),
                   ),
-
-                  // content
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    minVerticalPadding: 0,
-                    leading: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent.shade100,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.mail_outline,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: const Text('Essentials'),
-                    subtitle: const Text(' Notice Group, Bookmarks '),
-                  ),
-
-                  //
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      elevation: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          //
-                          ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      NoticeGroup(userModel: userModel),
-                                ),
-                              );
-                            },
-                            title: Text(
-                              'Notice Groups',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              size: 16,
-                            ),
-                          ),
-
-                          const Divider(height: 1),
-
-                          ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CourseBookMarks(
-                                    userModel: userModel,
-                                  ),
-                                ),
-                              );
-                            },
-                            title: Text(
-                              'Bookmarks',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              size: 16,
-                            ),
-                          ),
-                          //
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             )
           ],
         ),

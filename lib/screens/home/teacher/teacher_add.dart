@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -87,7 +89,7 @@ class _TeacherAddState extends State<TeacherAdd> {
                       ),
                       value: _selectedSerial,
                       isExpanded: true,
-                      items: List.generate(20, (index) => 1 + index++)
+                      items: List.generate(30, (index) => 1 + index++)
                           .map((serial) {
                         return DropdownMenuItem<int>(
                           alignment: Alignment.center,
@@ -250,6 +252,8 @@ class _TeacherAddState extends State<TeacherAdd> {
                             setState(() => _isLoading = true);
 
                             String id = const Uuid().v1();
+                            var token = Random().nextInt(9000) + 1000;
+
                             //
                             TeacherModel teacher = TeacherModel(
                               id: id,
@@ -271,6 +275,7 @@ class _TeacherAddState extends State<TeacherAdd> {
                                       ? ''
                                       : _publicationsController.text.trim(),
                               imageUrl: _imageUrlController.text.trim(),
+                              token: token.toString(),
                             );
 
                             //

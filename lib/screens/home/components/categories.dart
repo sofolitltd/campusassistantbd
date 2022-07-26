@@ -35,7 +35,7 @@ class Categories extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           physics: const NeverScrollableScrollPhysics(),
           primary: false,
-          childAspectRatio: MediaQuery.of(context).size.width > 800 ? 1.2 : 1,
+          childAspectRatio: MediaQuery.of(context).size.width > 800 ? 1.2 : .8,
           crossAxisCount: 2,
           mainAxisSpacing: MediaQuery.of(context).size.width > 800
               ? MediaQuery.of(context).size.width * .02

@@ -139,7 +139,7 @@ class _SignUpScreen2State extends State<SignUpScreen2> {
       //
 
       appBar: AppBar(
-        title: const Text('User Information'),
+        title: const Text('User information'),
         centerTitle: true,
       ),
 

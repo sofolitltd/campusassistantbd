@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '/screens/home/teacher/teacher_add.dart';
 import '/screens/home/teacher/teachers_edit.dart';
@@ -65,18 +66,21 @@ class TeacherListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: userModel.role[UserRole.admin.name]
-          ? FloatingActionButton(
-              onPressed: () {
-                //
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        TeacherAdd(userModel: userModel, present: isPresent),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 32),
+              child: FloatingActionButton(
+                onPressed: () {
+                  //
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TeacherAdd(userModel: userModel, present: isPresent),
+                    ),
+                  );
+                },
+                child: const Icon(Icons.add),
+              ),
             )
           : null,
       body: StreamBuilder<QuerySnapshot>(
@@ -129,20 +133,55 @@ class TeacherListView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8)),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          onLongPress: userModel.role[UserRole.admin.name]
-                              ? () {
-                                  //
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TeacherEdit(
-                                        userModel: userModel,
-                                        teacherModel: teacherModel,
-                                      ),
-                                    ),
-                                  );
-                                }
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          trailing: userModel.role[UserRole.admin.name]
+                              ? PopupMenuButton(
+                                  itemBuilder: (context) => [
+                                    //delete
+                                    PopupMenuItem(
+                                        value: 1,
+                                        onTap: () {
+                                          //
+                                          Future(
+                                            () =>
+                                                //
+                                                Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TeacherEdit(
+                                                  userModel: userModel,
+                                                  teacherModel: teacherModel,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text('Edit')),
+
+                                    //delete
+                                    PopupMenuItem(
+                                        value: 2,
+                                        onTap: () async {
+                                          //delete
+                                          await FirebaseFirestore.instance
+                                              .collection('Universities')
+                                              .doc(userModel.university)
+                                              .collection('Departments')
+                                              .doc(userModel.department)
+                                              .collection('Teachers')
+                                              .doc(teacherModel.id)
+                                              .delete()
+                                              .then((value) {
+                                            Fluttertoast.showToast(
+                                                msg: 'Successfully deleted');
+                                          });
+                                        },
+                                        child: const Text('Delete')),
+                                  ],
+                                )
                               : null,
                           onTap: () => Navigator.push(
                             context,
@@ -180,12 +219,20 @@ class TeacherListView extends StatelessWidget {
                           ),
 
                           //
-                          title: Text(
-                            teacherModel.name,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          title: Row(
+                            children: [
+                              //
+                              if (userModel.role[UserRole.admin.name])
+                                Text('${teacherModel.serial}. '),
+                              //
+                              Text(
+                                teacherModel.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
 
                           //

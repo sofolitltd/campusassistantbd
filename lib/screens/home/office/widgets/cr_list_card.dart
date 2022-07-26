@@ -57,15 +57,36 @@ class CrListCard extends StatelessWidget {
                   //
                   return GestureDetector(
                     onLongPress: (userModel.role[UserRole.admin.name])
-                        ? () {
+                        ? () async {
+                            List<String> batchList = [];
+                            await FirebaseFirestore.instance
+                                .collection('Universities')
+                                .doc(userModel.university)
+                                .collection('Departments')
+                                .doc(userModel.department)
+                                .collection('Batches')
+                                .orderBy('name')
+                                .get()
+                                .then(
+                              (QuerySnapshot snapshot) {
+                                for (var batch in snapshot.docs) {
+                                  batchList.add(batch.get('name'));
+                                }
+                              },
+                            );
+
+                            //
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => EditCr(
-                                          userModel: userModel,
-                                          crModel: crModel,
-                                          docId: data[index].id,
-                                        )));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditCr(
+                                  userModel: userModel,
+                                  crModel: crModel,
+                                  docId: data[index].id,
+                                  batchList: batchList,
+                                ),
+                              ),
+                            );
                           }
                         : null,
                     child: Card(
@@ -143,6 +164,25 @@ class CrListCard extends StatelessWidget {
                                     width: double.infinity,
                                     color: Theme.of(context).dividerColor,
                                   ),
+//phone
+                                  if (crModel.phone.isNotEmpty)
+                                    ListTile(
+                                      onTap: () {
+                                        OpenApp.withNumber(crModel.phone);
+                                      },
+                                      title: Text(crModel.phone),
+                                      trailing: const Icon(
+                                        Icons.call_outlined,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+
+                                  //
+                                  Container(
+                                    height: .5,
+                                    width: double.infinity,
+                                    color: Theme.of(context).dividerColor,
+                                  ),
 
                                   //mail
                                   if (crModel.email.isNotEmpty)
@@ -154,26 +194,6 @@ class CrListCard extends StatelessWidget {
                                       trailing: const Icon(
                                         Icons.email_outlined,
                                         color: Colors.redAccent,
-                                      ),
-                                    ),
-
-                                  //
-                                  Container(
-                                    height: .5,
-                                    width: double.infinity,
-                                    color: Theme.of(context).dividerColor,
-                                  ),
-
-                                  //phone
-                                  if (crModel.phone.isNotEmpty)
-                                    ListTile(
-                                      onTap: () {
-                                        OpenApp.withNumber(crModel.phone);
-                                      },
-                                      title: Text(crModel.phone),
-                                      trailing: const Icon(
-                                        Icons.call_outlined,
-                                        color: Colors.green,
                                       ),
                                     ),
 

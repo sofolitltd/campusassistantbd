@@ -51,8 +51,9 @@ class _TeacherEditState extends State<TeacherEdit> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Add Teacher'),
+          title: const Text('Edit Teacher Information'),
           elevation: 0,
+          centerTitle: true,
         ),
 
         //
@@ -97,7 +98,7 @@ class _TeacherEditState extends State<TeacherEdit> {
                       ),
                       value: _selectedSerial,
                       isExpanded: true,
-                      items: List<int>.generate(25, (index) => index + 1)
+                      items: List<int>.generate(30, (index) => index + 1)
                           .map((serial) {
                         return DropdownMenuItem<int>(
                           value: serial,
@@ -273,6 +274,7 @@ class _TeacherEditState extends State<TeacherEdit> {
                           imageUrl: _imageUrlController.text.trim(),
                           interests: _interestController.text.trim(),
                           publications: _publicationsController.text.trim(),
+                          token: widget.teacherModel.token,
                         );
 
                         //

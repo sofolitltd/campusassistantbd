@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/headline.dart';
 import '/screens/home/widgets/header.dart';
 import '/screens/home/widgets/notification_badge.dart';
 import '../../models/user_model.dart';
@@ -111,49 +112,44 @@ class _HomeScreenState extends State<HomeScreen>
 
       //
       body: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('Users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Center(child: Text('Something wrong!'));
-            }
+        stream: FirebaseFirestore.instance
+            .collection('Users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Something wrong!'));
+          }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            var data = snapshot.data;
-            userModel = UserModel.fromJson(data!);
+          var data = snapshot.data;
+          userModel = UserModel.fromJson(data!);
 
-            return ListView(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width > 1000
-                    ? MediaQuery.of(context).size.width * .2
-                    : 12,
-                vertical: 12,
-              ),
-              children: [
-                // header
-                Header(userName: userModel!.name),
+          return ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width > 1000
+                  ? MediaQuery.of(context).size.width * .2
+                  : 12,
+              vertical: 12,
+            ),
+            children: [
+              // header
+              Header(userName: userModel!.name),
 
-                const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                // categories
-                Categories(userModel: userModel!),
+              // categories
+              Categories(userModel: userModel!),
 
-                //important links
-                // ImportantLinks(),
-
-                //drive links
-                // DriveCollections(),
-
-                //syllabus links
-                // Syllabus(),
-              ],
-            );
-          }),
+              //syllabus links
+              // Syllabus(),
+            ],
+          );
+        },
+      ),
     );
   }
 

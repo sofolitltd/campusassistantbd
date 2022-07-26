@@ -38,7 +38,7 @@ class BatchStudentCard extends StatelessWidget {
         .collection('Departments')
         .doc(userModel.department)
         .collection('Students')
-        .doc('Batch List')
+        .doc('Batches')
         .collection(selectedBatch);
 
     //
@@ -281,7 +281,7 @@ class BatchStudentCard extends StatelessWidget {
                                   builder: (context) => AlertDialog(
                                     title: const Text('Generate Token'),
                                     content: const Text(
-                                        'Sure to regenerate verification token?'),
+                                        'Sure to re-generate verification token?'),
                                     actions: [
                                       TextButton(
                                           onPressed: () {
@@ -291,14 +291,7 @@ class BatchStudentCard extends StatelessWidget {
                                       TextButton(
                                           onPressed: () async {
                                             //
-                                            await FirebaseFirestore.instance
-                                                .collection('Universities')
-                                                .doc(userModel.university)
-                                                .collection('Departments')
-                                                .doc(userModel.department)
-                                                .collection('Students')
-                                                .doc('Batch List')
-                                                .collection(selectedBatch)
+                                            await ref
                                                 .doc(studentModel.id)
                                                 .update({
                                               'token': createToken(
@@ -336,22 +329,25 @@ class BatchStudentCard extends StatelessWidget {
                       //
                       PopupMenuButton(
                         itemBuilder: (context) => [
-                          //delete
+                          //edit
                           PopupMenuItem(
                               value: 1,
                               onTap: () {
                                 //
-                                Future(() =>
-                                    //
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditStudent(
-                                            userModel: userModel,
-                                            selectedBatch: selectedBatch,
-                                            studentModel: studentModel,
-                                          ),
-                                        )));
+                                Future(
+                                  () =>
+                                      //
+                                      Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditStudent(
+                                        userModel: userModel,
+                                        selectedBatch: selectedBatch,
+                                        studentModel: studentModel,
+                                      ),
+                                    ),
+                                  ),
+                                );
                               },
                               child: const Text('Edit')),
 
@@ -359,7 +355,13 @@ class BatchStudentCard extends StatelessWidget {
                           PopupMenuItem(
                               value: 2,
                               onTap: () async {
-                                await ref.doc(studentModel.id).delete();
+                                //
+                                await ref.doc(studentModel.id).delete().then(
+                                  (value) {
+                                    Fluttertoast.showToast(
+                                        msg: 'Successfully deleted');
+                                  },
+                                );
                               },
                               child: const Text('Delete')),
                         ],

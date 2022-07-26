@@ -1,31 +1,51 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campusassistant/screens/home/about/edit_about.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/user_model.dart';
+import '../../../utils/constants.dart';
+import 'add_about.dart';
+
 class AboutScreen extends StatelessWidget {
   static const routeName = 'about_screen';
 
-  const AboutScreen({Key? key, this.department}) : super(key: key);
-
-  final String? department;
+  const AboutScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    UserModel userModel =
+        ModalRoute.of(context)!.settings.arguments as UserModel;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('About '),
         centerTitle: true,
         elevation: 0,
+        actions: [],
       ),
+      floatingActionButton: userModel.role[UserRole.admin.name]
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddAbout(userModel: userModel),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: StreamBuilder<DocumentSnapshot>(
 
           ///Universities/University of Chittagong/Departments/Department of Psychology
           stream: FirebaseFirestore.instance
               .collection('Universities')
-              .doc('University of Chittagong')
+              .doc(userModel.university)
               .collection('Departments')
-              .doc('Department of Psychology')
+              .doc(userModel.department)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
@@ -36,6 +56,7 @@ class AboutScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
+            //
             var data = snapshot.data;
 
             return SingleChildScrollView(
@@ -46,11 +67,13 @@ class AboutScreen extends StatelessWidget {
                       : 0,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     //
                     Stack(
                       alignment: Alignment.bottomLeft,
                       children: [
+                        //
                         Container(
                           width: double.infinity,
                           height: 200,
@@ -78,19 +101,44 @@ class AboutScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         //
                         Container(
-                          width: double.infinity,
                           color: Colors.grey.shade100.withOpacity(.7),
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            data.id,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.only(left: 16, right: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              //
+                              Text(
+                                data.id,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+
+                              //
+                              if (userModel.role[UserRole.admin.name])
+                                IconButton(
+                                  onPressed: () {
+                                    //
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditAbout(
+                                          userModel: userModel,
+                                          data: data,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                )
+                            ],
                           ),
                         ),
+                        //
                       ],
                     ),
                     //image
