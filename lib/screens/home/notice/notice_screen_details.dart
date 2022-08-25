@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '/models/notice_model.dart';
@@ -10,11 +11,13 @@ import 'notice_screen.dart';
 class NoticeDetailsScreen extends StatelessWidget {
   final NoticeModel noticeModel;
   final UserModel userModel;
+  final DocumentSnapshot uploader;
 
   const NoticeDetailsScreen({
     Key? key,
     required this.noticeModel,
     required this.userModel,
+    required this.uploader,
   }) : super(key: key);
 
   @override
@@ -38,7 +41,7 @@ class NoticeDetailsScreen extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 // image
                 leading: CachedNetworkImage(
-                  imageUrl: noticeModel.uploaderImage,
+                  imageUrl: uploader.get('imageUrl'),
                   fadeInDuration: const Duration(milliseconds: 500),
                   imageBuilder: (context, imageProvider) => CircleAvatar(
                     backgroundImage: imageProvider,
@@ -60,7 +63,7 @@ class NoticeDetailsScreen extends StatelessWidget {
                   children: [
                     // uploader
                     Text(
-                      noticeModel.uploaderName,
+                      uploader.get('name'),
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -116,38 +119,31 @@ class NoticeDetailsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               //
-              // const Divider(height: 0),
-              //
-              // //
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: TextButton.icon(
-              //         onPressed: () {},
-              //         icon: const Icon(Icons.thumb_up_outlined),
-              //         label: const Text('Like'),
-              //       ),
-              //     ),
-              //
-              //     //
-              //     Expanded(
-              //       child: TextButton.icon(
-              //         onPressed: () {},
-              //         icon: const Icon(Icons.insert_comment_outlined),
-              //         label: const Text('Comment'),
-              //       ),
-              //     ),
-              //
-              //     //
-              //     Expanded(
-              //       child: TextButton.icon(
-              //         onPressed: () {},
-              //         icon: const Icon(Icons.share_outlined),
-              //         label: const Text('Share'),
-              //       ),
-              //     ),
-              //   ],
-              // ),
+              CachedNetworkImage(
+                height: 300,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+                imageUrl: noticeModel.imageUrl[0],
+                fadeInDuration: const Duration(milliseconds: 500),
+                imageBuilder: (context, imageProvider) => InteractiveViewer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        // fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const CupertinoActivityIndicator(),
+                errorWidget: (context, url, error) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade100,
+                  ),
+                ),
+              ),
 
               const Divider(height: 0),
               const SizedBox(height: 8),

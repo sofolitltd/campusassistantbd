@@ -1,34 +1,39 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 import '/models/notice_model.dart';
 import '/models/user_model.dart';
 
-class UploadNotice extends StatefulWidget {
+class UploadNoticeEdit extends StatefulWidget {
   final UserModel userModel;
+  final NoticeModel noticeModel;
+  final String noticeId;
 
-  const UploadNotice({
+  const UploadNoticeEdit({
     Key? key,
     required this.userModel,
+    required this.noticeModel,
+    required this.noticeId,
   }) : super(key: key);
 
   @override
-  State<UploadNotice> createState() => _UploadNoticeState();
+  State<UploadNoticeEdit> createState() => _UploadNoticeState();
 }
 
-class _UploadNoticeState extends State<UploadNotice> {
-  final TextEditingController _messageController = TextEditingController();
+class _UploadNoticeState extends State<UploadNoticeEdit> {
   bool isButtonActive = false;
+  final TextEditingController _messageController = TextEditingController();
   String counter = '';
-  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+
+    if (widget.noticeModel.message.isNotEmpty) {
+      _messageController.text = widget.noticeModel.message;
+    }
 
     //
     _messageController.addListener(() {
@@ -47,11 +52,9 @@ class _UploadNoticeState extends State<UploadNotice> {
 
   @override
   Widget build(BuildContext context) {
-    // print(getDateTime());
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.userModel.batch),
+        title: const Text("Edit Notice"),
         elevation: 0,
         titleSpacing: 0,
         actions: [
@@ -64,7 +67,7 @@ class _UploadNoticeState extends State<UploadNotice> {
                         setState(() => isButtonActive = true);
 
                         //
-                        postMessage();
+                        editMessage();
                       }
                     : null,
                 child: const Text('Post')),
@@ -74,19 +77,16 @@ class _UploadNoticeState extends State<UploadNotice> {
 
       //
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            if (isLoading) const LinearProgressIndicator(),
-
-            const SizedBox(height: 16),
-
             //admin profile
             Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   minRadius: 24,
-                  backgroundImage: NetworkImage(widget.userModel.imageUrl),
+                  backgroundImage: NetworkImage(''),
+                  //todo
                 ),
 
                 const SizedBox(width: 8),
@@ -95,22 +95,14 @@ class _UploadNoticeState extends State<UploadNotice> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.userModel.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    Text(widget.noticeModel.uploader),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.only(
-                        left: 8,
-                        right: 8,
-                        top: 2,
-                        bottom: 3,
-                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 2, horizontal: 4),
                       decoration: BoxDecoration(
-                        border: Border.all(width: .2),
+                        border: Border.all(width: .5),
                         borderRadius: BorderRadius.circular(2),
-                        // color: Colors.orangeAccent.shade100,
                       ),
                       child: const Text(
                         'Class Representative',
@@ -147,18 +139,16 @@ class _UploadNoticeState extends State<UploadNotice> {
   }
 
   //
-  postMessage() {
-    setState(() => isLoading = true);
-
+  editMessage() {
     var time = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
 
     NoticeModel noticeModel = NoticeModel(
-      uploaderName: widget.userModel.name,
-      uploaderImage: widget.userModel.imageUrl,
-      batch: [widget.userModel.batch],
+      uploader: widget.noticeModel.uploader,
+      imageUrl: widget.noticeModel.imageUrl,
+      batch: widget.noticeModel.batch,
       message: _messageController.text.toString(),
       time: time,
-      seen: [],
+      seen: widget.noticeModel.seen,
     );
 
     //
@@ -168,71 +158,34 @@ class _UploadNoticeState extends State<UploadNotice> {
         .collection('Departments')
         .doc(widget.userModel.department)
         .collection('Notifications')
-        .add(noticeModel.toJson())
+        .doc(widget.noticeId)
+        .update(noticeModel.toJson())
         .then((value) async {
       //
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .where('batch', isEqualTo: widget.userModel.batch)
-          .get()
-          .then((value) async {
-        for (var element in value.docs) {
-          var token = element.get('deviceToken');
-          print(token);
-
-          //
-          await sendPushMessage(
-            token: token,
-            title: widget.userModel.name,
-            body: _messageController.text,
-          );
-        }
-      });
+      // await FirebaseFirestore.instance
+      //     .collection("Users")
+      //     .where('batch', isEqualTo: widget.userModel.batch)
+      //     .get()
+      //     .then((value) async {
+      //   for (var element in value.docs) {
+      //     var token = element.get('deviceToken');
+      //     print(token);
+      //
+      //     //
+      //     await sendPushMessage(
+      //       token: token,
+      //       title: widget.userModel.name,
+      //       body: _messageController.text,
+      //     );
+      //   }
+      // });
 
       //
       if (!mounted) return;
       Navigator.pop(context);
 
       //
-      // Fluttertoast.showToast(msg: 'Post notice successfully');
-
-      //
-      setState(() => isLoading = false);
+      Fluttertoast.showToast(msg: 'Edit notice successfully');
     });
-  }
-
-  //
-  sendPushMessage({
-    required String token,
-    required String title,
-    required String body,
-  }) async {
-    try {
-      await http.post(
-        // Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        Uri.parse(
-            'https://fcm.googleapis.com/v1/projects/campusassistantbd/messages:send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization':
-              // 'key=AAAASdoJHIY:APA91bGsG2MPE-OASD4rq-YGpbdoVE_8HnVsC_hOPxStioi2WoPXVVOvC0vJqxRBP9UHFbSeIATgCSmAcGBZKQg_z2Gr2Ia4-HqKTHaYCavsD0Z0lAAUYPzMKUAc8v2nelf-HuU1tWqK',
-              'Bearer AIzaSyC6GyOYVB353N2SjORdNaZvKThz8zapfyk',
-        },
-        body: jsonEncode(
-          <String, dynamic>{
-            'notification': <String, dynamic>{'title': title, 'body': body},
-            'priority': 'high',
-            'data': <String, dynamic>{
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': '1',
-              'status': 'done'
-            },
-            "to": token,
-          },
-        ),
-      );
-    } catch (e) {
-      print("error push notification $e");
-    }
   }
 }
