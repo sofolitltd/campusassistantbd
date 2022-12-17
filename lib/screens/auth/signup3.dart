@@ -53,7 +53,7 @@ class _SignUpScreen3State extends State<SignUpScreen3> {
   bool isTaskActive = false;
 
   var regExp = RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
   //
   Future<void> _pickImage() async {
@@ -64,6 +64,7 @@ class _SignUpScreen3State extends State<SignUpScreen3> {
 
     CroppedFile? croppedImage = await imageCropper.cropImage(
       sourcePath: image.path,
+      cropStyle: CropStyle.circle,
       aspectRatioPresets: [
         CropAspectRatioPreset.original,
         CropAspectRatioPreset.square,
@@ -111,6 +112,7 @@ class _SignUpScreen3State extends State<SignUpScreen3> {
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
+                        //
                         GestureDetector(
                           onTap: () => _pickImage(),
                           child: Container(
@@ -135,6 +137,8 @@ class _SignUpScreen3State extends State<SignUpScreen3> {
                                   ),
                           ),
                         ),
+
+                        //
                         Positioned(
                           bottom: 0,
                           right: 16,

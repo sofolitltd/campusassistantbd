@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-class RoutineDetails extends StatelessWidget {
+class TransportsDetails extends StatelessWidget {
   final DocumentSnapshot data;
-  const RoutineDetails({Key? key, required this.data}) : super(key: key);
+  const TransportsDetails({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class RoutineDetails extends StatelessWidget {
               String shareableText = data.get('imageUrl');
 
               //
-              await Share.share(shareableText, subject: 'Routine');
+              await Share.share(shareableText, subject: 'Transports');
             },
             icon: const Icon(
               Icons.share,
@@ -38,27 +38,27 @@ class RoutineDetails extends StatelessWidget {
           //image
           Container(
             alignment: Alignment.center,
-            child: CachedNetworkImage(
-              height: MediaQuery.of(context).size.height * .5,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              imageUrl: data.get('imageUrl'),
-              fadeInDuration: const Duration(milliseconds: 500),
-              imageBuilder: (context, imageProvider) => InteractiveViewer(
-                child: Container(
+            child: InteractiveViewer(
+              child: CachedNetworkImage(
+                height: MediaQuery.of(context).size.height * .5,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+                imageUrl: data.get('imageUrl'),
+                fadeInDuration: const Duration(milliseconds: 500),
+                imageBuilder: (context, imageProvider) => Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: imageProvider,
                     ),
                   ),
                 ),
-              ),
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  const CupertinoActivityIndicator(),
-              errorWidget: (context, url, error) => Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey.shade100,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const CupertinoActivityIndicator(),
+                errorWidget: (context, url, error) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade100,
+                  ),
                 ),
               ),
             ),

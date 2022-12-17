@@ -12,44 +12,22 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      padding: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: MediaQuery.of(context).size.width > 1000
+            ? MediaQuery.of(context).size.width * .2
+            : 16,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // user name
-          // StreamBuilder<DocumentSnapshot>(
-          //   stream: ref.collection('Users').doc(currentUser).snapshots(),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.hasError) {
-          //       return const Center(child: Text('Something went wrong'));
-          //     }
-          //     if (snapshot.connectionState == ConnectionState.waiting) {
-          //       // return Center(child: CircularProgressIndicator());
-          //       return const SizedBox(
-          //           height: 32, child: Center(child: Text('')));
-          //     }
-          //
-          //     //
-          //     return SizedBox(
-          //       height: 32,
-          //       child: Text(
-          //         snapshot.data!.get('name').toUpperCase(),
-          //         style: const TextStyle(
-          //           fontSize: 22,
-          //           fontWeight: FontWeight.bold,
-          //         ),
-          //         overflow: TextOverflow.ellipsis,
-          //       ),
-          //     );
-          //   },
-          // ),
-
+          //welcome
           const Text(
             'Welcome back',
             style: TextStyle(fontSize: 16),
           ),
 
-          // welcome
+          // user name
           Text(
             userName.toUpperCase(),
             style: const TextStyle(

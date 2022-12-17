@@ -1,7 +1,7 @@
+import 'package:campusassistant/screens/auth/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '/screens/auth/welcome.dart';
 import '/screens/dashboard/dashboard.dart';
 
 class WrapperScreen extends StatelessWidget {

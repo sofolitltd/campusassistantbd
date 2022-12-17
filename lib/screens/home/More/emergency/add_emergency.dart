@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../models/stuff_model.dart';
 
-class AddStaff extends StatefulWidget {
+class AddEmergency extends StatefulWidget {
   static const routeName = 'add_staff';
 
-  const AddStaff({
+  const AddEmergency({
     Key? key,
     required this.userModel,
   }) : super(key: key);
@@ -15,10 +15,10 @@ class AddStaff extends StatefulWidget {
   final UserModel userModel;
 
   @override
-  State<AddStaff> createState() => _AddStaffState();
+  State<AddEmergency> createState() => _AddEmergencyState();
 }
 
-class _AddStaffState extends State<AddStaff> {
+class _AddEmergencyState extends State<AddEmergency> {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _postController = TextEditingController();
@@ -32,7 +32,7 @@ class _AddStaffState extends State<AddStaff> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Add Staff'),
+        title: const Text('Add Emergency Numbers'),
       ),
 
       //
@@ -100,7 +100,8 @@ class _AddStaffState extends State<AddStaff> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.ac_unit_outlined),
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.words,
               ),
 
               const SizedBox(height: 16),
@@ -132,8 +133,7 @@ class _AddStaffState extends State<AddStaff> {
                             var ref = FirebaseFirestore.instance
                                 .collection('Universities')
                                 .doc(widget.userModel.university)
-                                .collection('Departments')
-                                .doc(widget.userModel.department);
+                                .collection('Emergency');
 
                             //
                             StaffModel staffModel = StaffModel(
@@ -144,10 +144,7 @@ class _AddStaffState extends State<AddStaff> {
                               imageUrl: '',
                             );
 
-                            ref
-                                .collection('Staff')
-                                .doc()
-                                .set(staffModel.toJson());
+                            ref.doc().set(staffModel.toJson());
 
                             setState(() => _isLoading = false);
 
@@ -157,7 +154,7 @@ class _AddStaffState extends State<AddStaff> {
                         },
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Save'))
+                      : const Text('Upload'))
             ],
           ),
         ),

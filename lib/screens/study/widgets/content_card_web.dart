@@ -1,10 +1,9 @@
 import 'package:campusassistant/screens/study/widgets/pdf_viewer_web.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/models/content_model.dart';
 import '/models/user_model.dart';
-import '../../../widgets/open_app.dart';
+import '/widgets/open_app.dart';
 import 'bookmark_button.dart';
 
 class ContentCardWeb extends StatelessWidget {
@@ -70,7 +69,7 @@ class ContentCardWeb extends StatelessWidget {
                   )
                 ],
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -168,7 +167,8 @@ class ContentCardWeb extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => PdfViewerWeb(
-                                courseContentModel: courseContentModel,
+                                contentTitle: courseContentModel.contentTitle,
+                                fileUrl: courseContentModel.fileUrl,
                               ),
                             ),
                           );

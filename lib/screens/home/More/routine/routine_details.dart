@@ -39,7 +39,8 @@ class RoutineDetails extends StatelessWidget {
           Container(
             alignment: Alignment.center,
             child: CachedNetworkImage(
-              height: 500,
+              height: MediaQuery.of(context).size.height * .5,
+              width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
               imageUrl: data.get('imageUrl'),
               fadeInDuration: const Duration(milliseconds: 500),
@@ -74,7 +75,7 @@ class RoutineDetails extends StatelessWidget {
               children: [
                 //
                 Text(
-                  'Routine 2022',
+                  data.get('title'),
                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -85,7 +86,7 @@ class RoutineDetails extends StatelessWidget {
 
                 //
                 Text(
-                  'Aug 15 AT 11:16 PM',
+                  data.get('time'),
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Colors.white54,
                         fontWeight: FontWeight.w100,

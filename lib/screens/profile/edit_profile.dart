@@ -70,6 +70,7 @@ class _EditProfileState extends State<EditProfile> {
 
     CroppedFile? croppedImage = await imageCropper.cropImage(
       sourcePath: image.path,
+      cropStyle: CropStyle.circle,
       aspectRatioPresets: [
         CropAspectRatioPreset.original,
         CropAspectRatioPreset.square,
@@ -84,7 +85,12 @@ class _EditProfileState extends State<EditProfile> {
           toolbarWidgetColor: Colors.deepOrange,
           initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: false,
-        )
+        ),
+
+        //[todo: web only]
+        // WebUiSettings(
+        //   context: context,
+        // ),
       ],
     );
     if (croppedImage == null) return;
@@ -378,7 +384,7 @@ class _EditProfileState extends State<EditProfile> {
         .collection('Departments')
         .doc(widget.userModel.department)
         .collection('Students')
-        .doc('Batch List')
+        .doc('Batches')
         .collection(widget.userModel.batch)
         .doc(widget.userModel.id)
         .update(
@@ -392,3 +398,5 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 }
+
+class WebUiSettings {}

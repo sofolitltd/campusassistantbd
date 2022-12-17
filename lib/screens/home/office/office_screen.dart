@@ -5,7 +5,7 @@ import '../../../models/user_model.dart';
 import 'cr_list.dart';
 
 class OfficeScreen extends StatelessWidget {
-  static const routeName = '/office_screen';
+  static const routeName = '/office';
 
   const OfficeScreen({Key? key}) : super(key: key);
 

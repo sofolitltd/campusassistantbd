@@ -1,16 +1,20 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
-import 'package:campusassistant/screens/study/widgets/pdf_viewer_web.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '/models/content_model.dart';
 import '/models/user_model.dart';
-import '../../../utils/constants.dart';
+import '/screens/study/widgets/pdf_viewer_web.dart';
+import '/utils/constants.dart';
 import '../upload/Edit_content.dart';
 import 'bookmark_button.dart';
 
@@ -32,11 +36,48 @@ class _ContentCardState extends State<ContentCard> {
   bool _isLoading = false;
   double? _downloadProgress;
   CancelToken cancelToken = CancelToken();
+  bool permissionGranted = false;
+
+  //
+  final ReceivePort _port = ReceivePort();
+  var progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      DownloadTaskStatus status = data[1];
+      progress = data[2];
+      setState(() {});
+    });
+
+    FlutterDownloader.registerCallback(downloadCallback);
+  }
+
+  @override
+  void dispose() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    super.dispose();
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+    send?.send([id, status, progress]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    String fileName =
-        '${widget.courseContentModel.courseCode}_${widget.courseContentModel.contentTitle.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.courseContentModel.contentSubtitle}_${widget.courseContentModel.contentId.toString().substring(0, 5)}.pdf';
+    // String fileName =
+    // String fileNameTemp =
+    //     '${widget.courseContentModel.courseCode}_${widget.courseContentModel.contentTitle.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.courseContentModel.contentSubtitle}_${widget.courseContentModel.contentId.toString().substring(0, 5)}.pdf';
+    String fileName = '${widget.courseContentModel.contentId}.pdf';
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -100,16 +141,17 @@ class _ContentCardState extends State<ContentCard> {
                     );
                   }
                 : null,
-            onTap: () async {
+        onTap: () async {
               //
-              final appStorage =
-                  Directory('/storage/emulated/0/Download/Campus Assistant');
+              final appStorage = await getApplicationDocumentsDirectory();
+              // final appStorage =
+              //     Directory('/storage/emulated/0/Download/Campus Assistant');
 
               final file = File('${appStorage.path}/$fileName');
 
               //
               if (file.existsSync()) {
-                print('exist');
+                print('exist: ${file.path}');
                 await OpenFile.open(file.path);
               } else {
                 print('not exist');
@@ -153,20 +195,34 @@ class _ContentCardState extends State<ContentCard> {
             },
             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             // horizontalTitleGap: 8,
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: widget.courseContentModel.imageUrl == ''
-                  ? ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 56),
-                      child: Image.asset(
-                        'assets/images/placeholder.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Image.network(
-                      widget.courseContentModel.imageUrl,
-                      fit: BoxFit.cover,
-                    ),
+            leading: Stack(
+              alignment: Alignment.topLeft,
+              children: [
+                //
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: widget.courseContentModel.imageUrl == ''
+                      ? ConstrainedBox(
+                          constraints: const BoxConstraints(minWidth: 56),
+                          child: Image.asset(
+                            'assets/images/placeholder.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Image.network(
+                          widget.courseContentModel.imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+
+                //
+                if (widget.courseContentModel.status == 'Pro')
+                  const Icon(
+                    Icons.workspace_premium_outlined,
+                    color: Colors.blue,
+                    size: 20,
+                  )
+              ],
             ),
             title: Text(
               widget.courseContentModel.contentTitle,
@@ -190,7 +246,7 @@ class _ContentCardState extends State<ContentCard> {
                   )
                 ],
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -356,7 +412,9 @@ class _ContentCardState extends State<ContentCard> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => PdfViewerWeb(
-                                courseContentModel: widget.courseContentModel,
+                                contentTitle:
+                                    widget.courseContentModel.contentTitle,
+                                fileUrl: widget.courseContentModel.fileUrl,
                               ),
                             ),
                           );
@@ -407,40 +465,91 @@ class _ContentCardState extends State<ContentCard> {
   }
 
 // download file
+//   Future<File?> downloadFile(String url, String fileName) async {
+//     // file location
+//     // final appStorage = await getApplicationDocumentsDirectory();
+//     final appStorage =
+//         await Directory('/storage/emulated/0/Download/Campus Assistant')
+//             .create(recursive: true);
+//     final file = File('${appStorage.path}/$fileName');
+//
+//     // download file with dio
+//     try {
+//       final response = await Dio().get(url,
+//           // cancelToken: cancelToken,
+//           options: Options(
+//             responseType: ResponseType.bytes,
+//             followRedirects: false,
+//             receiveTimeout: 0,
+//           ), onReceiveProgress: (received, total) {
+//         double progress = received / total;
+//         setState(() {
+//           _downloadProgress = progress;
+//         });
+//       });
+//
+//       // store on file system
+//       final ref = file.openSync(mode: FileMode.write);
+//       ref.writeFromSync(response.data);
+//       await ref.close();
+//
+//       //
+//       Fluttertoast.showToast(msg: 'File save on /Download/Campus Assistant');
+//
+//       return file;
+//     } catch (e) {
+//       print('dio error: $e');
+//       Fluttertoast.showToast(msg: e.toString());
+//       return null;
+//     }
+//   }
+
+  // download file
   Future<File?> downloadFile(String url, String fileName) async {
     // file location
-    // final appStorage = await getApplicationDocumentsDirectory();
-    final appStorage =
-        await Directory('/storage/emulated/0/Download/Campus Assistant')
-            .create(recursive: true);
+    final appStorage = await getApplicationDocumentsDirectory();
+    // final appStorage =
+    // await Directory('/storage/emulated/0/Download/Campus Assistant')
+    //     .create(recursive: true);
     final file = File('${appStorage.path}/$fileName');
 
     // download file with dio
     try {
-      final response = await Dio().get(url,
-          // cancelToken: cancelToken,
-          options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-            receiveTimeout: 0,
-          ), onReceiveProgress: (received, total) {
-        double progress = received / total;
-        setState(() {
-          _downloadProgress = progress;
-        });
-      });
+      // final response = await Dio().get(url,
+      //     // cancelToken: cancelToken,
+      //     options: Options(
+      //       responseType: ResponseType.bytes,
+      //       followRedirects: false,
+      //       receiveTimeout: 0,
+      //     ), onReceiveProgress: (received, total) {
+      //   double progress = received / total;
+      //   setState(() {
+      //     _downloadProgress = progress;
+      //   });
+      // });
+      //
+      // // store on file system
+      // final ref = file.openSync(mode: FileMode.write);
+      // ref.writeFromSync(response.data);
+      // await ref.close();
 
-      // store on file system
-      final ref = file.openSync(mode: FileMode.write);
-      ref.writeFromSync(response.data);
-      await ref.close();
+      // start download
+      final taskId = await FlutterDownloader.enqueue(
+        url: url,
+        fileName: fileName,
+        savedDir: appStorage.path,
+        showNotification: true,
+        openFileFromNotification: false,
+        saveInPublicStorage: false,
+      );
 
       //
-      Fluttertoast.showToast(msg: 'File save on /Download/Campus Assistant');
+      Fluttertoast.showToast(msg: 'File downloaded');
 
       return file;
     } catch (e) {
-      print('dio error: $e');
+      print('error: $e');
+      Fluttertoast.showToast(msg: e.toString());
       return null;
     }
   }

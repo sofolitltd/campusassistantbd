@@ -118,17 +118,35 @@ class WelcomeScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           //log in
+                          const Text(
+                            'Already have an account?',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+
+                          //
                           ElevatedButton(
                               onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  LoginScreen.routeName,
+                                  arguments: 'Student',
+                                );
+
                                 //
-                                Navigator.pushNamed(
-                                    context, LoginScreen.routeName);
                               },
                               child: const Text('Log in')),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           // sign up
+                          const Text(
+                            'New to this app?',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+
+                          //
                           OutlinedButton(
                               onPressed: () {
                                 Navigator.pushNamed(
@@ -140,7 +158,7 @@ class WelcomeScreen extends StatelessWidget {
                                 //     MaterialPageRoute(
                                 //         builder: (context) => const SignUpScreen1()));
                               },
-                              child: const Text('Sign up')),
+                              child: const Text('Create new account')),
                         ],
                       ),
                     ),
@@ -150,4 +168,72 @@ class WelcomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+showDialog(BuildContext context) {
+  return showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+            // height: 200,
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                //
+                Text(
+                  'Login as',
+                  textAlign: TextAlign.left,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+
+                //
+                Container(
+                  height: 5,
+                  width: 100,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  // color: Theme.of(context).dividerColor,
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+
+                //
+                Card(
+                  elevation: 2,
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    onTap: () {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        LoginScreen.routeName,
+                        arguments: 'Student',
+                      );
+                    },
+                    title: const Text('Student'),
+                  ),
+                ),
+
+                //
+                Card(
+                  elevation: 2,
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    onTap: () {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        LoginScreen.routeName,
+                        arguments: 'Teacher',
+                      );
+                    },
+                    title: const Text('Teacher'),
+                  ),
+                ),
+              ],
+            ),
+          ));
 }

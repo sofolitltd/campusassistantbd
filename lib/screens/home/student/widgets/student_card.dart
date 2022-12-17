@@ -8,8 +8,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '/models/student_model.dart';
 import '/utils/constants.dart';
-import '../../../../models/user_model.dart';
-import '../../../../widgets/open_app.dart';
+import '/models/user_model.dart';
+import '/widgets/open_app.dart';
 import '../edit_student.dart';
 import 'batch_student_card.dart';
 
@@ -26,7 +26,8 @@ class StudentCard extends StatelessWidget {
     var shareToken = 'Name: ${studentModel.name}'
         '\nID: ${studentModel.id}'
         '\nBatch: ${userModel.batch}'
-        '\n\nYour verification code is: \n${studentModel.token}';
+        '\n\nYour verification code is: ${studentModel.token}'
+        '\n\nApp on play store- https://play.google.com/store/apps/details?id=com.sofolit.campusassistant';
 
     return Card(
       elevation: 3,
@@ -36,8 +37,9 @@ class StudentCard extends StatelessWidget {
         children: [
           //
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 //image
                 Expanded(
@@ -53,7 +55,7 @@ class StudentCard extends StatelessWidget {
                                     imageUrl: studentModel.imageUrl)));
                       },
                       child: CachedNetworkImage(
-                        height: 100,
+                        height: 88,
                         fit: BoxFit.cover,
                         imageUrl: studentModel.imageUrl,
                         fadeInDuration: const Duration(milliseconds: 500),
@@ -61,37 +63,39 @@ class StudentCard extends StatelessWidget {
                             (context, url, downloadProgress) =>
                                 const CupertinoActivityIndicator(),
                         errorWidget: (context, url, error) => ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
                               'assets/images/pp_placeholder.png',
-                              fit: BoxFit.cover,
+                              // fit: BoxFit.cover,
                             )),
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
 
                 //info, call
                 Expanded(
-                  flex: 5,
+                  flex: 6,
                   child: Stack(
                     alignment: Alignment.centerRight,
                     children: [
                       //
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        // mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           //name
                           Text(
                             studentModel.name,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.w600),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
 
                           //id, blood
                           Row(
@@ -101,13 +105,19 @@ class StudentCard extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Student ID',
-                                      style: TextStyle(fontSize: 12)),
+                                  Text(
+                                    'Student ID',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(),
+                                  ),
                                   Text(
                                     studentModel.id,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),
@@ -127,22 +137,26 @@ class StudentCard extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     //id
-                                    const Text('Blood Group',
-                                        style: TextStyle(fontSize: 12)),
+                                     Text(
+                                      'Blood ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .copyWith(),
+                                    ),
                                     Text(
                                       studentModel.blood,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(fontWeight: FontWeight.w600,color: Colors.red,),
                                     ),
                                   ],
                                 ),
                             ],
                           ),
 
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
 
                           //hall
                           if ((studentModel.hall != 'None'))
@@ -167,13 +181,16 @@ class StudentCard extends StatelessWidget {
                       //call
                       if (userModel.role[UserRole.cr.name] &&
                           studentModel.phone.isNotEmpty)
-                        IconButton(
-                          onPressed: () async {
-                            await OpenApp.withNumber(studentModel.phone);
-                          },
-                          icon: const Icon(
-                            Icons.call_outlined,
-                            color: Colors.green,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: IconButton(
+                            onPressed: () async {
+                              await OpenApp.withNumber(studentModel.phone);
+                            },
+                            icon: const Icon(
+                              Icons.call,
+                              color: Colors.green,
+                            ),
                           ),
                         ),
                     ],
@@ -199,7 +216,7 @@ class StudentCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Text('Token: '),
+                  const Text('Code: '),
 
                   const SizedBox(width: 8),
 
@@ -414,20 +431,22 @@ class FullImage extends StatelessWidget {
         },
         child: SafeArea(
           child: Center(
-            child: CachedNetworkImage(
-              height: MediaQuery.of(context).size.height * .5,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              imageUrl: imageUrl,
-              fadeInDuration: const Duration(milliseconds: 500),
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  const CupertinoActivityIndicator(),
-              errorWidget: (context, url, error) => ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    'assets/images/pp_placeholder.png',
-                    fit: BoxFit.cover,
-                  )),
+            child: InteractiveViewer(
+              child: CachedNetworkImage(
+                height: MediaQuery.of(context).size.height * .5,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+                imageUrl: imageUrl,
+                fadeInDuration: const Duration(milliseconds: 500),
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const CupertinoActivityIndicator(),
+                errorWidget: (context, url, error) => ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/pp_placeholder.png',
+                      fit: BoxFit.cover,
+                    )),
+              ),
             ),
           ),
         ),

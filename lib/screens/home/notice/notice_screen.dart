@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '/models/notice_model.dart';
 import '/models/user_model.dart';
-import 'notice_details_screen.dart';
+import 'notice_screen_details.dart';
 
 enum ActionsList { edit, delete, cancel }
 
@@ -64,90 +64,113 @@ class NoticeScreen extends StatelessWidget {
                     return Card(
                       margin: EdgeInsets.zero,
                       elevation: 0,
-                      child: ListTile(
-                        onTap: () async {
-                          //
-                          if (!noticeModel.seen.contains(userModel.uid)) {
-                            var seenList = noticeModel.seen;
-                            seenList.add(userModel.uid);
+                      child: StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(noticeModel.uploader)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Center(child: Text(''));
+                            }
 
-                            //
-                            FirebaseFirestore.instance
-                                .collection('Universities')
-                                .doc(userModel.university)
-                                .collection('Departments')
-                                .doc(userModel.department)
-                                .collection('Notifications')
-                                .doc(notice.id)
-                                .update({
-                              'seen': seenList,
-                            });
-                          }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
-                          //
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NoticeDetailsScreen(
-                                noticeModel: noticeModel,
-                                userModel: userModel,
-                              ),
-                            ),
-                          );
-                        },
-                        selected: noticeModel.seen.contains(userModel.uid)
-                            ? false
-                            : true,
-                        selectedTileColor:
-                            Colors.blueAccent.shade100.withOpacity(.2),
-                        // image
-                        leading: CachedNetworkImage(
-                          imageUrl: noticeModel.uploaderImage,
-                          fadeInDuration: const Duration(milliseconds: 500),
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                            backgroundImage: imageProvider,
-                            // radius: 120,
-                          ),
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) =>
-                                  const CircleAvatar(
-                                      // radius: 120,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/pp_placeholder.png')),
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                                  // radius: 120,
-                                  backgroundImage: AssetImage(
-                                      'assets/images/pp_placeholder.png')),
-                        ),
+                            var uploader = snapshot.data;
 
-                        //name
-                        title: RichText(
-                          text: TextSpan(
-                            text: noticeModel.uploaderName,
-                            style:
-                                Theme.of(context).textTheme.bodyText1!.copyWith(
-                                      fontWeight: FontWeight.bold,
+                            return ListTile(
+                              onTap: () async {
+                                //
+                                if (!noticeModel.seen.contains(userModel.uid)) {
+                                  var seenList = noticeModel.seen;
+                                  seenList.add(userModel.uid);
+
+                                  //
+                                  FirebaseFirestore.instance
+                                      .collection('Universities')
+                                      .doc(userModel.university)
+                                      .collection('Departments')
+                                      .doc(userModel.department)
+                                      .collection('Notifications')
+                                      .doc(notice.id)
+                                      .update({
+                                    'seen': seenList,
+                                  });
+                                }
+
+                                //
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => NoticeScreenDetails(
+                                      userModel: userModel,
+                                      noticeModel: noticeModel,
+                                      uploader: uploader!,
                                     ),
-                            children: const [
-                              TextSpan(
-                                text: ' added a new post.',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.normal,
+                                  ),
+                                );
+                              },
+                              selected: noticeModel.seen.contains(userModel.uid)
+                                  ? false
+                                  : true,
+                              selectedTileColor:
+                                  Colors.blueAccent.shade100.withOpacity(.2),
+                              // image
+                              leading: CachedNetworkImage(
+                                imageUrl: uploader!.get('imageUrl'),
+                                fadeInDuration:
+                                    const Duration(milliseconds: 500),
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                  backgroundImage: imageProvider,
+                                  // radius: 120,
+                                ),
+                                progressIndicatorBuilder: (context, url,
+                                        downloadProgress) =>
+                                    const CircleAvatar(
+                                        // radius: 120,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/pp_placeholder.png')),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                        // radius: 120,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/pp_placeholder.png')),
+                              ),
+
+                              //name
+                              title: RichText(
+                                text: TextSpan(
+                                  text: uploader.get('name'),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                  children: const [
+                                    TextSpan(
+                                      text: ' added a new post.',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
 
-                        //time
-                        subtitle: Text(
-                          TimeAgo.timeAgoSinceDate(
-                            noticeModel.time,
-                          ),
-                        ),
-                      ),
+                              //time
+                              subtitle: Text(
+                                TimeAgo.timeAgoSinceDate(
+                                  noticeModel.time,
+                                ),
+                              ),
+                            );
+                          }),
                     );
                   },
                 );

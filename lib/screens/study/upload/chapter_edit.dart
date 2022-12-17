@@ -99,8 +99,8 @@ class _EditChapterState extends State<EditChapter> {
             buildPathSection(
               widget.selectedYear,
               widget.courseModel.courseCategory,
-              'Psy ${widget.courseModel.courseCode}',
-              'Chapters',
+              widget.courseModel.courseCode,
+              'Chapter ${widget.chapterModel.chapterNo}',
             ),
 
             const SizedBox(height: 16),

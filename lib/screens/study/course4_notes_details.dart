@@ -1,3 +1,4 @@
+import 'package:campusassistant/screens/study/widgets/content_card_web.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,6 @@ import '/models/user_model.dart';
 import '/screens/study/upload/add_content.dart';
 import '/screens/study/widgets/bookmark_counter.dart';
 import '/screens/study/widgets/content_card.dart';
-import '/screens/study/widgets/content_card_web.dart';
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 

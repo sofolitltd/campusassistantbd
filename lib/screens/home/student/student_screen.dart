@@ -9,7 +9,7 @@ import '/utils/constants.dart';
 import 'all_batch_list.dart';
 
 class StudentScreen extends StatelessWidget {
-  static const routeName = 'student_screen';
+  static const routeName = '/student';
 
   const StudentScreen({Key? key}) : super(key: key);
 

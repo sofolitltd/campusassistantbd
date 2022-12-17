@@ -9,7 +9,7 @@ import '../../../utils/constants.dart';
 import 'add_about.dart';
 
 class AboutScreen extends StatelessWidget {
-  static const routeName = 'about_screen';
+  static const routeName = '/about';
 
   const AboutScreen({Key? key}) : super(key: key);
 

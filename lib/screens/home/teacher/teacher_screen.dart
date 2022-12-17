@@ -12,7 +12,7 @@ import '../../../utils/constants.dart';
 import '../teacher/teacher_details_screen.dart';
 
 class TeacherScreen extends StatelessWidget {
-  static const routeName = '/teacher_screen';
+  static const routeName = '/teacher';
 
   const TeacherScreen({Key? key}) : super(key: key);
 
@@ -132,6 +132,7 @@ class TeacherListView extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8)),
                         child: ListTile(
+                          horizontalTitleGap: 8,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 4,
@@ -225,33 +226,39 @@ class TeacherListView extends StatelessWidget {
                               if (userModel.role[UserRole.admin.name])
                                 Text('${teacherModel.serial}. '),
                               //
-                              Text(
-                                teacherModel.name,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                              Flexible(
+                                child: Text(
+                                  teacherModel.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
 
                           //
-                          subtitle: Row(
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               //post
                               Text(teacherModel.post, style: const TextStyle()),
 
                               // is chairman
                               if (teacherModel.chairman)
+                                const SizedBox(height: 4),
+
+                              //
+                              if (teacherModel.chairman)
                                 Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
+                                    borderRadius: BorderRadius.circular(100),
                                     color: Colors.greenAccent.shade100,
                                   ),
-                                  margin: const EdgeInsets.only(left: 8.0),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
-                                    vertical: 4,
+                                    vertical: 1,
                                   ),
                                   child: Text(
                                     'Chairman',

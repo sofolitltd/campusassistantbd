@@ -201,15 +201,16 @@ class _AddContentState extends State<AddContent> {
                   children: [
                     Expanded(
                       child: RadioListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('Basic'),
-                          value: 'Basic',
-                          groupValue: _selectedStatus,
-                          onChanged: (String? val) {
-                            setState(() {
-                              _selectedStatus = val!;
-                            });
-                          }),
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Basic'),
+                        value: 'Basic',
+                        groupValue: _selectedStatus,
+                        onChanged: (String? val) {
+                          setState(() {
+                            _selectedStatus = val!;
+                          });
+                        },
+                      ),
                     ),
 
                     // pro
@@ -245,7 +246,7 @@ class _AddContentState extends State<AddContent> {
                   } else if (_formState.currentState!.validate()) {
                     // fire storage
                     var fileName =
-                        '${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
+                        '${widget.courseModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
 
                     //
                     task = putFileToFireStorage(
@@ -303,8 +304,9 @@ class _AddContentState extends State<AddContent> {
   UploadTask? putFileToFireStorage({required File file, required String name}) {
     if (selectedFile == null) return null;
 
+    ///Universities/University of Chittagong/Departments/Department of Psychology
     var path =
-        'Study/${widget.userModel.university}/${widget.courseType}/$name';
+        'Universities/${widget.userModel.university}/${widget.userModel.department}/${widget.courseType}/$name';
 
     try {
       final ref = FirebaseStorage.instance.ref(path);

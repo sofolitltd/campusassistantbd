@@ -69,12 +69,12 @@ List<String> kBloodGroup = [
 enum UserRole { admin, cr }
 
 // developer info
-const kDeveloperName = 'Md. Asifuzzaman Reyad';
+const kDeveloperName = 'Md Asifuzzaman Reyad';
 const kDeveloperId = '18608047';
 const kDeveloperBatch = 'Batch 14';
-const kDeveloperSession = '17-18';
+const kDeveloperSession = 'Session: 17-18';
 const kDeveloperMobile = '01704340860';
-const kDeveloperEmail = 'asifreyad1@gmail.com';
+const kDeveloperEmail = 'campusAssistantbd@gmail.com';
 const kDeveloperFb = 'https://www.facebook.com/asifuzzaman.reyad';
 
 const String profileImage =
@@ -87,3 +87,6 @@ const kNoImagePP =
 
 // official fb gr
 const kFbGroup = 'https://www.facebook.com/campusassistantbd';
+const kYoutubeUrl = 'https://www.youtube.com/channel/UCVqzAAEozsLDMyXTys6Y_6g';
+const kPlayStoreUrl =
+    'https://play.google.com/store/apps/details?id=com.sofolit.campusassistant';

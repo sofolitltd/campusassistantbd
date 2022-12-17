@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -6,23 +7,25 @@ import 'package:intl/intl.dart';
 import '/models/notice_model.dart';
 import '/models/user_model.dart';
 
-class UploadNoticeEdit extends StatefulWidget {
+class NoticeEdit extends StatefulWidget {
   final UserModel userModel;
   final NoticeModel noticeModel;
   final String noticeId;
+  final DocumentSnapshot uploader;
 
-  const UploadNoticeEdit({
+  const NoticeEdit({
     Key? key,
     required this.userModel,
     required this.noticeModel,
     required this.noticeId,
+    required this.uploader,
   }) : super(key: key);
 
   @override
-  State<UploadNoticeEdit> createState() => _UploadNoticeState();
+  State<NoticeEdit> createState() => _UploadNoticeState();
 }
 
-class _UploadNoticeState extends State<UploadNoticeEdit> {
+class _UploadNoticeState extends State<NoticeEdit> {
   bool isButtonActive = false;
   final TextEditingController _messageController = TextEditingController();
   String counter = '';
@@ -81,40 +84,73 @@ class _UploadNoticeState extends State<UploadNoticeEdit> {
         child: ListView(
           children: [
             //admin profile
-            Row(
-              children: [
-                const CircleAvatar(
-                  minRadius: 24,
-                  backgroundImage: NetworkImage(''),
-                  //todo
-                ),
-
-                const SizedBox(width: 8),
-
-                //
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.noticeModel.uploader),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 2, horizontal: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(width: .5),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: const Text(
-                        'Class Representative',
-                        style: TextStyle(fontSize: 12),
-                      ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              // image
+              leading: CachedNetworkImage(
+                imageUrl:
+                widget.uploader.get('imageUrl'),
+                fadeInDuration:
+                const Duration(
+                    milliseconds: 500),
+                imageBuilder: (context,
+                    imageProvider) =>
+                    CircleAvatar(
+                      backgroundImage:
+                      imageProvider,
+                      // radius: 120,
                     ),
-                  ],
-                )
-              ],
-            ),
+                progressIndicatorBuilder: (context,
+                    url,
+                    downloadProgress) =>
+                const CircleAvatar(
+                  // radius: 120,
+                    backgroundImage:
+                    AssetImage(
+                        'assets/images/pp_placeholder.png')),
+                errorWidget: (context, url,
+                    error) =>
+                const CircleAvatar(
+                  // radius: 120,
+                    backgroundImage:
+                    AssetImage(
+                        'assets/images/pp_placeholder.png')),
+              ),
 
-            const SizedBox(height: 8),
+              title: Text(
+                widget.uploader.get('name'),
+                style: Theme.of(context)
+                    .textTheme
+                    .subtitle1!
+                    .copyWith(
+                  fontWeight:
+                  FontWeight.bold,
+                ),
+              ),
+
+              //time
+
+              subtitle: Row(
+                children: [
+                  Container(
+
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 2, horizontal: 4,),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: .5),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: const Text(
+                      'Moderator',
+
+                      style: TextStyle(fontSize: 12, ),
+
+                    ),
+                  ),
+                ],
+              ),
+
+            ),
 
             // message
             TextFormField(

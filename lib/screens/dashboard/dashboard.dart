@@ -21,6 +21,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
+    // final args = ModalRoute.of(context)!.settings.arguments as String;
+
     return Scaffold(
       bottomNavigationBar: width > 600
           ? null

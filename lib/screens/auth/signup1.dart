@@ -1,3 +1,4 @@
+import 'package:campusassistant/screens/auth/get_verification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -341,6 +342,20 @@ class _SignUpScreen1State extends State<SignUpScreen1> {
                         child: _isLoading
                             ? const CircularProgressIndicator()
                             : const Text('Next'),
+                      ),
+
+                      const SizedBox(height: 8),
+                      //
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const GetVerificationCode()));
+                        },
+                        icon: const Icon(Icons.help_outline_outlined),
+                        label: const Text('How to get verification code?'),
                       ),
                     ],
                   ),

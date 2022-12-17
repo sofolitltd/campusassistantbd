@@ -49,7 +49,7 @@ class CustomDrawer extends StatelessWidget {
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
-                    const Text('UX Designer & App Developer'),
+                    const Text('UI/UX Designer, App Developer'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -156,7 +156,7 @@ class CustomDrawer extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -169,7 +169,7 @@ class CustomDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'More',
+                    'Help',
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium!
@@ -180,30 +180,66 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
 
-            // fb
-            ListTile(
-              onTap: () {
-                OpenApp.withUrl(kFbGroup);
-              },
-              leading: const Icon(Icons.facebook_outlined),
-              title: const Text('Facebook Page'),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-                size: 18,
-              ),
-            ),
+            //
+            ListTileTheme(
+              horizontalTitleGap: 0,
+              minVerticalPadding: 0,
+              child: Column(
+                children: [
+                  // fb
+                  ListTile(
+                    onTap: () {
+                      OpenApp.withUrl(kFbGroup);
+                    },
+                    leading: const Icon(
+                      Icons.facebook_outlined,
+                      color: Colors.blue,
+                    ),
+                    title: const Text(
+                      'Facebook Page',
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 18,
+                    ),
+                  ),
 
-            // website
-            ListTile(
-              onTap: () {
-                //todo: youtube
-                // OpenApp.withUrl(kFbGroup);
-              },
-              leading: const Icon(Icons.video_collection_rounded),
-              title: const Text('Youtube Channel'),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_outlined,
-                size: 18,
+                  // youtube
+                  ListTile(
+                    onTap: () {
+                      OpenApp.withUrl(kYoutubeUrl);
+                    },
+                    leading: const Icon(
+                      Icons.video_collection_rounded,
+                      color: Colors.red,
+                    ),
+                    title: const Text(
+                      'Youtube Channel',
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 18,
+                    ),
+                  ),
+
+                  // Rate us
+                  ListTile(
+                    onTap: () {
+                      OpenApp.withUrl(kPlayStoreUrl);
+                    },
+                    leading: const Icon(
+                      Icons.star,
+                      color: Color(0xFF228B22),
+                    ),
+                    title: const Text(
+                      'Rate Us',
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 18,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

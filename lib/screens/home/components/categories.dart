@@ -19,20 +19,28 @@ class Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         //category title
-        const Padding(
-          padding: EdgeInsets.only(left: 8),
-          child: Headline(title: 'Categories'),
+        Padding(
+          padding: EdgeInsets.only(
+            left: MediaQuery.of(context).size.width > 1000
+                ? MediaQuery.of(context).size.width * .2
+                : 16,
+          ),
+          child: const Headline(title: 'Categories'),
         ),
 
         //category card grid
         GridView.count(
           shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          padding: EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: MediaQuery.of(context).size.width > 1000
+                ? MediaQuery.of(context).size.width * .2
+                : 16,
+          ),
           physics: const NeverScrollableScrollPhysics(),
           primary: false,
           childAspectRatio: MediaQuery.of(context).size.width > 800 ? 1.2 : .8,

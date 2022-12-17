@@ -18,12 +18,10 @@ class EditContent extends StatefulWidget {
     key,
     required this.userModel,
     required this.courseContentModel,
-    this.chapterNo,
   }) : super(key: key);
 
   final UserModel userModel;
   final ContentModel courseContentModel;
-  final int? chapterNo;
 
   @override
   State<EditContent> createState() => _EditContentState();
@@ -76,9 +74,9 @@ class _EditContentState extends State<EditContent> {
         children: [
           //
           buildPathSection(
-            year: '',
+            year: 'Study',
             courseCode: widget.courseContentModel.courseCode,
-            chapterNo: widget.chapterNo.toString(),
+            chapterNo: widget.courseContentModel.lessonNo.toString(),
             courseType: widget.courseContentModel.contentType,
           ),
 
@@ -240,7 +238,7 @@ class _EditContentState extends State<EditContent> {
                       _formState.currentState!.validate()) {
                     // fire storage
                     var fileName =
-                        '${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
+                        '${widget.courseContentModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
 
                     //delete old file
                     await FirebaseStorage.instance
@@ -277,7 +275,9 @@ class _EditContentState extends State<EditContent> {
                         '/storage/emulated/0/Download/Campus Assistant');
 
                     final file = File('${appStorage.path}/$localFile');
-                    await file.delete();
+                    if (file.existsSync()) {
+                      await file.delete();
+                    }
 
                     //
                     Navigator.pop(this.context);
@@ -322,7 +322,7 @@ class _EditContentState extends State<EditContent> {
     if (selectedFile == null) return null;
 
     var path =
-        'Study/${widget.userModel.university}/${widget.courseContentModel.contentType}/$name';
+        'Universities/${widget.userModel.university}/${widget.userModel.department}/${widget.courseContentModel.contentType}/$name';
 
     try {
       final ref = FirebaseStorage.instance.ref(path);

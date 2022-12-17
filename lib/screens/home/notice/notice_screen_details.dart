@@ -8,12 +8,12 @@ import '/models/user_model.dart';
 import '/screens/home/notice/notice_group.dart';
 import 'notice_screen.dart';
 
-class NoticeDetailsScreen extends StatelessWidget {
+class NoticeScreenDetails extends StatelessWidget {
   final NoticeModel noticeModel;
   final UserModel userModel;
   final DocumentSnapshot uploader;
 
-  const NoticeDetailsScreen({
+  const NoticeScreenDetails({
     Key? key,
     required this.noticeModel,
     required this.userModel,
@@ -119,6 +119,7 @@ class NoticeDetailsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               //
+              if(noticeModel.imageUrl[0] != '')
               CachedNetworkImage(
                 height: 300,
                 width: MediaQuery.of(context).size.width,

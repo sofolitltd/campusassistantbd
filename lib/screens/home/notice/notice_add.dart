@@ -12,19 +12,19 @@ import 'package:uuid/uuid.dart';
 import '/models/notice_model.dart';
 import '/models/user_model.dart';
 
-class UploadNotice extends StatefulWidget {
+class NoticeAdd extends StatefulWidget {
   final UserModel userModel;
 
-  const UploadNotice({
+  const NoticeAdd({
     Key? key,
     required this.userModel,
   }) : super(key: key);
 
   @override
-  State<UploadNotice> createState() => _UploadNoticeState();
+  State<NoticeAdd> createState() => _NoticeAddState();
 }
 
-class _UploadNoticeState extends State<UploadNotice> {
+class _NoticeAddState extends State<NoticeAdd> {
   final TextEditingController _messageController = TextEditingController();
   bool isButtonActive = false;
   String counter = '';
@@ -109,6 +109,8 @@ class _UploadNoticeState extends State<UploadNotice> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
+
+                    //
                     Container(
                       padding: const EdgeInsets.only(
                         left: 8,

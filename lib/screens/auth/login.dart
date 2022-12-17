@@ -377,7 +377,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             builder: (context) =>
                                                 const SignUpScreen1()));
                                   },
-                                  child: const Text('Sign up')),
+                                  child: const Text('Create new account')),
 
                               const SizedBox(height: 16),
                             ],

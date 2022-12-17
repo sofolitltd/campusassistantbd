@@ -1,3 +1,4 @@
+import 'package:campusassistant/screens/home/More/emergency/emergecy.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -18,14 +19,13 @@ import '/screens/home/teacher/teacher_screen.dart';
 import '/screens/profile/profile.dart';
 import '/screens/study/course1_screen.dart';
 import '/utils/theme.dart';
+import 'admin/admin_login.dart';
+import 'screens/home/More/clubs.dart';
+import 'screens/home/More/routine/routine.dart';
+import 'screens/home/More/syllabus/syllabus.dart';
+import 'screens/home/More/transports/transports.dart';
 import 'services/firebase_options.dart';
 import 'utils/constants.dart';
-
-// notification
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
-//   print('Handling a background message ${message.messageId}');
-// }
 
 void main() async {
   //
@@ -34,25 +34,25 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
   //status bar transparent
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
   // remove # in web
-  // setPathUrlStrategy();
 
   // force to stick portrait screen
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
-    // DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitDown,
+    // DeviceOrientation.landscapeLeft,
+    // DeviceOrientation.landscapeRight,
   ]).then(
     (value) => runApp(
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
+        // child: const MyApp(),
         child: const MyApp(),
       ),
     ),
@@ -72,6 +72,7 @@ class MyApp extends StatelessWidget {
       theme: lightThemeData(context),
       initialRoute: WrapperScreen.routeName,
       routes: routes,
+      // home: const TeacherDashboard(),
     );
   }
 }
@@ -90,6 +91,13 @@ Map<String, Widget Function(BuildContext)> routes = {
   // home
   HomeScreen.routeName: (context) => const HomeScreen(),
 
+  //more
+  Emergency.routeName: (context) => const Emergency(),
+  Syllabus.routeName: (context) => const Syllabus(),
+  Routine.routeName: (context) => const Routine(),
+  Transports.routeName: (context) => const Transports(),
+  Clubs.routeName: (context) => const Clubs(),
+
   TeacherScreen.routeName: (context) => const TeacherScreen(),
   // TeacherDetailsScreen.routeName: (context) => const TeacherDetailsScreen(),
 
@@ -107,4 +115,7 @@ Map<String, Widget Function(BuildContext)> routes = {
 
   //profile
   ProfileScreen.routeName: (context) => const ProfileScreen(),
+
+  //admin
+  AdminLogin.routeName: (context) => const AdminLogin(),
 };

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campusassistant/screens/profile/admin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,13 +7,14 @@ import 'package:flutter/material.dart';
 import '/models/user_model.dart';
 import '/screens/home/notice/notice_group.dart';
 import '/screens/study/course6_bookmarks.dart';
+import '../../utils/constants.dart';
 import '../auth/login.dart';
 import 'edit_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
   //
-  static const routeName = 'profile_screen';
+static const routeName = '/profile';
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -428,32 +430,64 @@ class _ProfileScreenState extends State<ProfileScreen>
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        //
-                        // ListTile(
-                        //   onTap: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) =>
-                        //             NoticeGroup(userModel: userModel),
-                        //       ),
-                        //     );
-                        //   },
-                        //   title: Text(
-                        //     'Notice Groups',
-                        //     style: Theme.of(context)
-                        //         .textTheme
-                        //         .titleMedium!
-                        //         .copyWith(fontWeight: FontWeight.w600),
-                        //   ),
-                        //   trailing: const Icon(
-                        //     Icons.arrow_forward_ios_outlined,
-                        //     size: 16,
-                        //   ),
-                        // ),
-                        //
-                        // const Divider(height: 1),
+                        //Admin
+                        if (userModel.role[UserRole.admin.name])
+                          ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Admin(
+                                    userModel: userModel,
+                                  ),
+                                ),
+                              );
+                            },
+                            title: Text(
+                              'Admin',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 16,
+                            ),
+                          ),
 
+                        if (userModel.role[UserRole.admin.name])
+                          const Divider(height: 1),
+
+                        // notice
+                        if (userModel.role[UserRole.admin.name])
+                          ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NoticeGroup(userModel: userModel),
+                                ),
+                              );
+                            },
+                            title: Text(
+                              'Notice Group',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 16,
+                            ),
+                          ),
+
+                        if (userModel.role[UserRole.admin.name])
+                          const Divider(height: 1),
+
+                        //bookmarks
                         ListTile(
                           onTap: () {
                             Navigator.push(
@@ -477,7 +511,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                             size: 16,
                           ),
                         ),
-                        //
                       ],
                     ),
                   ),

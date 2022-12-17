@@ -100,7 +100,8 @@ class _AddStaffState extends State<AddStaff> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.ac_unit_outlined),
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.words,
               ),
 
               const SizedBox(height: 16),

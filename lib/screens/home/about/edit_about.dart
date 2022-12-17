@@ -37,76 +37,79 @@ class _EditAboutState extends State<EditAbout> {
         key: _globalKey,
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              //about
-              TextFormField(
-                controller: _aboutController,
-                keyboardType: TextInputType.multiline,
-                textCapitalization: TextCapitalization.sentences,
-                minLines: 1,
-                maxLines: 15,
-                decoration: InputDecoration(
-                  hintText: 'About',
-                  prefixIcon: const Icon(Icons.align_vertical_bottom_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                validator: (val) {
-                  if (val!.isEmpty) {
-                    return 'Enter something';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-
-              //image
-              TextFormField(
-                controller: _imageUrlController,
-                keyboardType: TextInputType.url,
-                minLines: 1,
-                maxLines: 5,
-                decoration: InputDecoration(
-                  hintText: 'Image Url',
-                  prefixIcon: const Icon(Icons.image_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                validator: (val) {
-                  if (val!.isEmpty) {
-                    return 'Enter something';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              // btn
-              ElevatedButton(
-                  onPressed: () async {
-                    if (_globalKey.currentState!.validate()) {
-                      await FirebaseFirestore.instance
-                          .collection('Universities')
-                          .doc(widget.userModel.university)
-                          .collection('Departments')
-                          .doc(widget.userModel.department)
-                          .update(
-                        {
-                          'about': _aboutController.text.trim(),
-                          'imageUrl': _imageUrlController.text.trim(),
-                        },
-                      ).then((value) {
-                        Navigator.pop(context);
-                      });
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                //about
+                TextFormField(
+                  controller: _aboutController,
+                  keyboardType: TextInputType.multiline,
+                  textCapitalization: TextCapitalization.sentences,
+                  minLines: 1,
+                  maxLines: 15,
+                  decoration: InputDecoration(
+                    hintText: 'About',
+                    prefixIcon:
+                        const Icon(Icons.align_vertical_bottom_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'Enter something';
                     }
-                    //
+                    return null;
                   },
-                  child: const Text('Update')),
-            ],
+                ),
+
+                const SizedBox(height: 16),
+
+                //image
+                TextFormField(
+                  controller: _imageUrlController,
+                  keyboardType: TextInputType.url,
+                  minLines: 1,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    hintText: 'Image Url',
+                    prefixIcon: const Icon(Icons.image_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'Enter something';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // btn
+                ElevatedButton(
+                    onPressed: () async {
+                      if (_globalKey.currentState!.validate()) {
+                        await FirebaseFirestore.instance
+                            .collection('Universities')
+                            .doc(widget.userModel.university)
+                            .collection('Departments')
+                            .doc(widget.userModel.department)
+                            .update(
+                          {
+                            'about': _aboutController.text.trim(),
+                            'imageUrl': _imageUrlController.text.trim(),
+                          },
+                        ).then((value) {
+                          Navigator.pop(context);
+                        });
+                      }
+                      //
+                    },
+                    child: const Text('Update')),
+              ],
+            ),
           ),
         ),
       ),

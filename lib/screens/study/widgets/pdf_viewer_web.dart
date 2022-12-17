@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import '/models/content_model.dart';
 
 class PdfViewerWeb extends StatefulWidget {
-  final ContentModel courseContentModel;
+  final String contentTitle;
+  final String fileUrl;
 
-  const PdfViewerWeb({Key? key, required this.courseContentModel})
-      : super(key: key);
+  const PdfViewerWeb({
+    Key? key,
+    required this.contentTitle,
+    required this.fileUrl,
+  }) : super(key: key);
 
   @override
   State<PdfViewerWeb> createState() => _PdfViewerWebState();
 }
 
 class _PdfViewerWebState extends State<PdfViewerWeb> {
+
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
 
   @override
@@ -25,12 +29,12 @@ class _PdfViewerWebState extends State<PdfViewerWeb> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.courseContentModel.contentTitle),
-        actions: [
+        title:  Text(widget.contentTitle),
+        actions: <Widget>[
           IconButton(
             icon: const Icon(
               Icons.bookmark,
-              // color: Colors.white,
+              color: Colors.white,
               semanticLabel: 'Bookmark',
             ),
             onPressed: () {
@@ -39,8 +43,7 @@ class _PdfViewerWebState extends State<PdfViewerWeb> {
           ),
         ],
       ),
-      body: SfPdfViewer.network(
-        widget.courseContentModel.fileUrl,
+      body: SfPdfViewer.network(widget.fileUrl,
         key: _pdfViewerKey,
       ),
     );

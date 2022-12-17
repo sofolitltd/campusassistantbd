@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:campusassistant/screens/home/More/routine/add_routine.dart';
 import 'package:campusassistant/screens/home/More/routine/routine_details.dart';
+import 'package:campusassistant/screens/home/More/transports/add_transports.dart';
 import 'package:campusassistant/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,10 +10,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/user_model.dart';
 
-class Routine extends StatelessWidget {
-  static const routeName = '/routine';
+class Transports extends StatelessWidget {
+  static const routeName = '/transports';
 
-  const Routine({Key? key}) : super(key: key);
+  const Transports({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class Routine extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Routine'),
+        title: const Text('Transports'),
         centerTitle: true,
       ),
 
@@ -33,7 +33,7 @@ class Routine extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddRoutine(userModel: userModel),
+                    builder: (context) => AddTransports(userModel: userModel),
                   ),
                 );
               },
@@ -45,9 +45,7 @@ class Routine extends StatelessWidget {
         stream: FirebaseFirestore.instance
             .collection('Universities')
             .doc(userModel.university)
-            .collection('Departments')
-            .doc(userModel.department)
-            .collection('Routine')
+            .collection('Transports')
             .orderBy('time', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -63,7 +61,7 @@ class Routine extends StatelessWidget {
           var data = snapshot.data!.docs;
 
           return data.isEmpty
-              ? const Center(child: Text('No notice found'))
+              ? const Center(child: Text('No data found'))
               : ListView.separated(
                   padding: EdgeInsets.symmetric(
                     vertical: 8,
@@ -138,9 +136,7 @@ class Routine extends StatelessWidget {
                                       await FirebaseFirestore.instance
                                           .collection('Universities')
                                           .doc(userModel.university)
-                                          .collection('Departments')
-                                          .doc(userModel.department)
-                                          .collection('Routine')
+                                          .collection('Transports')
                                           .doc(data[index].id)
                                           .delete();
 
@@ -192,7 +188,7 @@ class Routine extends StatelessWidget {
                     ),
                   ),
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                 );
         },
       ),

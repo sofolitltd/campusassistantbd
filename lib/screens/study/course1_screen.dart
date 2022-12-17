@@ -6,14 +6,14 @@ import '/models/user_model.dart';
 import '/screens/study/upload/add_year_semester.dart';
 import '/screens/study/upload/edit_year_semester.dart';
 import '/utils/constants.dart';
-import '../../widgets/headline.dart';
+import '/widgets/headline.dart';
 import 'course2_screen.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({Key? key}) : super(key: key);
 
   //
-  static const routeName = 'course1_screen';
+  static const routeName = '/course1';
 
   @override
   State<CourseScreen> createState() => _CourseScreenState();

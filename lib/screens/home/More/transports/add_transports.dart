@@ -9,16 +9,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-class AddRoutine extends StatefulWidget {
+class AddTransports extends StatefulWidget {
   final UserModel userModel;
 
-  const AddRoutine({Key? key, required this.userModel}) : super(key: key);
+  const AddTransports({Key? key, required this.userModel}) : super(key: key);
 
   @override
-  State<AddRoutine> createState() => _AddRoutineState();
+  State<AddTransports> createState() => _AddTransportsState();
 }
 
-class _AddRoutineState extends State<AddRoutine> {
+class _AddTransportsState extends State<AddTransports> {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
 
@@ -33,7 +33,7 @@ class _AddRoutineState extends State<AddRoutine> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Routine'),
+        title: const Text('Add Transports'),
         centerTitle: true,
       ),
 
@@ -141,8 +141,7 @@ class _AddRoutineState extends State<AddRoutine> {
     var time = DateFormat('dd-MM-yyyy AT hh:mm a').format(DateTime.now());
 
     //
-    final filePath =
-        'Universities/${userModel.university}/${userModel.department}/Routine';
+    final filePath = 'Universities/${userModel.university}/Transports';
 
     //
     final destination = '$filePath/$fileId.jpg';
@@ -162,15 +161,15 @@ class _AddRoutineState extends State<AddRoutine> {
     await FirebaseFirestore.instance
         .collection('Universities')
         .doc(userModel.university)
-        .collection('Departments')
-        .doc(userModel.department)
-        .collection('Routine')
+        .collection('Transports')
         .doc(fileId)
-        .set({
-      'title': _titleController.text.trim(),
-      'time': time,
-      'imageUrl': downloadedUrl,
-    });
+        .set(
+      {
+        'title': _titleController.text.trim(),
+        'time': time,
+        'imageUrl': downloadedUrl,
+      },
+    );
 
     //
     if (!mounted) return;
@@ -184,32 +183,8 @@ class _AddRoutineState extends State<AddRoutine> {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     //
     if (image == null) return;
-    // ImageCropper imageCropper = ImageCropper();
-    //
-    // CroppedFile? croppedImage = await imageCropper.cropImage(
-    //   sourcePath: image.path,
-    //   cropStyle: CropStyle.rectangle,
-    //   aspectRatioPresets: [
-    //     CropAspectRatioPreset.original,
-    //     CropAspectRatioPreset.square,
-    //     CropAspectRatioPreset.ratio3x2,
-    //     CropAspectRatioPreset.ratio4x3,
-    //     CropAspectRatioPreset.ratio16x9,
-    //   ],
-    //   uiSettings: [
-    //     AndroidUiSettings(
-    //       toolbarTitle: 'image Customization',
-    //       toolbarColor: ThemeData().cardColor,
-    //       toolbarWidgetColor: Colors.deepOrange,
-    //       initAspectRatio: CropAspectRatioPreset.square,
-    //       lockAspectRatio: false,
-    //     )
-    //   ],
-    // );
-    // if (croppedImage == null) return;
 
     setState(() {
-      // _pickedImage = XFile(croppedImage.path);
       _pickedImage = XFile(image.path);
     });
   }

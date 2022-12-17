@@ -29,8 +29,9 @@ class BatchStudentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var shareToken = 'Name: ${studentModel.name}'
         '\nID: ${studentModel.id}'
-        '\nBatch: ${userModel.batch}'
-        '\n\nYour verification code is: \n${studentModel.token}';
+        '\nBatch: $selectedBatch'
+        '\n\nYour verification code is: ${studentModel.token}'
+        '\n\nApp on play store- https://play.google.com/store/apps/details?id=com.sofolit.campusassistant';
 
     var ref = FirebaseFirestore.instance
         .collection('Universities')
@@ -83,7 +84,8 @@ class BatchStudentCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           fontWeight: FontWeight.bold,
                           // color: Colors.black,
-                        )),
+                        ),
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -149,17 +151,9 @@ class BatchStudentCard extends StatelessWidget {
 
                     //
                     if (studentModel.hall != 'None')
-                      Text.rich(
-                        TextSpan(
-                          text: 'Hall :  ',
-                          style: Theme.of(context).textTheme.bodyText2,
-                          children: [
-                            TextSpan(
-                              text: studentModel.hall,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            )
-                          ],
-                        ),
+                      Text(
+                        studentModel.hall,
+                        style: Theme.of(context).textTheme.bodyText1,
                       ),
                   ],
                 ),
@@ -194,7 +188,7 @@ class BatchStudentCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const Text('Token: '),
+                      const Text('Code: '),
 
                       const SizedBox(width: 8),
 

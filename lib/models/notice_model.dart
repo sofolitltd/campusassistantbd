@@ -1,42 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NoticeModel {
-  final String uploaderName;
-  final String uploaderImage;
+  final String uploader;
   final String message;
-  final String time;
+  final List<String> imageUrl;
   final List<String> batch;
   final List<String> seen;
+  final String time;
 
   NoticeModel({
-    required this.uploaderName,
-    required this.uploaderImage,
+    required this.uploader,
     required this.batch,
     required this.message,
-    required this.time,
+    required this.imageUrl,
     required this.seen,
+    required this.time,
   });
 
   // fetch
   NoticeModel.fromJson(DocumentSnapshot json)
       : this(
-          uploaderName: json['uploaderName']! as String,
-          uploaderImage: json['uploaderImage']! as String,
+          uploader: json['uploader']! as String,
           message: json['message']! as String,
-          time: json['time']! as String,
+          imageUrl: (json['imageUrl']! as List).cast<String>(),
           batch: (json['batch']! as List).cast<String>(),
           seen: (json['seen']! as List).cast<String>(),
+          time: json['time']! as String,
         );
 
   // upload
   Map<String, dynamic> toJson() {
     return {
-      'uploaderName': uploaderName,
-      'uploaderImage': uploaderImage,
-      'batch': batch,
+      'uploader': uploader,
       'message': message,
-      'time': time,
+      'imageUrl': imageUrl,
+      'batch': batch,
       'seen': seen,
+      'time': time,
     };
   }
 }
