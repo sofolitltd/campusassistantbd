@@ -9,6 +9,7 @@ A few resources to get you started if this is your first Flutter project:
 - [Playstore: Campus Assistant](https://play.google.com/store/apps/details?id=com.sofolit.campusassistantbd)
 - [Website: campusassistantbd.web.app](https://campusassistantbd.web.app)
 
-For help getting started with Flutter development, view the
--[Facebook: fb/campusassiatantbd](https://facebook.com/campusassistantbd)
+For help getting started with-
+
+- [Facebook: fb/campusassiatantbd](https://facebook.com/campusassistantbd)
 
