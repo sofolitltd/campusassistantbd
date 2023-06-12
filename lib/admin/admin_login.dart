@@ -1,4 +1,4 @@
-import 'package:campusassistant/admin/attendance.dart';
+import 'package:campusassistant/teacher/attendance.dart';
 import 'package:flutter/material.dart';
 
 class AdminLogin extends StatelessWidget {

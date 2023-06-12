@@ -9,13 +9,14 @@ class Headline extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
       child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.titleMedium!.copyWith(
               // fontSize: 20,
-              fontWeight: FontWeight.bold,
-              // color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+              color: Colors.grey,
             ),
       ),
     );

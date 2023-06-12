@@ -6,7 +6,7 @@ class ContentModel {
   final String contentType;
   final int lessonNo;
   final String status;
-  final List<String> sessionList;
+  final List<String> batches;
   final String contentTitle;
   final String contentSubtitle;
   final String contentSubtitleType;
@@ -21,7 +21,7 @@ class ContentModel {
     required this.contentType,
     required this.lessonNo,
     required this.status,
-    required this.sessionList,
+    required this.batches,
     required this.contentTitle,
     required this.contentSubtitle,
     required this.contentSubtitleType,
@@ -39,7 +39,7 @@ class ContentModel {
           contentType: json['contentType']! as String,
           lessonNo: json['lessonNo']! as int,
           status: json['status']! as String,
-          sessionList: (json['sessionList']! as List).cast<String>(),
+          batches: (json['batches']! as List).cast<String>(),
           contentTitle: json['contentTitle']! as String,
           contentSubtitle: json['contentSubtitle']! as String,
           contentSubtitleType: json['contentSubtitleType']! as String,
@@ -57,7 +57,7 @@ class ContentModel {
       'contentType': contentType,
       'lessonNo': lessonNo,
       'status': status,
-      'sessionList': sessionList,
+      'batches': batches,
       'contentTitle': contentTitle,
       'contentSubtitle': contentSubtitle,
       'contentSubtitleType': contentSubtitleType,

@@ -5,6 +5,7 @@ ThemeData lightThemeData(BuildContext context) {
   return ThemeData.light().copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     primaryColor: Theme.of(context).cardColor,
+    // scaffoldBackgroundColor: Colors.grey.shade100,
     appBarTheme: const AppBarTheme(
       elevation: 0,
       // centerTitle: true,
@@ -21,19 +22,23 @@ ThemeData lightThemeData(BuildContext context) {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(48, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(48, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w500),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
       height: 72,
       labelTextStyle:
           MaterialStateProperty.all(Theme.of(context).textTheme.labelLarge),
+    ),
+    cardTheme: const CardTheme(
+      elevation: 0,
     ),
   );
 }
@@ -66,6 +71,9 @@ ThemeData darkThemeData(BuildContext context) {
           .textTheme
           .labelLarge!
           .copyWith(color: Colors.white)),
+    ),
+    cardTheme: const CardTheme(
+      elevation: 0,
     ),
   );
 }

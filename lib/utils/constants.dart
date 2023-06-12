@@ -23,18 +23,17 @@ const List<String> kCourseCategory = [
   'Practical Course'
 ];
 
-List kCourseType = ['Chapters', 'Videos', 'Books', 'Questions', 'Syllabus'];
+List kCourseType = ['chapters', 'videos', 'books', 'questions', 'syllabus'];
 
 List kArchive = ['Library', 'Research'];
 
-const List<String> kYearList = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-
-// const List<String> kBatchList = [
-//   'Batch 13',
-//   'Batch 14',
-//   'Batch 15',
-//   'Batch 16',
-// ];
+const List<String> kYearList = [
+  '1st Year',
+  '2nd Year',
+  '3rd Year',
+  '4th Year',
+  'Masters'
+];
 
 const List<String> kSessionList = [
   '17-18',
@@ -43,16 +42,6 @@ const List<String> kSessionList = [
   '20-21',
 ];
 List<String> kStudentStatus = ['Regular', 'Irregular'];
-
-// List<String> kHallList = [
-//   'Shaheed Abdur Rab Hall',
-//   'Pritilata Hall',
-//   'Shamsun Nahar Hall',
-//   'Jononetri Sheikh Hasina Hall',
-//   'Deshnetri Begum Khaleda Zia Hall',
-//   'Bangamata Sheikh Fazilatunnesa Mujib Hall',
-//   'None',
-// ];
 
 List<String> kBloodGroup = [
   'A+',
@@ -76,9 +65,6 @@ const kDeveloperSession = 'Session: 17-18';
 const kDeveloperMobile = '01704340860';
 const kDeveloperEmail = 'campusAssistantbd@gmail.com';
 const kDeveloperFb = 'https://www.facebook.com/asifuzzaman.reyad';
-
-const String profileImage =
-    "https://fiverr-res.cloudinary.com/t_profile_original,q_auto,f_auto/attachments/profile/photo/50ab8b114895b9b4f16d48c4d3e1c484-1603538670494/993b70dc-f9f0-423e-b98b-3e8690bff1d7.png";
 
 const String kNoImage =
     'https://images.squarespace-cdn.com/content/v1/578988fe46c3c4caeebf9a64/1519165074664-0D0BR46DVK0032CWW7V6/sorry-image-not-available.png';

@@ -14,7 +14,7 @@
       This is a placeholder for base href that will be replaced by the value of
       the `--base-href` argument provided to `flutter build`.
     -->
-    <!--    <base href="/campusassistantbd.web.app/">-->
+    <base href="$FLUTTER_BASE_HREF">
 
     <meta charset="UTF-8">
     <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -39,10 +39,13 @@
     var serviceWorkerVersion = null;
 
 
+
+
     </script>
     <!-- This script adds the flutter initialization JS code -->
     <script src="flutter.js" defer></script>
-    <!--    -->
+
+    <!--  loading  -->
     <style>
       .container {
         width: 100vw;
@@ -54,7 +57,6 @@
       .indicator{
         width: 7vw;
       }
-
 
     </style>
 
@@ -81,6 +83,8 @@
       });
     });
 
+
+
 </script>
 
 <!---->
@@ -94,12 +98,16 @@
         }, 5000);
 };
 
+
+
 </script>
 
 <!-- web pdf-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
 <script type="text/javascript">
    pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
+
+
 
 </script>
 
