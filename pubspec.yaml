@@ -24,18 +24,18 @@ dependencies:
   cached_network_image: ^3.2.0
   file_picker: ^5.2.11
   open_file: ^3.2.1
-  image_cropper: ^3.0.1
+  image_cropper: ^4.0.1
   image_picker: ^0.8.5+3
 
   dio: ^5.1.1
   url_launcher: ^6.1.1
   multi_select_flutter: ^4.1.2
-  share_plus: ^4.0.4
+  share_plus: ^7.0.2
 
   uuid: ^3.0.6
 
   youtube_player_flutter: ^8.1.0
-  intl: ^0.17.0
+  intl: ^0.18.1
   flutter_local_notifications: ^14.0.0+1
   http: ^0.13.4
   url_strategy: ^0.2.0
@@ -43,8 +43,8 @@ dependencies:
   permission_handler: ^10.2.0
 
 
-  get: ^4.6.5
-  pinch_zoom_release_unzoom: ^0.0.10
+#  get: ^4.6.5
+  pinch_zoom_release_unzoom: ^1.0.1
   salomon_bottom_bar: ^3.3.1
 
 
@@ -57,6 +57,8 @@ dependencies:
   email_validator: ^2.1.17
   upgrader: ^6.5.0
   animated_bottom_navigation_bar: ^1.2.0
+  sidebarx: ^0.16.0
+  path_provider: ^2.0.15
 
 
 

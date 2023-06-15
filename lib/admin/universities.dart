@@ -2,7 +2,6 @@ import 'package:campusassistant/admin/university_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/route_manager.dart';
 
 class Universities extends StatelessWidget {
   const Universities({Key? key}) : super(key: key);
@@ -19,7 +18,7 @@ class Universities extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Universities',
-          style: TextStyle(color: Colors.black),
+          // style: TextStyle(color: Colors.black),
         ),
       ),
 
@@ -41,7 +40,7 @@ class Universities extends StatelessWidget {
                   //
                   IconButton(
                       onPressed: () {
-                        Get.back();
+                        Navigator.pop(context);
                       },
                       icon: const Icon(Icons.clear))
                 ],
@@ -148,7 +147,7 @@ class Universities extends StatelessWidget {
                               .doc(name)
                               .set(universityModel.toJson())
                               .then((value) {
-                            Get.back();
+                            Navigator.pop(context);
                           });
                         } else {
                           Fluttertoast.showToast(msg: 'Enter all field');
@@ -194,8 +193,13 @@ class Universities extends StatelessWidget {
                 return GestureDetector(
                   onTap: () {
                     //
-                    Get.to(
-                        () => UniversityDetails(university: university.name));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UniversityDetails(university: university.name),
+                      ),
+                    );
                   },
                   child: Card(
                     margin: EdgeInsets.zero,

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/student_model.dart';
-import 'student_batch_screen.dart';
+import 'student_specific_batch_screen.dart';
 
 class AllStudentScreen extends StatefulWidget {
   static const routeName = '/student';
@@ -28,7 +28,7 @@ class _AllStudentScreenState extends State<AllStudentScreen> {
         .doc(widget.university)
         .collection('Departments')
         .doc(widget.department)
-        .collection('Batches')
+        .collection('batches')
         .orderBy('name')
         .snapshots();
 
@@ -58,7 +58,7 @@ class _AllStudentScreenState extends State<AllStudentScreen> {
               appBar: AppBar(
                 centerTitle: true,
                 elevation: 0,
-                title: const Text('All Student'),
+                title: const Text('All Students'),
                 bottom: TabBar(
                   tabs: batches!.reversed
                       .map((batch) => Tab(text: batch))
@@ -84,6 +84,7 @@ class _AllStudentScreenState extends State<AllStudentScreen> {
   }
 }
 
+//
 class StudentCard extends StatelessWidget {
   const StudentCard({
     Key? key,

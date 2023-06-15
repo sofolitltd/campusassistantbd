@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/route_manager.dart';
 
 class BatchesScreen extends StatelessWidget {
   const BatchesScreen(
@@ -22,7 +21,6 @@ class BatchesScreen extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Batches',
-          style: TextStyle(color: Colors.black),
         ),
       ),
 
@@ -44,7 +42,7 @@ class BatchesScreen extends StatelessWidget {
                   //
                   IconButton(
                       onPressed: () {
-                        Get.back();
+                        Navigator.pop(context);
                       },
                       icon: const Icon(Icons.clear))
                 ],
@@ -79,13 +77,13 @@ class BatchesScreen extends StatelessWidget {
                               .doc(university)
                               .collection('Departments')
                               .doc(department)
-                              .collection('Batches')
+                              .collection('batches')
                               .doc()
                               .set({
                             'name': name,
                             'study': study,
                           }).then((value) {
-                            Get.back();
+                            Navigator.pop(context);
                           });
                         } else {
                           Fluttertoast.showToast(msg: 'Enter all field');
@@ -108,7 +106,7 @@ class BatchesScreen extends StatelessWidget {
               .doc(university)
               .collection('Departments')
               .doc(department)
-              .collection('Batches')
+              .collection('batches')
               .orderBy('name', descending: true)
               .snapshots(),
           builder: (context, snapshot) {

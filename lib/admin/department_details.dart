@@ -1,7 +1,6 @@
 import 'package:campusassistant/admin/batches_screen.dart';
 import 'package:campusassistant/admin/student_all_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
 
 class DepartmentDetails extends StatelessWidget {
   const DepartmentDetails(
@@ -34,29 +33,39 @@ class DepartmentDetails extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Batches'),
             onTap: () {
-              Get.to(() => BatchesScreen(
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BatchesScreen(
                     university: university,
                     department: department,
-                  ));
+                  ),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Students'),
             onTap: () {
-              Get.to(() => AllStudentScreen(
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AllStudentScreen(
                     university: university,
                     department: department,
-                  ));
+                  ),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Teachers'),
             onTap: () {
               // Get.to(() => Departments(university: university));
@@ -64,7 +73,7 @@ class DepartmentDetails extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Cr'),
             onTap: () {
               // Get.to(() => Departments(university: university));
@@ -72,7 +81,7 @@ class DepartmentDetails extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Staff'),
             onTap: () {
               // Get.to(() => Departments(university: university));

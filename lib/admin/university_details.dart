@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 
 import 'departments.dart';
 
@@ -16,7 +14,6 @@ class UniversityDetails extends StatelessWidget {
         centerTitle: true,
         title: Text(
           university,
-          style: const TextStyle(color: Colors.black),
         ),
       ),
 
@@ -25,10 +22,15 @@ class UniversityDetails extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           ListTile(
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Departments'),
             onTap: () {
-              Get.to(() => Departments(university: university));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Departments(university: university),
+                ),
+              );
             },
           )
         ],

@@ -1,5 +1,6 @@
-import 'package:campusassistant/teacher/attendance.dart';
 import 'package:flutter/material.dart';
+
+import '../screens/attendance.dart';
 
 class AdminLogin extends StatelessWidget {
   const AdminLogin({Key? key}) : super(key: key);

@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/route_manager.dart';
 
 import 'department_details.dart';
 
@@ -50,10 +49,13 @@ class Departments extends StatelessWidget {
                 return GestureDetector(
                   onTap: () {
                     //
-                    Get.to(
-                      () => DepartmentDetails(
-                        university: university,
-                        department: docs[index].get('name'),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DepartmentDetails(
+                          university: university,
+                          department: docs[index].get('name'),
+                        ),
                       ),
                     );
                   },

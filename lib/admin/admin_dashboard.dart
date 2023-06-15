@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import 'universities.dart';
 
@@ -19,9 +18,12 @@ class AdminDashboardScreen extends StatelessWidget {
         children: [
           ListTile(
             onTap: () {
-              Get.to(() => const Universities());
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const Universities()));
             },
-            tileColor: Colors.white,
+            tileColor: Theme.of(context).cardColor,
             title: const Text('Universities'),
           ),
         ],

@@ -1,11 +1,11 @@
 {
-    "name": "campusassistant",
-    "short_name": "campusassistant",
+    "name": "Campus Assistant",
+    "short_name": "Campus Assistant",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#ffffff",
     "theme_color": "#0175C2",
-    "description": "stay connected",
+    "description": "Your smart assistant",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
