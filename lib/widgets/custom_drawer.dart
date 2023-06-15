@@ -416,9 +416,15 @@ class ContributorCard extends StatelessWidget {
                   maxLines: 1,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                Text(data.get('university')),
-                Text(data.get('department')),
+                const SizedBox(height: 16),
+                Text(
+                  data.get('university'),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Text(
+                  data.get('department'),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             ),
           ],

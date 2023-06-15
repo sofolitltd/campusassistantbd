@@ -54,7 +54,8 @@ class AllBatchCardWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: GestureDetector(
                     onTap: () {
-                      if (profileData.information.status!.moderator!) {
+                      if ((selectedBatch == profileData.information.batch) ||
+                          profileData.information.status!.moderator!) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

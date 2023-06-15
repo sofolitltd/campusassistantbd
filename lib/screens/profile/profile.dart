@@ -5,8 +5,6 @@ import 'profile_card.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.profileData});
-  static const routeName = '/profile';
-
   final ProfileData profileData;
 
   @override

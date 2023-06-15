@@ -90,6 +90,7 @@ class CourseBookMarks extends StatelessWidget {
 
                   //for mobile
                   return ContentCard(
+                    selectedYear: 'Bookmarks',
                     profileData: profileData,
                     contentModel: courseContentModel,
                     batches: batches,

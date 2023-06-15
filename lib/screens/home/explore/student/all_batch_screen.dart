@@ -108,8 +108,7 @@ class SpecificBatchScreen extends StatelessWidget {
 
     return Scaffold(
       // add student
-      floatingActionButton: (profileData.information.status!.cr! == true ||
-              profileData.information.status!.moderator! == true)
+      floatingActionButton: (profileData.information.status!.moderator! == true)
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -150,6 +149,7 @@ class SpecificBatchScreen extends StatelessWidget {
             radius: const Radius.circular(8),
             interactive: true,
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width > 800

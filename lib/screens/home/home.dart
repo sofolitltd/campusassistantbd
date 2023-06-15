@@ -5,6 +5,8 @@ import '/models/profile_data.dart';
 import '/screens/home/header.dart';
 import '/screens/home/more/more.dart';
 import '/widgets/custom_drawer.dart';
+import '../community/notice/notice_screen.dart';
+import '../community/notice/notification_badge.dart';
 import 'explore/explore.dart';
 
 enum Profession { student, teacher }
@@ -63,94 +65,51 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           ),
         ),
         actions: [
-          // todo: delete later [use to copy Users -> users]
-          //
-          // IconButton(
-          //   onPressed: () {
-          //     var ref1 = FirebaseFirestore.instance.collection('Users');
-          //     var ref2 = FirebaseFirestore.instance.collection('users');
-          //     ref1.get().then(
-          //           (snap) {
-          //         for (var doc in snap.docs) {
-          //           //
-          //           ProfileData profileData = ProfileData(
-          //             uid: doc.get('uid'),
-          //             university: doc.get('university'),
-          //             department: doc.get('department'),
-          //             profession: 'student',
-          //             name: doc.get('name'),
-          //             mobile: doc.get('phone'),
-          //             email: doc.get('email'),
-          //             image: doc.get('imageUrl'),
-          //             token: '',
-          //             information: Information(
-          //               batch: doc.get('batch'),
-          //               id: doc.get('id'),
-          //               session: doc.get('session'),
-          //               hall: doc.get('hall'),
-          //               blood: doc.get('blood'),
-          //               status: Status(
-          //                 subscriber:
-          //                 doc.get('status').toString().toLowerCase(),
-          //                 moderator: doc.get('role')['cr'],
-          //                 admin: doc.get('role')['admin'],
-          //                 cr: doc.get('role')['cr'],
-          //               ),
-          //             ),
-          //           );
-          //           // log('${doc.id} => ${jsonEncode(profileData.toJson())}');
-          //           // ref2.doc(doc.id).set(profileData.toJson());
-          //         }
-          //       },
-          //     );
-          //   },
-          //   icon: const Icon(Icons.add),
-          // ),
+          /// notification
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NoticeScreen(
+                    profileData: widget.profileData,
+                  ),
+                ),
+              );
+            },
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                //
+                IconButton(
+                  onPressed: () {
+                    //
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NoticeScreen(
+                          profileData: widget.profileData,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                  ),
+                ),
 
-          /// notificaton
-          //todo:
-          // InkWell(
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => NoticeScreen(
-          //           profileData: widget.profileData,
-          //         ),
-          //       ),
-          //     );
-          //   },
-          //   child: Stack(
-          //     alignment: Alignment.topRight,
-          //     children: [
-          //       //
-          //       IconButton(
-          //         onPressed: () {
-          //           //
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) => NoticeScreen(
-          //                 profileData: widget.profileData,
-          //               ),
-          //             ),
-          //           );
-          //         },
-          //         icon: const Icon(
-          //           Icons.notifications_outlined,
-          //         ),
-          //       ),
-          //
-          //       //  Notification Badge
-          //       const Positioned(
-          //         top: 6,
-          //         right: 6,
-          //         child: NotificationBadge(),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // const SizedBox(width: 12),
+                //  Notification Badge
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: NotificationBadge(
+                    profileData: widget.profileData,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
         ],
       ),
       drawer: width < 800 ? const CustomDrawer() : null,

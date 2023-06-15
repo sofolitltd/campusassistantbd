@@ -41,7 +41,7 @@ class RoutineDetails extends StatelessWidget {
             child: CachedNetworkImage(
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
-              imageUrl: data.get('imageUrl'),
+              imageUrl: data.get('image'),
               fadeInDuration: const Duration(milliseconds: 500),
               imageBuilder: (context, imageProvider) => InteractiveViewer(
                 child: Container(

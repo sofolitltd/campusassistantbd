@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,11 +18,13 @@ import '/models/profile_data.dart';
 class EditContent extends StatefulWidget {
   const EditContent({
     key,
+    required this.selectedYear,
     required this.profileData,
     required this.contentModel,
     required this.batches,
   }) : super(key: key);
 
+  final String selectedYear;
   final ProfileData profileData;
   final ContentModel contentModel;
   final List<String> batches;
@@ -108,11 +111,16 @@ class _EditContentState extends State<EditContent> {
 
       //
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         children: [
           //
           buildPathSection(
-            year: 'Study',
+            year: widget.selectedYear,
             courseCode: widget.contentModel.courseCode,
             chapterNo: widget.contentModel.lessonNo.toString(),
             courseType: widget.contentModel.contentType,
@@ -192,7 +200,8 @@ class _EditContentState extends State<EditContent> {
                             widget.contentModel.contentType.toLowerCase()),
                     // widget.courseType == 'notes' ? 'Creator' : 'Year',
                     hintText: getContentSubtitle(
-                        courseType: widget.contentModel.contentType),
+                        courseType:
+                            widget.contentModel.contentType.toLowerCase()),
                   ),
                   validator: (value) =>
                       value!.isEmpty ? "Enter Chapter Title" : null,
@@ -276,16 +285,24 @@ class _EditContentState extends State<EditContent> {
                         //
                         if (fileName != 'Update file' &&
                             _formState.currentState!.validate()) {
-                          setState(() => _isLoading = true);
-
                           //delete old file
                           await FirebaseStorage.instance
                               .refFromURL(widget.contentModel.fileUrl)
                               .delete();
 
                           // put new file
-                          await putFileToFireStorage();
-                          setState(() => _isLoading = false);
+                          task = putContentOnStorage();
+                          setState(() {});
+                          if (task == null) return;
+                          progressDialog(context, task!);
+
+                          // download link
+                          final snapshot = await task!.whenComplete(() {});
+                          String downloadedUrl =
+                              await snapshot.ref.getDownloadURL();
+                          await updateFileToFireStore(
+                            fileUrl: downloadedUrl,
+                          );
                         } else {
                           setState(() => _isLoading = true);
 
@@ -341,126 +358,32 @@ class _EditContentState extends State<EditContent> {
   }
 
   // upload file to storage
-  putFileToFireStorage() async {
-    if (_selectedMobileFile == null) return null;
-
+  UploadTask? putContentOnStorage() {
     var fileName =
         '${widget.contentModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
-    var path =
-        'Universities/${widget.profileData.university}/${widget.profileData.department}/${widget.contentModel.contentType}/$fileName';
 
-    var downloadedUrl = '';
+    final ref = FirebaseStorage.instance
+        .ref('Universities')
+        .child(widget.profileData.university)
+        .child(widget.profileData.department)
+        .child(widget.contentModel.contentType.toLowerCase())
+        .child(fileName);
 
-    final ref = FirebaseStorage.instance.ref(path);
-
-    if (kIsWeb) {
-      await ref.putData(
-        _selectedWebFile,
-        SettableMetadata(
-          contentType: 'application/pdf',
-        ),
-      );
-      downloadedUrl = await ref.getDownloadURL();
-    } else {
-      await ref.putFile(_selectedMobileFile!);
-      downloadedUrl = await ref.getDownloadURL();
+    try {
+      if (kIsWeb) {
+        return ref.putData(
+          _selectedWebFile,
+          SettableMetadata(
+            contentType: 'application/pdf',
+          ),
+        );
+      } else {
+        return ref.putFile(_selectedMobileFile!);
+      }
+    } on FirebaseException catch (e) {
+      log('Content upload error: ${e.message!}');
+      return null;
     }
-
-    // fire store
-    await updateFileToFireStore(fileUrl: downloadedUrl);
-  }
-
-  // show dialog
-  progressDialog(BuildContext context, UploadTask task) {
-    FocusManager.instance.primaryFocus!.unfocus();
-
-    return showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        contentPadding: const EdgeInsets.all(12),
-        title: Stack(
-          alignment: Alignment.centerRight,
-          children: [
-            const SizedBox(
-              width: double.infinity,
-              child: Text(
-                'Uploading File',
-                style: TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            //
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey.shade100,
-                ),
-                child: const Icon(
-                  Icons.close_outlined,
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
-        titlePadding: const EdgeInsets.all(12),
-        content: StreamBuilder<TaskSnapshot>(
-            stream: task.snapshotEvents,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final snap = snapshot.data!;
-                final progress = snap.bytesTransferred / snap.totalBytes;
-                final percentage = (progress * 100).toStringAsFixed(0);
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(32),
-                      child: LinearProgressIndicator(
-                        minHeight: 16,
-                        value: progress,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.blueAccent.shade200),
-                        backgroundColor:
-                            Colors.lightBlueAccent.shade100.withOpacity(.2),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('$percentage %'),
-                    const SizedBox(height: 8),
-                  ],
-                );
-              } else {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(32),
-                      child: LinearProgressIndicator(
-                        minHeight: 16,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.blueAccent.shade200),
-                        backgroundColor:
-                            Colors.lightBlueAccent.shade100.withOpacity(.2),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(' '),
-                    const SizedBox(height: 8),
-                  ],
-                );
-              }
-            }),
-      ),
-    );
   }
 
   // upload file to fire store
@@ -486,6 +409,99 @@ class _EditContentState extends State<EditContent> {
       Navigator.pop(context);
     });
   }
+}
+
+// show dialog
+progressDialog(BuildContext context, UploadTask task) {
+  FocusManager.instance.primaryFocus!.unfocus();
+
+  return showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) => AlertDialog(
+      contentPadding: const EdgeInsets.all(12),
+      title: Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          const SizedBox(
+            width: double.infinity,
+            child: Text(
+              'Uploading File',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          //
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade100,
+              ),
+              child: const Icon(
+                Icons.close_outlined,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+      titlePadding: const EdgeInsets.all(12),
+      content: StreamBuilder<TaskSnapshot>(
+          stream: task.snapshotEvents,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final snap = snapshot.data!;
+              final progress = snap.bytesTransferred / snap.totalBytes;
+              final percentage = (progress * 100).toStringAsFixed(0);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: LinearProgressIndicator(
+                      minHeight: 16,
+                      value: progress,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.blueAccent.shade200),
+                      backgroundColor:
+                          Colors.lightBlueAccent.shade100.withOpacity(.2),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('$percentage %'),
+                  const SizedBox(height: 8),
+                ],
+              );
+            } else {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: LinearProgressIndicator(
+                      minHeight: 16,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.blueAccent.shade200),
+                      backgroundColor:
+                          Colors.lightBlueAccent.shade100.withOpacity(.2),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(' '),
+                  const SizedBox(height: 8),
+                ],
+              );
+            }
+          }),
+    ),
+  );
 }
 
 // content subtitle

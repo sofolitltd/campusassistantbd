@@ -9,7 +9,9 @@ import '/screens/study/archive/research.dart';
 import '/screens/study/upload/semester_edit.dart';
 import '/widgets/headline.dart';
 import '2courses.dart';
+import '8course_bookmarks.dart';
 import 'upload/semester_add.dart';
+import 'widgets/bookmark_counter.dart';
 
 class Study extends StatefulWidget {
   const Study({Key? key, required this.profileData}) : super(key: key);
@@ -162,20 +164,101 @@ class _StudyState extends State<Study> with AutomaticKeepAliveClientMixin {
                           : 16,
                       vertical: 16,
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        ArchiveCategoryCard(
-                          title: 'Library',
-                          subtitle: 'Book collection',
-                          profileData: widget.profileData,
-                          batches: batches,
+                        // archive
+                        Row(
+                          children: [
+                            ArchiveCategoryCard(
+                              title: 'Library',
+                              subtitle: 'Book collection',
+                              profileData: widget.profileData,
+                              batches: batches,
+                            ),
+                            const SizedBox(width: 16),
+                            ArchiveCategoryCard(
+                              title: 'Research',
+                              subtitle: 'Research, Thesis paper',
+                              profileData: widget.profileData,
+                              batches: batches,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 16),
-                        ArchiveCategoryCard(
-                          title: 'Research',
-                          subtitle: 'Research, Thesis paper',
-                          profileData: widget.profileData,
-                          batches: batches,
+
+                        const SizedBox(height: 16),
+
+                        // bookmarks
+                        Card(
+                          margin: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 2,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CourseBookMarks(
+                                    profileData: widget.profileData,
+                                    batches: batches,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 72,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  // title
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        //title
+                                        Text(
+                                          'Bookmarks'.toUpperCase(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium!
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: .5,
+                                              ),
+                                        ),
+
+                                        const SizedBox(height: 4),
+                                        //sub
+                                        Text(
+                                          'All bookmarks in one place',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  //Bookmark Counter
+                                  BookmarkCounter(
+                                    profileData: widget.profileData,
+                                    batches: batches,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -203,7 +286,7 @@ class _StudyState extends State<Study> with AutomaticKeepAliveClientMixin {
                               .collection('Departments')
                               .doc(widget.profileData.department)
                               .collection('semesters')
-                              .orderBy('title')
+                              .orderBy('title', descending: true)
                               .where('batches', arrayContains: _selectedBatch)
                               .snapshots(),
                           builder: (context, snapshot) {

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '/admin/admin_dashboard.dart';
 import '/auth/new_splash_screen.dart';
 import '/models/profile_data.dart';
+import '../community/notice/notice_group.dart';
 import 'profile_edit.dart';
 
 enum Profession { student, teacher }
@@ -437,16 +438,16 @@ class ProfileCard extends StatelessWidget {
                         ],
 
                         // notice
-                        if (profileData.information.status!.admin == true) ...[
+                        if (profileData.information.status!.admin != true) ...[
                           ListTile(
                             onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         NoticeGroup(userModel: userModel),
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NoticeGroup(profileData: profileData),
+                                ),
+                              );
                             },
                             title: Text(
                               'Notice Group',
@@ -462,31 +463,6 @@ class ProfileCard extends StatelessWidget {
                           ),
                           const Divider(height: 1),
                         ],
-
-                        //bookmarks
-                        ListTile(
-                          onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => CourseBookMarks(
-                            //       userModel: userModel,
-                            //     ),
-                            //   ),
-                            // );
-                          },
-                          title: Text(
-                            'Bookmarks',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(fontWeight: FontWeight.w600),
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 16,
-                          ),
-                        ),
                       ],
                     ),
                   ),

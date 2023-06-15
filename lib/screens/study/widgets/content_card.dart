@@ -18,11 +18,13 @@ import '/widgets/pdf_viewer.dart';
 class ContentCard extends StatefulWidget {
   const ContentCard({
     Key? key,
+    required this.selectedYear,
     required this.profileData,
     required this.contentModel,
     required this.batches,
   }) : super(key: key);
 
+  final String selectedYear;
   final ProfileData profileData;
   final ContentModel contentModel;
   final List<String> batches;
@@ -108,6 +110,7 @@ class _ContentCardState extends State<ContentCard> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => EditContent(
+                      selectedYear: widget.selectedYear,
                       profileData: widget.profileData,
                       contentModel: widget.contentModel,
                       batches: widget.batches,
@@ -429,6 +432,7 @@ class _ContentCardState extends State<ContentCard> {
               width: double.infinity,
               alignment: Alignment.centerLeft,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.arrow_right,

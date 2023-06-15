@@ -12,7 +12,6 @@ class CourseTypesDetails extends StatelessWidget {
     Key? key,
     required this.profileData,
     required this.selectedYear,
-    // required this.id,
     required this.courseType,
     required this.courseModel,
     required this.batches,
@@ -97,6 +96,7 @@ class CourseTypesDetails extends StatelessWidget {
 
               //
               return ContentCard(
+                selectedYear: selectedYear,
                 profileData: profileData,
                 contentModel: courseContentModel,
                 batches: batches,

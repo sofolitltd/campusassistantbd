@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -135,24 +136,6 @@ class _NoticeAddState extends State<NoticeAdd> {
               ],
             ),
 
-            const SizedBox(height: 8),
-
-            // message
-            TextFormField(
-              controller: _messageController,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Type notice here!',
-                hintStyle: TextStyle(fontSize: 20),
-              ),
-              onChanged: (value) => setState(() => counter = value),
-              style: TextStyle(fontSize: counter.length < 100 ? 20 : 16),
-              textCapitalization: TextCapitalization.sentences,
-              keyboardType: TextInputType.multiline,
-              minLines: 10,
-              maxLines: 25,
-            ),
-
             const SizedBox(height: 16),
 
             //
@@ -191,6 +174,24 @@ class _NoticeAddState extends State<NoticeAdd> {
                       )
                     ],
                   ),
+
+            const SizedBox(height: 16),
+
+            // message
+            TextFormField(
+              controller: _messageController,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Type notice here!',
+                hintStyle: TextStyle(fontSize: 20),
+              ),
+              onChanged: (value) => setState(() => counter = value),
+              style: TextStyle(fontSize: counter.length < 100 ? 20 : 16),
+              textCapitalization: TextCapitalization.sentences,
+              keyboardType: TextInputType.multiline,
+              minLines: 10,
+              maxLines: 25,
+            ),
           ],
         ),
       ),
@@ -198,14 +199,14 @@ class _NoticeAddState extends State<NoticeAdd> {
   }
 
   // upload and download url
-  Future uploadImageFile(ProfileData userModel) async {
+  Future uploadImageFile(ProfileData profileModel) async {
     setState(() => isLoading = true);
 
     String fileId = const Uuid().v4();
 
     //
     final filePath =
-        'Universities/${userModel.university}/${userModel.department}/Notice';
+        'Universities/${profileModel.university}/${profileModel.department}/notices';
 
     //
     final destination = '$filePath/$fileId.jpg';
@@ -246,37 +247,33 @@ class _NoticeAddState extends State<NoticeAdd> {
         .doc(widget.profileData.university)
         .collection('Departments')
         .doc(widget.profileData.department)
-        .collection('Notifications')
+        .collection('notices')
         .add(noticeModel.toJson())
         .then((value) async {
+      //todo: check fcm
+      // await FirebaseFirestore.instance
+      //     .collection("users")
+      //     .where('batch', isEqualTo: widget.profileData.information.batch)
+      //     .get()
+      //     .then((value) async {
+      //   for (var element in value.docs) {
+      //     var token = element.get('token');
+      //     log(token);
       //
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .where('batch', isEqualTo: widget.profileData.information.batch)
-          .get()
-          .then((value) async {
-        for (var element in value.docs) {
-          var token = element.get('deviceToken');
-          log(token);
-
-          //
-          await sendPushMessage(
-            token: token,
-            title: widget.profileData.name,
-            body: _messageController.text,
-          );
-        }
-      });
-
-      //
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      //
-      // Fluttertoast.showToast(msg: 'Post notice successfully');
+      //     //
+      //     await sendPushMessage(
+      //       token: token,
+      //       title: widget.profileData.name,
+      //       body: _messageController.text,
+      //     );
+      //   }
+      // });
 
       //
       setState(() => isLoading = false);
+      Fluttertoast.showToast(msg: 'Post notice successfully');
+      if (!mounted) return;
+      Navigator.pop(context);
     });
   }
 
@@ -293,7 +290,7 @@ class _NoticeAddState extends State<NoticeAdd> {
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization':
-              'Bearer ya29.AIzaSyC6GyOYVB353N2SjORdNaZvKThz8zapfyk',
+              'key=AAAAvuYABLU:APA91bEMuMwtcZLkSfTj7wg9cDLowAKVEHjRfkVp2x5PN3m6_cSvnD2TYgoipsOaqgMCvuQ5w65LuhpWbojxDhHiztJWMDRt5U6MrHY8mTuTquxOO46jrtKeQVt0qhCqcwJtoKAaLuDn',
         },
         body: jsonEncode(
           <String, dynamic>{

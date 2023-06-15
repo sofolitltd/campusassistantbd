@@ -67,6 +67,7 @@ class Research extends StatelessWidget {
                 //
 
                 return ContentCard(
+                  selectedYear: 'Research',
                   profileData: profileData,
                   contentModel: courseContentModel,
                   batches: batches,

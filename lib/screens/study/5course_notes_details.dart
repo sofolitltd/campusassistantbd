@@ -25,8 +25,6 @@ class CourseNotesDetails extends StatelessWidget {
 
   final ProfileData profileData;
   final String selectedYear;
-
-  // final String id;
   final String courseType;
   final CourseModelNew courseModel;
   final ChapterModel chapterModel;
@@ -124,6 +122,7 @@ class CourseNotesDetails extends StatelessWidget {
 
               //
               return ContentCard(
+                selectedYear: selectedYear,
                 profileData: profileData,
                 contentModel: contentModel,
                 batches: batches,

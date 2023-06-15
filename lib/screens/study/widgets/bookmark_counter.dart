@@ -16,7 +16,7 @@ class BookmarkCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //todo: fix ref
+    //
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("Universities")
@@ -38,7 +38,7 @@ class BookmarkCounter extends StatelessWidget {
           var data = snapshot.data!.size;
 
           if (data == 0) {
-            return const Text('');
+            return const Text('0');
           }
           //
           return GestureDetector(
@@ -56,9 +56,9 @@ class BookmarkCounter extends StatelessWidget {
             },
             child: Container(
               constraints: const BoxConstraints(
-                minWidth: 24,
+                minWidth: 28,
               ),
-              margin: const EdgeInsets.only(right: 8, top: 16, bottom: 16),
+              margin: const EdgeInsets.only(right: 12, top: 12, bottom: 12),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                   color: Theme.of(context).dividerColor,

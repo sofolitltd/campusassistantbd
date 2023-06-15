@@ -1,21 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campusassistant/screens/community/notice/comment_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '/models/notice_model.dart';
 import '/models/profile_data.dart';
+import '../../home/explore/student/widget/full_image.dart';
 import 'notice_group.dart';
 import 'notice_screen.dart';
 
 class NoticeScreenDetails extends StatelessWidget {
   final NoticeModel noticeModel;
+  final String noticeId;
   final ProfileData profileData;
   final DocumentSnapshot uploader;
 
   const NoticeScreenDetails({
     Key? key,
     required this.noticeModel,
+    required this.noticeId,
     required this.profileData,
     required this.uploader,
   }) : super(key: key);
@@ -43,7 +47,7 @@ class NoticeScreenDetails extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   // image
                   leading: CachedNetworkImage(
-                    imageUrl: uploader.get('imageUrl'),
+                    imageUrl: uploader.get('image'),
                     fadeInDuration: const Duration(milliseconds: 500),
                     imageBuilder: (context, imageProvider) => CircleAvatar(
                       backgroundImage: imageProvider,
@@ -137,12 +141,16 @@ class NoticeScreenDetails extends StatelessWidget {
                     fadeInDuration: const Duration(milliseconds: 500),
                     imageBuilder: (context, imageProvider) => GestureDetector(
                       onTap: () {
-                        // Get.to(
-                        //   () => FullImage(
-                        //     imageUrl: noticeModel.imageUrl[0],
-                        //     title: '',
-                        //   ),
-                        // );
+                        //
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullImage(
+                              imageUrl: noticeModel.imageUrl[0],
+                              title: noticeModel.message,
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -170,20 +178,50 @@ class NoticeScreenDetails extends StatelessWidget {
                 child: Divider(height: 0),
               ),
 
+              // seen
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                SeenListScreen(seenList: noticeModel.seen)));
-                  },
-                  child: Text(
-                    'Seen by ${noticeModel.seen.length}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // seen
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SeenListScreen(
+                                    seenList: noticeModel.seen)));
+                      },
+                      child: Text(
+                        'Seen by ${noticeModel.seen.length}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+
+                    //comment
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CommentScreen(
+                                      noticeId: noticeId,
+                                      profileData: profileData,
+                                    )));
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.keyboard_command_key,
+                            size: 16,
+                          ),
+                          Text('Comment'),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
 

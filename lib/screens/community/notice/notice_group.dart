@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campusassistant/screens/home/explore/student/widget/full_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '/models/notice_model.dart';
-import '/widgets/headline.dart';
 import '/models/profile_data.dart';
+import '/widgets/headline.dart';
 import 'notice_add.dart';
 import 'notice_edit.dart';
 import 'notice_screen.dart';
@@ -21,8 +22,26 @@ class NoticeGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DocumentSnapshot? uploader;
+
     return Scaffold(
+      floatingActionButton: profileData.information.status!.cr!
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NoticeAdd(
+                      profileData: profileData,
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(Icons.message_outlined),
+            )
+          : null,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           //
           SliverAppBar(
@@ -41,56 +60,16 @@ class NoticeGroup extends StatelessWidget {
           SliverToBoxAdapter(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width > 1000
+                horizontal: MediaQuery.of(context).size.width > 800
                     ? MediaQuery.of(context).size.width * .2
                     : 12,
                 vertical: 12,
               ),
               child: Column(
                 children: [
-                  // add
-                  if (profileData.information.status!.cr!)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: ListTile(
-                        tileColor: Theme.of(context).cardColor,
-
-                        // image
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(profileData.image),
-                        ),
-
-                        title: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NoticeAdd(
-                                  profileData: profileData,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
-                            margin: const EdgeInsets.only(right: 8),
-                            child: Text(
-                              'Write something...',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
                   //
                   const Padding(
-                    padding: EdgeInsets.only(left: 8, top: 8),
+                    padding: EdgeInsets.only(top: 16),
                     child: Headline(title: 'Notices'),
                   ),
 
@@ -101,15 +80,18 @@ class NoticeGroup extends StatelessWidget {
                         .doc(profileData.university)
                         .collection('Departments')
                         .doc(profileData.department)
-                        .collection('Notifications')
+                        .collection('notices')
                         .where('batch',
                             arrayContains: profileData.information.batch)
                         .orderBy('time', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return const Center(
-                            child: Text('Something went wrong'));
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height * .7,
+                          child:
+                              const Center(child: Text('Something went wrong')),
+                        );
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -131,29 +113,38 @@ class NoticeGroup extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 16),
                               itemBuilder: (BuildContext context, int index) {
                                 //
                                 var notice = data[index];
                                 NoticeModel noticeModel =
                                     NoticeModel.fromJson(notice);
 
-                                return Card(
-                                  elevation: 0,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 12,
-                                      right: 12,
-                                      bottom: 16,
-                                    ),
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (uploader != null) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FullImage(
+                                            title: noticeModel.message,
+                                            imageUrl:
+                                                noticeModel.imageUrl.first,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Card(
+                                    elevation: 0,
+                                    margin: EdgeInsets.zero,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.stretch,
                                       children: [
                                         StreamBuilder<DocumentSnapshot>(
                                             stream: FirebaseFirestore.instance
-                                                .collection('Users')
+                                                .collection('users')
                                                 .doc(noticeModel.uploader)
                                                 .snapshots(),
                                             builder: (context, snapshot) {
@@ -164,186 +155,198 @@ class NoticeGroup extends StatelessWidget {
 
                                               if (snapshot.connectionState ==
                                                   ConnectionState.waiting) {
-                                                return const Center(
-                                                    child:
-                                                        CircularProgressIndicator());
+                                                return const SizedBox(
+                                                    height: 72,
+                                                    child: Text(''));
                                               }
 
-                                              var uploader = snapshot.data;
+                                              uploader = snapshot.data;
 
-                                              return ListTile(
-                                                contentPadding: EdgeInsets.zero,
-                                                // image
-                                                leading: CachedNetworkImage(
-                                                  imageUrl:
-                                                      uploader!.get('imageUrl'),
-                                                  fadeInDuration:
-                                                      const Duration(
-                                                          milliseconds: 500),
-                                                  imageBuilder: (context,
-                                                          imageProvider) =>
-                                                      CircleAvatar(
-                                                    backgroundImage:
-                                                        imageProvider,
-                                                    // radius: 120,
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 12),
+                                                child: ListTile(
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                  // image
+                                                  leading: CachedNetworkImage(
+                                                    imageUrl:
+                                                        uploader!.get('image'),
+                                                    fadeInDuration:
+                                                        const Duration(
+                                                            milliseconds: 500),
+                                                    imageBuilder: (context,
+                                                            imageProvider) =>
+                                                        CircleAvatar(
+                                                      backgroundImage:
+                                                          imageProvider,
+                                                      // radius: 120,
+                                                    ),
+                                                    progressIndicatorBuilder: (context,
+                                                            url,
+                                                            downloadProgress) =>
+                                                        const CircleAvatar(
+                                                            // radius: 120,
+                                                            backgroundImage:
+                                                                AssetImage(
+                                                                    'assets/images/pp_placeholder.png')),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        const CircleAvatar(
+                                                            // radius: 120,
+                                                            backgroundImage:
+                                                                AssetImage(
+                                                                    'assets/images/pp_placeholder.png')),
                                                   ),
-                                                  progressIndicatorBuilder: (context,
-                                                          url,
-                                                          downloadProgress) =>
-                                                      const CircleAvatar(
-                                                          // radius: 120,
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/pp_placeholder.png')),
-                                                  errorWidget: (context, url,
-                                                          error) =>
-                                                      const CircleAvatar(
-                                                          // radius: 120,
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/pp_placeholder.png')),
-                                                ),
 
-                                                title: Text(
-                                                  uploader.get('name'),
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                ),
-
-                                                //time
-                                                subtitle: Text(
-                                                  TimeAgo.timeAgoSinceDate(
-                                                    noticeModel.time,
+                                                  title: Text(
+                                                    uploader!.get('name'),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium!
+                                                        .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   ),
-                                                ),
 
-                                                //edit, delete
-                                                trailing:
-                                                    (profileData.information
-                                                            .status!.admin!)
-                                                        ? PopupMenuButton(
-                                                            itemBuilder:
-                                                                (context) => [
-                                                              //delete
-                                                              PopupMenuItem(
-                                                                value: 1,
-                                                                onTap: () {
-                                                                  //
-                                                                  Future(
-                                                                    () =>
-                                                                        //
-                                                                        Navigator
-                                                                            .push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                NoticeEdit(
-                                                                          noticeId:
-                                                                              notice.id,
-                                                                          profileData:
-                                                                              profileData,
-                                                                          noticeModel:
-                                                                              noticeModel,
-                                                                          uploader:
-                                                                              uploader,
+                                                  //time
+                                                  subtitle: Text(
+                                                    TimeAgo.timeAgoSinceDate(
+                                                      noticeModel.time,
+                                                    ),
+                                                  ),
+
+                                                  //edit, delete
+                                                  trailing:
+                                                      (profileData.information
+                                                              .status!.cr!)
+                                                          ? PopupMenuButton(
+                                                              itemBuilder:
+                                                                  (context) => [
+                                                                //delete
+                                                                PopupMenuItem(
+                                                                  value: 1,
+                                                                  onTap: () {
+                                                                    //
+                                                                    Future(
+                                                                      () =>
+                                                                          //
+                                                                          Navigator
+                                                                              .push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              NoticeEdit(
+                                                                            noticeId:
+                                                                                notice.id,
+                                                                            profileData:
+                                                                                profileData,
+                                                                            noticeModel:
+                                                                                noticeModel,
+                                                                            uploader:
+                                                                                uploader!,
+                                                                          ),
                                                                         ),
                                                                       ),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                                child:
-                                                                    const Text(
-                                                                        'Edit'),
-                                                              ),
-
-                                                              //delete
-                                                              PopupMenuItem(
-                                                                  value: 2,
-                                                                  onTap:
-                                                                      () async {
-                                                                    //
-                                                                    await FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'Universities')
-                                                                        .doc(profileData
-                                                                            .university)
-                                                                        .collection(
-                                                                            'Departments')
-                                                                        .doc(profileData
-                                                                            .department)
-                                                                        .collection(
-                                                                            'Notifications')
-                                                                        .doc(notice
-                                                                            .id)
-                                                                        .delete();
-
-                                                                    //
-                                                                    FirebaseStorage
-                                                                        .instance
-                                                                        .refFromURL(
-                                                                            noticeModel.imageUrl[0])
-                                                                        .delete();
+                                                                    );
                                                                   },
-                                                                  child: const Text(
-                                                                      'Delete')),
-                                                            ],
-                                                          )
-                                                        : null,
+                                                                  child:
+                                                                      const Text(
+                                                                          'Edit'),
+                                                                ),
+
+                                                                //delete
+                                                                PopupMenuItem(
+                                                                    value: 2,
+                                                                    onTap:
+                                                                        () async {
+                                                                      //
+                                                                      await FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              'Universities')
+                                                                          .doc(profileData
+                                                                              .university)
+                                                                          .collection(
+                                                                              'Departments')
+                                                                          .doc(profileData
+                                                                              .department)
+                                                                          .collection(
+                                                                              'notices')
+                                                                          .doc(notice
+                                                                              .id)
+                                                                          .delete();
+
+                                                                      //
+                                                                      FirebaseStorage
+                                                                          .instance
+                                                                          .refFromURL(
+                                                                              noticeModel.imageUrl[0])
+                                                                          .delete();
+                                                                    },
+                                                                    child: const Text(
+                                                                        'Delete')),
+                                                              ],
+                                                            )
+                                                          : null,
+                                                ),
                                               );
                                             }),
-                                        //
-
                                         //message
-                                        SelectableText(
-                                          noticeModel.message,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12),
+                                          child: SelectableText(
+                                            noticeModel.message,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
                                         ),
 
+                                        const SizedBox(height: 10),
+                                        // image
                                         if (noticeModel.imageUrl[0] != '')
-                                          const SizedBox(height: 16),
-
-                                        //
-                                        if (noticeModel.imageUrl[0] != '')
-                                          CachedNetworkImage(
-                                            height: 300,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            fit: BoxFit.cover,
-                                            imageUrl: noticeModel.imageUrl[0],
-                                            fadeInDuration: const Duration(
-                                                milliseconds: 500),
-                                            imageBuilder:
-                                                (context, imageProvider) =>
-                                                    Container(
-                                              decoration: BoxDecoration(
-                                                image: DecorationImage(
-                                                  image: imageProvider,
+                                          Container(
+                                            constraints: const BoxConstraints(
+                                              minHeight: 250,
+                                            ),
+                                            color: Colors.blueGrey.shade50,
+                                            child: CachedNetworkImage(
+                                              // height: 300,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              fit: BoxFit.contain,
+                                              imageUrl: noticeModel.imageUrl[0],
+                                              fadeInDuration: const Duration(
+                                                  milliseconds: 500),
+                                              imageBuilder:
+                                                  (context, imageProvider) =>
+                                                      Container(
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            progressIndicatorBuilder: (context,
-                                                    url, downloadProgress) =>
-                                                const CupertinoActivityIndicator(),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: Colors.grey.shade100,
+                                              progressIndicatorBuilder: (context,
+                                                      url, downloadProgress) =>
+                                                  const CupertinoActivityIndicator(),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: Colors.grey.shade100,
+                                                ),
                                               ),
                                             ),
                                           ),
+
+                                        // seen
                                       ],
                                     ),
                                   ),

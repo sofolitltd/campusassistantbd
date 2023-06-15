@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,7 +53,6 @@ class _AddContentState extends State<AddContent> {
   File? _selectedMobileFile;
   Uint8List _selectedWebFile = Uint8List(8);
   UploadTask? task;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -245,32 +245,26 @@ class _AddContentState extends State<AddContent> {
             height: 50,
             child: ElevatedButton.icon(
                 icon: const Icon(Icons.cloud_upload_outlined),
-                onPressed: _isLoading
-                    ? null
-                    : () async {
-                        if (fileName == null) {
-                          Fluttertoast.cancel();
-                          Fluttertoast.showToast(msg: 'No File Selected !');
-                        } else if (_formState.currentState!.validate()) {
-                          //
-                          setState(() => _isLoading = true);
-                          await putFileToFireStorage();
+                onPressed: () async {
+                  if (_selectedMobileFile == null) {
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(msg: 'No File Selected !');
+                  } else if (_formState.currentState!.validate()) {
+                    // put file
+                    task = putContentOnStorage();
+                    // setState(() {});
+                    if (task == null) return;
+                    progressDialog(context, task!);
 
-                          // if (task == null) return;
-                          // progressDialog(context, task!);
+                    // download link
+                    final snapshot = await task!.whenComplete(() {});
+                    String downloadedUrl = await snapshot.ref.getDownloadURL();
 
-                          setState(() => _isLoading = false);
-                        }
-                      },
-                label: _isLoading
-                    ? const SizedBox(
-                        height: 32,
-                        width: 32,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text('Upload File')),
+                    // fire store
+                    await uploadFileToFireStore(fileUrl: downloadedUrl);
+                  }
+                },
+                label: const Text('Upload File')),
           ),
         ],
       ),
@@ -308,127 +302,33 @@ class _AddContentState extends State<AddContent> {
   }
 
   // upload file to storage
-  putFileToFireStorage() async {
-    if (_selectedMobileFile == null) return null;
-
+  UploadTask? putContentOnStorage() {
     var fileName =
         '${widget.courseModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
 
     ///Universities/University of Chittagong/Departments/Department of Psychology
-    var path =
-        'Universities/${widget.profileData.university}/${widget.profileData.department}/${widget.courseType}/$fileName';
+    final ref = FirebaseStorage.instance
+        .ref('Universities')
+        .child(widget.profileData.university)
+        .child(widget.profileData.department)
+        .child(widget.courseType.toLowerCase())
+        .child(fileName);
 
-    var downloadedUrl = '';
-
-    final ref = FirebaseStorage.instance.ref(path);
-
-    if (kIsWeb) {
-      await ref.putData(
-        _selectedWebFile,
-        SettableMetadata(
-          contentType: 'application/pdf',
-        ),
-      );
-      downloadedUrl = await ref.getDownloadURL();
-    } else {
-      await ref.putFile(_selectedMobileFile!);
-      downloadedUrl = await ref.getDownloadURL();
+    try {
+      if (kIsWeb) {
+        return ref.putData(
+          _selectedWebFile,
+          SettableMetadata(
+            contentType: 'application/pdf',
+          ),
+        );
+      } else {
+        return ref.putFile(_selectedMobileFile!);
+      }
+    } on FirebaseException catch (e) {
+      log('Content upload error: ${e.message!}');
+      return null;
     }
-
-    // fire store
-    await uploadFileToFireStore(fileUrl: downloadedUrl);
-  }
-
-  // show dialog
-  progressDialog(BuildContext context, UploadTask task) {
-    FocusManager.instance.primaryFocus!.unfocus();
-
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => AlertDialog(
-              contentPadding: const EdgeInsets.all(12),
-              title: Stack(
-                alignment: Alignment.centerRight,
-                children: [
-                  const SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      'Uploading File',
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  //
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.shade100,
-                      ),
-                      child: const Icon(
-                        Icons.close_outlined,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              titlePadding: const EdgeInsets.all(12),
-              content: StreamBuilder<TaskSnapshot>(
-                  stream: task.snapshotEvents,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final snap = snapshot.data!;
-                      final progress = snap.bytesTransferred / snap.totalBytes;
-                      final percentage = (progress * 100).toStringAsFixed(0);
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: LinearProgressIndicator(
-                              minHeight: 16,
-                              value: progress,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.blueAccent.shade200),
-                              backgroundColor: Colors.lightBlueAccent.shade100
-                                  .withOpacity(.2),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text('$percentage %'),
-                          const SizedBox(height: 8),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: LinearProgressIndicator(
-                              minHeight: 16,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.blueAccent.shade200),
-                              backgroundColor: Colors.lightBlueAccent.shade100
-                                  .withOpacity(.2),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(' '),
-                          const SizedBox(height: 8),
-                        ],
-                      );
-                    }
-                  }),
-            ));
   }
 
   // upload file to fire store
@@ -468,8 +368,101 @@ class _AddContentState extends State<AddContent> {
         .set(courseContentModel.toJson())
         .then((value) {
       Navigator.pop(context);
+      Navigator.pop(context);
     });
   }
+}
+
+// show dialog
+progressDialog(BuildContext context, UploadTask task) {
+  FocusManager.instance.primaryFocus!.unfocus();
+
+  return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+            contentPadding: const EdgeInsets.all(12),
+            title: Stack(
+              alignment: Alignment.centerRight,
+              children: [
+                const SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Uploading File',
+                    style: TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                //
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey.shade100,
+                    ),
+                    child: const Icon(
+                      Icons.close_outlined,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            titlePadding: const EdgeInsets.all(12),
+            content: StreamBuilder<TaskSnapshot>(
+                stream: task.snapshotEvents,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final snap = snapshot.data!;
+                    final progress = snap.bytesTransferred / snap.totalBytes;
+                    final percentage = (progress * 100).toStringAsFixed(0);
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(32),
+                          child: LinearProgressIndicator(
+                            minHeight: 16,
+                            value: progress,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.blueAccent.shade200),
+                            backgroundColor:
+                                Colors.lightBlueAccent.shade100.withOpacity(.2),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text('$percentage %'),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(32),
+                          child: LinearProgressIndicator(
+                            minHeight: 16,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.blueAccent.shade200),
+                            backgroundColor:
+                                Colors.lightBlueAccent.shade100.withOpacity(.2),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(' '),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  }
+                }),
+          ));
 }
 
 // content subtitle

@@ -20,6 +20,13 @@ class NoticeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ref = FirebaseFirestore.instance
+        .collection('Universities')
+        .doc(profileData.university)
+        .collection('Departments')
+        .doc(profileData.department)
+        .collection('notices');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
@@ -27,13 +34,9 @@ class NoticeScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('Universities')
-            .doc(profileData.university)
-            .collection('Departments')
-            .doc(profileData.department)
-            .collection('Notifications')
+        stream: ref
             .where('batch', arrayContains: profileData.information.batch)
+            .orderBy('time', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -70,7 +73,7 @@ class NoticeScreen extends StatelessWidget {
                       elevation: 0,
                       child: StreamBuilder<DocumentSnapshot>(
                           stream: FirebaseFirestore.instance
-                              .collection('Users')
+                              .collection('users')
                               .doc(noticeModel.uploader)
                               .snapshots(),
                           builder: (context, snapshot) {
@@ -94,14 +97,7 @@ class NoticeScreen extends StatelessWidget {
                                   seenList.add(uid);
 
                                   //
-                                  FirebaseFirestore.instance
-                                      .collection('Universities')
-                                      .doc(profileData.university)
-                                      .collection('Departments')
-                                      .doc(profileData.department)
-                                      .collection('Notifications')
-                                      .doc(notice.id)
-                                      .update({
+                                  await ref.doc(notice.id).update({
                                     'seen': seenList,
                                   });
                                 }
@@ -111,9 +107,10 @@ class NoticeScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => NoticeScreenDetails(
+                                      noticeId: notice.id,
                                       profileData: profileData,
                                       noticeModel: noticeModel,
-                                      uploader: uploader!,
+                                      uploader: uploader,
                                     ),
                                   ),
                                 );
@@ -124,7 +121,7 @@ class NoticeScreen extends StatelessWidget {
                                   Colors.blueAccent.shade100.withOpacity(.2),
                               // image
                               leading: CachedNetworkImage(
-                                imageUrl: uploader!.get('imageUrl'),
+                                imageUrl: uploader!.get('image'),
                                 fadeInDuration:
                                     const Duration(milliseconds: 500),
                                 imageBuilder: (context, imageProvider) =>

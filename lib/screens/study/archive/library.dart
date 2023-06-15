@@ -23,7 +23,7 @@ class Library extends StatelessWidget {
         actions: [
           BookmarkCounter(
             profileData: profileData,
-            batches: [],
+            batches: batches,
           ),
           const SizedBox(width: 4),
         ],
@@ -76,16 +76,9 @@ class Library extends StatelessWidget {
 
               var contentData = data[index];
 
-              // // for web browser
-              // if (kIsWeb) {
-              //   return ContentCardWeb(
-              //     userModel: userModel!,
-              //     courseContentModel: courseContentModel,
-              //   );
-              // }
-
-              // for mobile
+              //
               return ContentCard(
+                selectedYear: 'Library',
                 profileData: profileData,
                 contentModel: courseContentModel,
                 batches: batches,

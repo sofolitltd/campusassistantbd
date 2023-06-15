@@ -12,7 +12,6 @@ import '/utils/constants.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key, required this.profileData}) : super(key: key);
-
   final ProfileData profileData;
 
   @override

@@ -110,6 +110,7 @@ class FriendsScreen extends StatelessWidget {
             radius: const Radius.circular(8),
             interactive: true,
             child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width > 800
                     ? MediaQuery.of(context).size.width * .2
