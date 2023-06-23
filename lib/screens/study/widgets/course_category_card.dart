@@ -11,14 +11,14 @@ class CourseCategoryCard extends StatelessWidget {
     Key? key,
     required this.profileData,
     required this.courseCategory,
-    required this.selectedYear,
+    required this.selectedSemester,
     required this.selectedBatch,
     required this.batches,
   }) : super(key: key);
 
   final ProfileData profileData;
   final String courseCategory;
-  final String selectedYear;
+  final String selectedSemester;
   final String selectedBatch;
   final List<String> batches;
 
@@ -35,7 +35,7 @@ class CourseCategoryCard extends StatelessWidget {
               .doc(profileData.department)
               .collection('courses')
               .orderBy('courseCode')
-              .where('courseYear', isEqualTo: selectedYear)
+              .where('courseYear', isEqualTo: selectedSemester)
               .where('courseCategory', isEqualTo: courseCategory)
               .where('batches', arrayContains: selectedBatch)
               .snapshots(),
@@ -80,15 +80,13 @@ class CourseCategoryCard extends StatelessWidget {
                       //model
                       CourseModelNew courseModel =
                           CourseModelNew.fromJson(data[index]);
-
-                      // log("courseId: ${data[index].id}");
                       //
                       return CourseCard(
                         profileData: profileData,
-                        selectedYear: selectedYear,
+                        selectedSemester: selectedSemester,
+                        selectedBatch: selectedBatch,
                         courseId: data[index].id,
                         courseModel: courseModel,
-                        selectedSession: selectedBatch,
                         batches: batches,
                       );
                     },

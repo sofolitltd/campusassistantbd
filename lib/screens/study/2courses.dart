@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '/utils/constants.dart';
 import '../../models/profile_data.dart';
-import 'upload/course_add.dart';
+import 'uploader/course_add.dart';
 import 'widgets/course_category_card.dart';
 
 class Courses extends StatelessWidget {
@@ -61,7 +61,7 @@ class Courses extends StatelessWidget {
               (courseCategory) => CourseCategoryCard(
                 courseCategory: courseCategory,
                 profileData: profileData,
-                selectedYear: semester,
+                selectedSemester: semester,
                 selectedBatch: selectedBatch,
                 batches: batches,
               ),

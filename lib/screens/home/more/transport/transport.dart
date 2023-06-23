@@ -37,7 +37,7 @@ class Transport extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Universities')
-            .doc(profileData!.university)
+            .doc(profileData.university)
             .collection('Transports')
             .orderBy('time', descending: false)
             .snapshots(),
@@ -56,13 +56,13 @@ class Transport extends StatelessWidget {
           return data.isEmpty
               ? const Center(child: Text('No data found'))
               : ListView.separated(
+                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: MediaQuery.of(context).size.width > 1000
                         ? MediaQuery.of(context).size.width * .2
                         : 16,
                   ),
-                  shrinkWrap: true,
                   itemCount: data.length,
                   itemBuilder: (context, index) => GestureDetector(
                     onTap: () {
@@ -86,7 +86,7 @@ class Transport extends StatelessWidget {
                             ),
                           ),
                           child: CachedNetworkImage(
-                            imageUrl: data[index].get('imageUrl'),
+                            imageUrl: data[index].get('image'),
                             fadeInDuration: const Duration(milliseconds: 500),
                             imageBuilder: (context, imageProvider) => Container(
                               decoration: BoxDecoration(

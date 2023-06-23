@@ -418,11 +418,11 @@ class _EditProfileState extends State<EditProfile> {
           context: context,
           presentStyle: CropperPresentStyle.dialog,
           boundary: const CroppieBoundary(
-            width: 500,
-            height: 500,
+            width: 350,
+            height: 350,
           ),
           viewPort:
-              const CroppieViewPort(width: 480, height: 480, type: 'square'),
+              const CroppieViewPort(width: 350, height: 350, type: 'square'),
           enableExif: true,
           enableZoom: true,
           showZoomer: true,

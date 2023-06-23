@@ -142,7 +142,7 @@ class Universities extends StatelessWidget {
                             departments != '' &&
                             area != '' &&
                             website != '') {
-                          var ref = await FirebaseFirestore.instance
+                          await FirebaseFirestore.instance
                               .collection('Universities')
                               .doc(name)
                               .set(universityModel.toJson())
@@ -183,7 +183,12 @@ class Universities extends StatelessWidget {
 
             return ListView.separated(
               itemCount: docs.length,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width > 800
+                    ? MediaQuery.of(context).size.width * .2
+                    : 16,
+                vertical: 16,
+              ),
               separatorBuilder: (BuildContext context, int index) =>
                   const SizedBox(height: 16),
               itemBuilder: (context, index) {

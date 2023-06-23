@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '/screens/study/widgets/pdf_viewer_web.dart';
+import '../../../../widgets/pdf_viewer_web.dart';
 
 class SyllabusCardWeb extends StatefulWidget {
   const SyllabusCardWeb({Key? key, required this.contentData})

@@ -243,17 +243,17 @@ class _NewTeacherSignupScreenState extends State<NewTeacherSignupScreen> {
       if (e.code == 'weak-password') {
         setState(() => _isLoading = false);
         Fluttertoast.showToast(msg: 'The password provided is too weak.');
-        print('The password provided is too weak.');
+        log('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
         setState(() => _isLoading = false);
         Fluttertoast.showToast(
             msg: 'The account already exists for that email.');
-        print('The account already exists for that email.');
+        log('The account already exists for that email.');
       }
     } catch (e) {
       setState(() => _isLoading = false);
       Fluttertoast.showToast(msg: 'Some thing wrong.');
-      print('signup error: $e');
+      log('signup error: $e');
     }
   }
 

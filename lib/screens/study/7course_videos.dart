@@ -6,7 +6,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '/models/chapter_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
-import '/screens/study/upload/video_add.dart';
+import '/screens/study/uploader/video_add.dart';
 import '/widgets/open_app.dart';
 
 class CourseVideos extends StatelessWidget {
@@ -14,6 +14,7 @@ class CourseVideos extends StatelessWidget {
     Key? key,
     required this.profileData,
     required this.selectedYear,
+    required this.selectedBatch,
     this.courseChapterModel,
     required this.courseModel,
     required this.batches,
@@ -21,6 +22,7 @@ class CourseVideos extends StatelessWidget {
 
   final ProfileData profileData;
   final String selectedYear;
+  final String selectedBatch;
   final ChapterModel? courseChapterModel;
   final CourseModelNew courseModel;
   final List<String> batches;
@@ -29,7 +31,8 @@ class CourseVideos extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: (profileData.information.status!.moderator! ||
-              profileData.information.status!.cr!)
+              (profileData.information.status!.cr! &&
+                  selectedBatch == profileData.information.batch))
           ? FloatingActionButton(
               onPressed: () {
                 //
@@ -57,6 +60,7 @@ class CourseVideos extends StatelessWidget {
               .doc(profileData.department)
               .collection('videos')
               .where('courseCode', isEqualTo: courseModel.courseCode)
+              .where('batches', arrayContains: selectedBatch)
               .orderBy('chapterNo')
               .snapshots(),
           builder: (context, snapshot) {

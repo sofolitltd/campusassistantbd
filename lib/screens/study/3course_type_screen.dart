@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '/models/course_model_new.dart';
 import '/utils/constants.dart';
 import '../../models/profile_data.dart';
-import '4course_notes_chapters.dart';
+import '4course_chapters_screen.dart';
 import '6course_types_details.dart';
 import '7course_videos.dart';
 import 'widgets/bookmark_counter.dart';
@@ -12,19 +12,16 @@ class CourseTypeScreen extends StatefulWidget {
   const CourseTypeScreen({
     Key? key,
     required this.profileData,
-    // required this.id,
-    required this.selectedYear,
+    required this.selectedSemester,
     required this.courseModel,
     required this.selectedBatch,
     required this.batches,
   }) : super(key: key);
 
   final ProfileData profileData;
-  final String selectedYear;
-
-  // final String id;
-  final CourseModelNew courseModel;
+  final String selectedSemester;
   final String selectedBatch;
+  final CourseModelNew courseModel;
   final List<String> batches;
 
   @override
@@ -47,9 +44,7 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
           // tab bar
           bottom: TabBar(
             isScrollable: true,
-            tabs: kCourseType
-                .map((tab) => Tab(text: tab.toString().toUpperCase()))
-                .toList(),
+            tabs: kCourseType.map((tab) => Tab(text: tab)).toList(),
           ),
 
           actions: [
@@ -62,21 +57,21 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
         //
         body: TabBarView(
           children: [
-            // chapter list
-            CourseNotesChapters(
+            // chapters[notes]
+            CourseChaptersScreen(
               profileData: widget.profileData,
-              selectedYear: widget.selectedYear,
-              courseType: kCourseType[0],
-              courseModel: widget.courseModel,
+              selectedSemester: widget.selectedSemester,
               selectedBatch: widget.selectedBatch,
+              courseType: kCourseType[0].toString().toLowerCase(),
+              courseModel: widget.courseModel,
               batches: widget.batches,
             ),
 
             // video list
             CourseVideos(
               profileData: widget.profileData,
-              selectedYear: widget.selectedYear,
-              // courseChapterModel: courseChapterModel,
+              selectedYear: widget.selectedSemester,
+              selectedBatch: widget.selectedBatch,
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -84,8 +79,9 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
             // books
             CourseTypesDetails(
               profileData: widget.profileData,
-              selectedYear: widget.selectedYear,
-              courseType: kCourseType[2],
+              selectedSemester: widget.selectedSemester,
+              selectedBatch: widget.selectedBatch,
+              courseType: kCourseType[2].toString().toLowerCase(),
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -93,8 +89,9 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
             // questions
             CourseTypesDetails(
               profileData: widget.profileData,
-              selectedYear: widget.selectedYear,
-              courseType: kCourseType[3],
+              selectedSemester: widget.selectedSemester,
+              selectedBatch: widget.selectedBatch,
+              courseType: kCourseType[3].toString().toLowerCase(),
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -102,8 +99,9 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
             // syllabus
             CourseTypesDetails(
               profileData: widget.profileData,
-              selectedYear: widget.selectedYear,
-              courseType: kCourseType[4],
+              selectedSemester: widget.selectedSemester,
+              selectedBatch: widget.selectedBatch,
+              courseType: kCourseType[4].toString().toLowerCase(),
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),

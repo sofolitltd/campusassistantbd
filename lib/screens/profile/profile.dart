@@ -20,7 +20,6 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     //for automatic keep alive
     super.build(context);
-    var width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: NestedScrollView(

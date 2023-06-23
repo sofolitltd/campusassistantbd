@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/content_model.dart';
-import '../../models/profile_data.dart';
+import '/models/content_model.dart';
+import '/models/profile_data.dart';
 import 'widgets/content_card.dart';
 
 class CourseBookMarks extends StatelessWidget {
@@ -50,6 +50,7 @@ class CourseBookMarks extends StatelessWidget {
           var data = snapshot.data!.docs;
 
           return ListView.separated(
+            physics: const BouncingScrollPhysics(),
             itemCount: data.length,
             separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: 12),
@@ -90,7 +91,8 @@ class CourseBookMarks extends StatelessWidget {
 
                   //for mobile
                   return ContentCard(
-                    selectedYear: 'Bookmarks',
+                    selectedSemester: 'Bookmarks',
+                    selectedBatch: '',
                     profileData: profileData,
                     contentModel: courseContentModel,
                     batches: batches,

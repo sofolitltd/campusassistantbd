@@ -7,17 +7,15 @@ class PdfViewer extends StatelessWidget {
     required this.title,
     required this.fileUrl,
   }) : super(key: key);
-  final String title;
 
+  final String title;
   final String fileUrl;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          title,
-        ),
+        title: Text(title),
         centerTitle: true,
       ),
       body: const PDF(

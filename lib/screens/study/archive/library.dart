@@ -14,8 +14,6 @@ class Library extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var fullWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Library'),
@@ -74,11 +72,10 @@ class Library extends StatelessWidget {
               ContentModel courseContentModel =
                   ContentModel.fromJson(data[index]);
 
-              var contentData = data[index];
-
               //
               return ContentCard(
-                selectedYear: 'Library',
+                selectedSemester: 'Library',
+                selectedBatch: '',
                 profileData: profileData,
                 contentModel: courseContentModel,
                 batches: batches,

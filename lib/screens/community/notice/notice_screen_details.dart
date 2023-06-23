@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:campusassistant/screens/community/notice/comment_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '/models/notice_model.dart';
 import '/models/profile_data.dart';
-import '../../home/explore/student/widget/full_image.dart';
+import '/screens/community/notice/comment_screen.dart';
+import '/screens/home/explore/student/widget/full_image.dart';
 import 'notice_group.dart';
 import 'notice_screen.dart';
 
@@ -178,7 +178,7 @@ class NoticeScreenDetails extends StatelessWidget {
                 child: Divider(height: 0),
               ),
 
-              // seen
+              // seen & comment
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(

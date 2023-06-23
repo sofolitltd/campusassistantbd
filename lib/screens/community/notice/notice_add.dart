@@ -5,12 +5,13 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import '/models/notice_model.dart';
 import '/models/profile_data.dart';
@@ -32,8 +33,9 @@ class _NoticeAddState extends State<NoticeAdd> {
   bool isButtonActive = false;
   String counter = '';
   bool isLoading = false;
-  XFile? _pickedImage;
   UploadTask? task;
+  File? _pickedMobileImage;
+  Uint8List _webImage = Uint8List(8);
 
   @override
   void initState() {
@@ -71,11 +73,14 @@ class _NoticeAddState extends State<NoticeAdd> {
                 onPressed: isButtonActive
                     ? () async {
                         setState(() => isButtonActive = true);
-                        if (_pickedImage != null) {
+                        if (_pickedMobileImage != null) {
+                          setState(() => isLoading = true);
                           await uploadImageFile(widget.profileData);
+                          setState(() => isLoading = false);
                         } else {
-                          //
-                          await postMessage('');
+                          setState(() => isLoading = true);
+                          await postMessage(image: '');
+                          setState(() => isLoading = false);
                         }
                       }
                     : null,
@@ -139,10 +144,10 @@ class _NoticeAddState extends State<NoticeAdd> {
             const SizedBox(height: 16),
 
             //
-            _pickedImage == null
+            _pickedMobileImage == null
                 ? OutlinedButton.icon(
                     icon: const Icon(Icons.image_outlined),
-                    onPressed: _pickImage,
+                    onPressed: () async => await pickImage(context),
                     label: Text('Add image',
                         style: Theme.of(context).textTheme.titleMedium!
                         // .copyWith(color: Colors.red),
@@ -154,7 +159,7 @@ class _NoticeAddState extends State<NoticeAdd> {
                       //
                       FittedBox(
                         child: Image.file(
-                          File(_pickedImage!.path),
+                          File(_pickedMobileImage!.path),
                           fit: BoxFit.cover,
                           // height: 300,
                         ),
@@ -167,7 +172,7 @@ class _NoticeAddState extends State<NoticeAdd> {
                         child: IconButton(
                             onPressed: () {
                               setState(() {
-                                _pickedImage = null;
+                                _pickedMobileImage = null;
                               });
                             },
                             icon: const Icon(Icons.clear)),
@@ -200,43 +205,37 @@ class _NoticeAddState extends State<NoticeAdd> {
 
   // upload and download url
   Future uploadImageFile(ProfileData profileModel) async {
-    setState(() => isLoading = true);
+    String imageId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    String fileId = const Uuid().v4();
+    var ref = FirebaseStorage.instance
+        .ref('Universities')
+        .child(profileModel.university)
+        .child(profileModel.department)
+        .child('notices')
+        .child('$imageId.jpg');
 
-    //
-    final filePath =
-        'Universities/${profileModel.university}/${profileModel.department}/notices';
-
-    //
-    final destination = '$filePath/$fileId.jpg';
-
-    task = FirebaseStorage.instance
-        .ref(destination)
-        .putFile(File(_pickedImage!.path));
+    if (kIsWeb) {
+      await ref.putData(_webImage);
+    } else {
+      await ref.putFile(_pickedMobileImage!);
+    }
     setState(() {});
-
-    if (task == null) return;
-
-    final snapshot = await task!.whenComplete(() {});
-    var downloadedUrl = await snapshot.ref.getDownloadURL();
+    var downloadedUrl = await ref.getDownloadURL();
     // print('Download-Link: $downloadedUrl');
 
     // cloud fire store
-    postMessage(downloadedUrl);
+    await postMessage(image: downloadedUrl);
   }
 
   //
-  postMessage(String downloadedUrl) {
-    setState(() => isLoading = true);
-
+  postMessage({required String image}) {
     var time = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
 
     NoticeModel noticeModel = NoticeModel(
       uploader: FirebaseAuth.instance.currentUser!.uid,
       batch: [widget.profileData.information.batch!],
       message: _messageController.text.toString(),
-      imageUrl: [downloadedUrl],
+      imageUrl: [image],
       seen: [],
       time: time,
     );
@@ -270,7 +269,6 @@ class _NoticeAddState extends State<NoticeAdd> {
       // });
 
       //
-      setState(() => isLoading = false);
       Fluttertoast.showToast(msg: 'Post notice successfully');
       if (!mounted) return;
       Navigator.pop(context);
@@ -306,42 +304,71 @@ class _NoticeAddState extends State<NoticeAdd> {
         ),
       );
     } catch (e) {
-      log("error push notification ${e}");
+      log("error push notification $e");
     }
   }
 
-  //
-  Future<void> _pickImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    //
-    if (image == null) return;
-    // ImageCropper imageCropper = ImageCropper();
-    //
-    // CroppedFile? croppedImage = await imageCropper.cropImage(
-    //   sourcePath: image.path,
-    //   cropStyle: CropStyle.rectangle,
-    //   aspectRatioPresets: [
-    //     CropAspectRatioPreset.original,
-    //     CropAspectRatioPreset.square,
-    //     CropAspectRatioPreset.ratio3x2,
-    //     CropAspectRatioPreset.ratio4x3,
-    //     CropAspectRatioPreset.ratio16x9,
-    //   ],
-    //   uiSettings: [
-    //     AndroidUiSettings(
-    //       toolbarTitle: 'image Customization',
-    //       toolbarColor: ThemeData().cardColor,
-    //       toolbarWidgetColor: Colors.deepOrange,
-    //       initAspectRatio: CropAspectRatioPreset.square,
-    //       lockAspectRatio: false,
-    //     )
-    //   ],
-    // );
-    // if (croppedImage == null) return;
+  //add image
+  pickImage(context) async {
+    // Pick an image
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      // _pickedImage = XFile(croppedImage.path);
-      _pickedImage = XFile(image.path);
-    });
+    //
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 40,
+      cropStyle: CropStyle.rectangle,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        //android
+        AndroidUiSettings(
+          toolbarTitle: 'image Customization',
+          toolbarColor: ThemeData().cardColor,
+          toolbarWidgetColor: Colors.deepOrange,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: false,
+        ),
+
+        //web
+        WebUiSettings(
+          context: context,
+          presentStyle: CropperPresentStyle.dialog,
+          boundary: const CroppieBoundary(
+            width: 500,
+            height: 500,
+          ),
+          viewPort:
+              const CroppieViewPort(width: 480, height: 480, type: 'square'),
+          enableExif: true,
+          enableZoom: true,
+          showZoomer: true,
+        ),
+      ],
+    );
+
+    if (!kIsWeb) {
+      if (croppedImage != null) {
+        var selectedMobileImage = File(croppedImage.path);
+        setState(() {
+          _pickedMobileImage = selectedMobileImage;
+        });
+      }
+    } else if (kIsWeb) {
+      if (croppedImage != null) {
+        var selectedWebImage = await croppedImage.readAsBytes();
+        setState(() {
+          // _webImage = selectedWebImage;
+          _webImage = selectedWebImage;
+          _pickedMobileImage = File('');
+        });
+      }
+    }
   }
 }

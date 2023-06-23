@@ -7,16 +7,16 @@ import '/models/chapter_model.dart';
 import '/models/content_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
-import '/screens/study/upload/content_add.dart';
+import '/screens/study/uploader/content_add.dart';
 import 'widgets/bookmark_counter.dart';
 import 'widgets/content_card.dart';
 
-class CourseNotesDetails extends StatelessWidget {
-  const CourseNotesDetails({
+class CourseNotesScreens extends StatelessWidget {
+  const CourseNotesScreens({
     Key? key,
     required this.profileData,
-    required this.selectedYear,
-    // required this.id,
+    required this.selectedSemester,
+    required this.selectedBatch,
     required this.courseType,
     required this.courseModel,
     required this.chapterModel,
@@ -24,7 +24,8 @@ class CourseNotesDetails extends StatelessWidget {
   }) : super(key: key);
 
   final ProfileData profileData;
-  final String selectedYear;
+  final String selectedSemester;
+  final String selectedBatch;
   final String courseType;
   final CourseModelNew courseModel;
   final ChapterModel chapterModel;
@@ -51,16 +52,18 @@ class CourseNotesDetails extends StatelessWidget {
         ],
       ),
       floatingActionButton: (profileData.information.status!.moderator! ||
-              profileData.information.status!.cr!)
+              (profileData.information.status!.cr! &&
+                  selectedBatch == profileData.information.batch))
           ? FloatingActionButton(
               onPressed: () {
+                log(courseType);
                 //
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddContent(
                       profileData: profileData,
-                      selectedYear: selectedYear,
+                      selectedSemester: selectedSemester,
                       courseType: courseType,
                       courseModel: courseModel,
                       batches: batches,
@@ -81,14 +84,11 @@ class CourseNotesDetails extends StatelessWidget {
             .collection('Departments')
             .doc(profileData.department)
             .collection('notes')
-            // .where('status', whereIn: [
-            //   'basic',
-            //   subscriber,
-            // ])
+            .where('status', whereIn: ['basic', subscriber])
             .where('courseCode', isEqualTo: courseModel.courseCode)
             .where('lessonNo', isEqualTo: chapterModel.chapterNo)
-            .where('batches', arrayContains: profileData.information.batch)
-            // .orderBy('contentTitle')
+            .where('batches', arrayContains: selectedBatch)
+            .orderBy('contentTitle')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -119,10 +119,12 @@ class CourseNotesDetails extends StatelessWidget {
             itemBuilder: (context, index) {
               //model
               ContentModel contentModel = ContentModel.fromJson(data[index]);
+              log('contentId: ${contentModel.contentId}');
 
               //
               return ContentCard(
-                selectedYear: selectedYear,
+                selectedSemester: selectedSemester,
+                selectedBatch: selectedBatch,
                 profileData: profileData,
                 contentModel: contentModel,
                 batches: batches,

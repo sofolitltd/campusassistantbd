@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 class AddTransports extends StatefulWidget {
   final UserModel userModel;
@@ -137,7 +136,7 @@ class _AddTransportsState extends State<AddTransports> {
 
   // upload and download url
   Future uploadImageFile(UserModel userModel) async {
-    String fileId = const Uuid().v4();
+    String fileId = DateTime.now().millisecondsSinceEpoch.toString();
     var time = DateFormat('dd-MM-yyyy AT hh:mm a').format(DateTime.now());
 
     //

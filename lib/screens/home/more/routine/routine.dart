@@ -1,11 +1,12 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/profile_data.dart';
+import 'routine_add.dart';
 import 'routine_details.dart';
 
 class Routine extends StatelessWidget {
@@ -15,6 +16,13 @@ class Routine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ref = FirebaseFirestore.instance
+        .collection('Universities')
+        .doc(profileData.university)
+        .collection('Departments')
+        .doc(profileData.department)
+        .collection('routines');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Routine'),
@@ -23,45 +31,25 @@ class Routine extends StatelessWidget {
 
       //
       floatingActionButton: profileData.information.status!.moderator!
-          ? FloatingActionButton(
-              onPressed: () async {
-                log('pressed');
-                var ref = FirebaseFirestore.instance
-                    .collection('Universities')
-                    .doc(profileData.university)
-                    .collection('Departments')
-                    .doc(profileData.department);
-
-                await ref.collection('Clubs').get().then((value) {
-                  for (var element in value.docs) {
-                    log(element.id);
-                    ref.collection('clubs').doc(element.id).set({
-                      'name': element.get('name'),
-                      'about': element.get('about')['estd'],
-                    });
-                  }
-                });
-
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => AddRoutine(profileData: profileData),
-                //   ),
-                // );
-              },
-              child: const Icon(Icons.add),
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AddRoutine(profileData: profileData),
+                    ),
+                  );
+                },
+                child: const Icon(Icons.add),
+              ),
             )
           : null,
 
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('Universities')
-            .doc(profileData.university)
-            .collection('Departments')
-            .doc(profileData.department)
-            .collection('routines')
-            .orderBy('time', descending: false)
-            .snapshots(),
+        stream: ref.orderBy('time', descending: false).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('some thing wrong'));
@@ -77,13 +65,13 @@ class Routine extends StatelessWidget {
           return data.isEmpty
               ? const Center(child: Text('No data found'))
               : ListView.separated(
+                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: MediaQuery.of(context).size.width > 800
                         ? MediaQuery.of(context).size.width * .2
                         : 16,
                   ),
-                  shrinkWrap: true,
                   itemCount: data.length,
                   itemBuilder: (context, index) => GestureDetector(
                     onTap: () {
@@ -172,35 +160,27 @@ class Routine extends StatelessWidget {
                                 ],
                               ),
 
-                              // if (userModel.role[UserRole.admin.name])
-                              //   IconButton(
-                              //     onPressed: () async {
-                              //       //
-                              //       await FirebaseFirestore.instance
-                              //           .collection('Universities')
-                              //           .doc(userModel.university)
-                              //           .collection('Departments')
-                              //           .doc(userModel.department)
-                              //           .collection('Routine')
-                              //           .doc(data[index].id)
-                              //           .delete();
-                              //
-                              //       //
-                              //       await FirebaseStorage.instance
-                              //           .refFromURL(
-                              //               data[index].get('imageUrl'))
-                              //           .delete()
-                              //           .then((value) {
-                              //         Fluttertoast.showToast(
-                              //             msg: 'Delete successfully');
-                              //       });
-                              //     },
-                              //     icon: const Icon(
-                              //       Icons.delete,
-                              //       color: Colors.black,
-                              //     ),
-                              //   ),
-                              //
+                              if (profileData.information.status!.moderator!)
+                                IconButton(
+                                  onPressed: () async {
+                                    //
+                                    await ref.doc(data[index].id).delete();
+
+                                    //
+                                    await FirebaseStorage.instance
+                                        .refFromURL(data[index].get('image'))
+                                        .delete()
+                                        .then((value) {
+                                      Fluttertoast.showToast(
+                                          msg: 'Delete successfully');
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.grey,
+                                    size: 22,
+                                  ),
+                                ),
                             ],
                           ),
                         ),

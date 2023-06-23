@@ -46,207 +46,218 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                     : 16,
                 vertical: 16,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 350,
+                    maxWidth: 400,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
 
-                  // logo
-                  const AppLogo(),
+                      // logo
+                      const AppLogo(),
 
-                  const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                  // login
-                  Card(
-                    elevation: 6,
-                    margin: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Welcome back'.toUpperCase(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
-                                ),
-                          ),
-                          Text(
-                            'login with email and password',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.w100,
-                                ),
-                          ),
-
-                          const SizedBox(height: 24),
-                          CommonTextFieldWidget(
-                            controller: _emailController,
-                            heading: 'Email',
-                            hintText: 'Enter email',
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (val) {
-                              if (val!.isEmpty) {
-                                return 'Enter your email';
-                              } else if (!regExp.hasMatch(val)) {
-                                return 'Enter valid email';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          CommonTextFieldWidget(
-                            heading: 'Password',
-                            controller: _passwordController,
-                            hintText: 'Enter password',
-                            keyboardType: TextInputType.visiblePassword,
-                            obscureText: true,
-                            validator: (val) {
-                              if (val!.isEmpty) {
-                                return 'Enter your password';
-                              } else if (val.length < 8) {
-                                return 'Password at least 8 characters';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          //log in
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 48)),
-                            onPressed: _isLoading
-                                ? null
-                                : () async {
-                                    //todo: change !
-                                    if (_globalKey.currentState!.validate()) {
-                                      setState(() => _isLoading = true);
-                                      // await Future.delayed(
-                                      //     const Duration(seconds: 1));
-                                      //
-                                      await loginWithEmail(
-                                        email: _emailController.text.trim(),
-                                        password: _passwordController.text,
-                                      );
-                                    }
-                                  },
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 32,
-                                    width: 32,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    'Login'.toUpperCase(),
-                                    style: const TextStyle(
-                                      letterSpacing: 1,
+                      // login
+                      Card(
+                        elevation: 6,
+                        margin: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Welcome back'.toUpperCase(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
                                       fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
+                              ),
+                              Text(
+                                'login with email and password',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w100,
+                                    ),
+                              ),
+
+                              const SizedBox(height: 24),
+                              CommonTextFieldWidget(
+                                controller: _emailController,
+                                heading: 'Email',
+                                hintText: 'Enter email',
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (val) {
+                                  if (val!.isEmpty) {
+                                    return 'Enter your email';
+                                  } else if (!regExp.hasMatch(val)) {
+                                    return 'Enter valid email';
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              CommonTextFieldWidget(
+                                heading: 'Password',
+                                controller: _passwordController,
+                                hintText: 'Enter password',
+                                keyboardType: TextInputType.visiblePassword,
+                                obscureText: true,
+                                validator: (val) {
+                                  if (val!.isEmpty) {
+                                    return 'Enter your password';
+                                  } else if (val.length < 8) {
+                                    return 'Password at least 8 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              //log in
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize:
+                                        const Size(double.infinity, 48)),
+                                onPressed: _isLoading
+                                    ? null
+                                    : () async {
+                                        //todo: change !
+                                        if (_globalKey.currentState!
+                                            .validate()) {
+                                          setState(() => _isLoading = true);
+                                          // await Future.delayed(
+                                          //     const Duration(seconds: 1));
+                                          //
+                                          await loginWithEmail(
+                                            email: _emailController.text.trim(),
+                                            password: _passwordController.text,
+                                          );
+                                        }
+                                      },
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 32,
+                                        width: 32,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Login'.toUpperCase(),
+                                        style: const TextStyle(
+                                          letterSpacing: 1,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              //forgot pass
+                              TextButton(
+                                onPressed: () {
+                                  //
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ForgotPassword(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 4,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black54,
+                                      ),
                                     ),
                                   ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          //forgot pass
-                          TextButton(
-                            onPressed: () {
-                              //
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ForgotPassword(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                bottom: 4,
-                              ),
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.black54,
+                                  child: const Text(
+                                    'Forgot Password ?',
+                                    style: TextStyle(),
                                   ),
                                 ),
                               ),
-                              child: const Text(
-                                'Forgot Password ?',
-                                style: TextStyle(),
-                              ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                  // sign up
-                  Card(
-                    elevation: 6,
-                    margin: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Don\'t have an account?'.toUpperCase(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black54,
+                      // sign up
+                      Card(
+                        elevation: 6,
+                        margin: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Don\'t have an account?'.toUpperCase(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black54,
+                                    ),
+                              ),
+                              const SizedBox(height: 16),
+
+                              //
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: const Size(double.infinity, 48),
                                 ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          //
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 48),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NewVerificationScreen()));
-                            },
-                            child: Text(
-                              'Create new account'.toUpperCase(),
-                              style: const TextStyle(
-                                letterSpacing: .5,
-                                fontWeight: FontWeight.bold,
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NewVerificationScreen()));
+                                },
+                                child: Text(
+                                  'Create new account'.toUpperCase(),
+                                  style: const TextStyle(
+                                    letterSpacing: .5,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

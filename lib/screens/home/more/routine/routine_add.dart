@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import '/models/profile_data.dart';
 
@@ -138,7 +137,7 @@ class _AddRoutineState extends State<AddRoutine> {
 
   // upload and download url
   Future uploadImageFile(ProfileData profileData) async {
-    String fileId = const Uuid().v4();
+    String fileId = DateTime.now().millisecondsSinceEpoch.toString();
     var time = DateFormat('dd-MM-yyyy AT hh:mm a').format(DateTime.now());
 
     //
@@ -166,12 +165,12 @@ class _AddRoutineState extends State<AddRoutine> {
         .doc(profileData.university)
         .collection('Departments')
         .doc(profileData.department)
-        .collection('Routine')
+        .collection('routines')
         .doc(fileId)
         .set({
       'title': _titleController.text.trim(),
       'time': time,
-      'imageUrl': downloadedUrl,
+      'image': downloadedUrl,
     });
 
     //

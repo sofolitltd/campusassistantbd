@@ -89,10 +89,8 @@ class _AttendanceState extends State<Attendance> {
             }
 
             //Total Student:
-            String studentCounter = '${doc.length}';
             int rank = 0;
 
-            final ScrollController controller = ScrollController();
             return ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
                 PointerDeviceKind.touch,
@@ -254,7 +252,7 @@ class AttendanceTable extends StatelessWidget {
           .map(
             (data) => DataRow(
               cells: [
-                DataCell(Text('${data}')),
+                DataCell(Text('$data')),
                 DataCell(
                   Container(
                     decoration: BoxDecoration(

@@ -75,7 +75,7 @@ class RoutineDetails extends StatelessWidget {
                 //
                 Text(
                   data.get('title'),
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),

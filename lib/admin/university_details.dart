@@ -1,3 +1,4 @@
+import 'package:campusassistant/admin/hall_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'departments.dart';
@@ -19,8 +20,14 @@ class UniversityDetails extends StatelessWidget {
 
       //
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         children: [
+          ///dept
           ListTile(
             tileColor: Theme.of(context).cardColor,
             title: const Text('Departments'),
@@ -32,7 +39,23 @@ class UniversityDetails extends StatelessWidget {
                 ),
               );
             },
-          )
+          ),
+
+          const SizedBox(height: 16),
+
+          ///halls
+          ListTile(
+            tileColor: Theme.of(context).cardColor,
+            title: const Text('Halls'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HallScreen(university: university),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

@@ -1,31 +1,27 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:dio/dio.dart';
-import 'package:external_path/external_path.dart';
+import 'package:campusassistant/widgets/open_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '/models/content_model.dart';
 import '/models/profile_data.dart';
-import '/screens/study/upload/content_edit.dart';
+import '/screens/study/uploader/content_edit.dart';
 import '/screens/study/widgets/bookmark_button.dart';
-import '/screens/study/widgets/pdf_viewer_web.dart';
 import '/widgets/pdf_viewer.dart';
+import '../../../widgets/pdf_viewer_web.dart';
 
 class ContentCard extends StatefulWidget {
   const ContentCard({
     Key? key,
-    required this.selectedYear,
     required this.profileData,
+    required this.selectedSemester,
+    required this.selectedBatch,
     required this.contentModel,
     required this.batches,
   }) : super(key: key);
 
-  final String selectedYear;
   final ProfileData profileData;
+  final String selectedSemester;
+  final String selectedBatch;
   final ContentModel contentModel;
   final List<String> batches;
 
@@ -34,31 +30,8 @@ class ContentCard extends StatefulWidget {
 }
 
 class _ContentCardState extends State<ContentCard> {
-  bool _isLoading = false;
-  double? _downloadProgress;
-  String? directoryPath;
-
-  @override
-  void initState() {
-    super.initState();
-    getPublicDirectoryPath();
-  }
-
-  Future<void> getPublicDirectoryPath() async {
-    if (!kIsWeb) {
-      directoryPath = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOCUMENTS);
-
-      log(directoryPath.toString()); // /storage/emulated/0/Download
-      setState(() {});
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    String fileName =
-        '${widget.contentModel.courseCode}_${widget.contentModel.contentTitle.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.contentModel.contentSubtitle}_${widget.contentModel.contentId.toString().substring(0, 5)}.pdf';
-
     List<String> batches = widget.contentModel.batches;
     batches.sort((a, b) {
       //sorting in ascending order
@@ -102,15 +75,17 @@ class _ContentCardState extends State<ContentCard> {
               }
             },
 
-            //delete
+            //edit
             onLongPress: () {
               if (widget.profileData.information.status!.moderator! ||
-                  widget.profileData.information.status!.cr!) {
+                  (widget.profileData.information.status!.cr! &&
+                      widget.selectedBatch ==
+                          widget.profileData.information.batch)) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => EditContent(
-                      selectedYear: widget.selectedYear,
+                      selectedYear: widget.selectedSemester,
                       profileData: widget.profileData,
                       contentModel: widget.contentModel,
                       batches: widget.batches,
@@ -314,85 +289,34 @@ class _ContentCardState extends State<ContentCard> {
                   bottom: -6,
                   child: Row(
                     children: [
-                      // download //todo: add later[add cr, moderator also]
-                      if (!kIsWeb &&
-                          widget.profileData.information.status!.admin!) ...[
-                        if (directoryPath != null &&
-                            downloadFileChecker(fileName: fileName))
-                          const SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: IconButton(
-                              onPressed: null,
-                              icon: Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
-                                // size: 30,
-                              ),
+                      // download
+                      if (widget.profileData.information.status!.subscriber ==
+                              'pro' ||
+                          widget.profileData.information.status!.moderator! ==
+                              true ||
+                          widget.profileData.information.status!.cr! ==
+                              true) ...[
+                        SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: IconButton(
+                            onPressed: () async {
+                              OpenApp.openPdf(widget.contentModel.fileUrl);
+                            },
+                            tooltip: 'Download',
+                            icon: const Icon(
+                              Icons.downloading,
+                              // color: Colors.red,
+                              size: 22,
                             ),
-                          )
-                        else
-                          (_isLoading == false)
-                              ? SizedBox(
-                                  height: 40,
-                                  width: 40,
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      setState(() => _isLoading = true);
-
-                                      //
-                                      await downloadFileAndroid(
-                                        url: widget.contentModel.fileUrl,
-                                        fileName: fileName,
-                                      );
-
-                                      //
-                                      setState(() => _isLoading = false);
-                                    },
-                                    icon: const Icon(
-                                      Icons.downloading_rounded,
-                                      color: Colors.red,
-                                      // size: 30,
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(
-                                  height: 40,
-                                  width: 40,
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      //
-
-                                      // cancelToken.cancel();
-                                    },
-                                    icon: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        const Icon(
-                                          // Icons.clear,
-                                          Icons.downloading_rounded,
-                                          color: Colors.grey,
-                                          size: 18,
-                                        ),
-                                        SizedBox(
-                                          height: 25,
-                                          width: 25,
-                                          child: CircularProgressIndicator(
-                                            value: _downloadProgress,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                          ),
+                        ),
                         // preview
                         SizedBox(
                           height: 40,
                           width: 40,
                           child: IconButton(
-                            tooltip: 'Preview  before download or open file',
-                            onPressed: () {
-                              //
+                            onPressed: () async {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -403,17 +327,20 @@ class _ContentCardState extends State<ContentCard> {
                                 ),
                               );
                             },
+                            tooltip: 'Preview',
                             icon: const Icon(
-                              Icons.visibility_outlined,
+                              Icons.remove_red_eye_outlined,
+                              // color: Colors.red,
+                              // size: 30,
                             ),
                           ),
                         ),
                       ],
 
-                      //
+                      // bookmark
                       BookmarkButton(
                         profileData: widget.profileData,
-                        courseContentModel: widget.contentModel,
+                        contentModel: widget.contentModel,
                       ),
                     ],
                   ),
@@ -470,56 +397,5 @@ class _ContentCardState extends State<ContentCard> {
         ],
       ),
     );
-  }
-
-  // downloadFileChecker
-  downloadFileChecker({required String fileName}) {
-    final file = File('$directoryPath/$fileName');
-
-    if (file.existsSync()) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> getStoragePermission() async {
-    return await Permission.storage.request().isGranted;
-  }
-
-  // download file
-  Future<File?> downloadFileAndroid(
-      {required String url, required String fileName}) async {
-    if (await getStoragePermission()) {
-      final file = File('$directoryPath/$fileName');
-
-      // download file with dio
-      try {
-        final response = await Dio().get(
-          url,
-          // cancelToken: cancelToken,
-          options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-          ),
-          onReceiveProgress: (received, total) {
-            double progress = received / total;
-            _downloadProgress = progress;
-            setState(() {});
-          },
-        );
-
-        // store on file system
-        final ref = file.openSync(mode: FileMode.write);
-        ref.writeFromSync(response.data);
-        await ref.close();
-        Fluttertoast.showToast(msg: 'File save on: \n$directoryPath');
-
-        return file;
-      } catch (e) {
-        log('error: $e');
-        Fluttertoast.showToast(msg: e.toString());
-      }
-    }
-    return null;
   }
 }

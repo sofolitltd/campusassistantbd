@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:campusassistant/screens/home/explore/student/widget/full_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,10 +6,13 @@ import 'package:flutter/material.dart';
 
 import '/models/notice_model.dart';
 import '/models/profile_data.dart';
+import '/screens/home/explore/student/widget/full_image.dart';
 import '/widgets/headline.dart';
+import 'comment_screen.dart';
 import 'notice_add.dart';
 import 'notice_edit.dart';
 import 'notice_screen.dart';
+import 'notice_screen_details.dart';
 
 class NoticeGroup extends StatelessWidget {
   final ProfileData profileData;
@@ -25,7 +27,8 @@ class NoticeGroup extends StatelessWidget {
     DocumentSnapshot? uploader;
 
     return Scaffold(
-      floatingActionButton: profileData.information.status!.cr!
+      floatingActionButton: (profileData.information.status!.moderator! ||
+              profileData.information.status!.cr!)
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -213,14 +216,19 @@ class NoticeGroup extends StatelessWidget {
                                                   //time
                                                   subtitle: Text(
                                                     TimeAgo.timeAgoSinceDate(
-                                                      noticeModel.time,
-                                                    ),
+                                                        noticeModel.time),
                                                   ),
 
                                                   //edit, delete
                                                   trailing:
-                                                      (profileData.information
-                                                              .status!.cr!)
+                                                      (profileData
+                                                                  .information
+                                                                  .status!
+                                                                  .moderator! ||
+                                                              profileData
+                                                                  .information
+                                                                  .status!
+                                                                  .cr!)
                                                           ? PopupMenuButton(
                                                               itemBuilder:
                                                                   (context) => [
@@ -346,7 +354,77 @@ class NoticeGroup extends StatelessWidget {
                                             ),
                                           ),
 
-                                        // seen
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Divider(height: 0),
+                                        ),
+
+                                        // seen & comment
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              // seen
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              SeenListScreen(
+                                                                  seenList:
+                                                                      noticeModel
+                                                                          .seen)));
+                                                },
+                                                child: Text(
+                                                  'Seen by ${noticeModel.seen.length}',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
+                                                ),
+                                              ),
+
+                                              //comment
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              CommentScreen(
+                                                                noticeId:
+                                                                    notice.id,
+                                                                profileData:
+                                                                    profileData,
+                                                              )));
+                                                },
+                                                child: const Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .keyboard_command_key,
+                                                      size: 16,
+                                                    ),
+                                                    Text('Comment'),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+
+                                        //
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          child: Divider(height: 0),
+                                        ),
                                       ],
                                     ),
                                   ),

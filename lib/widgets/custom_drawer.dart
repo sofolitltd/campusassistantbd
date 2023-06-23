@@ -102,7 +102,7 @@ class CustomDrawer extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             'Department of Psychology',
-                            style: Theme.of(context).textTheme.bodyText1!,
+                            style: Theme.of(context).textTheme.bodyLarge!,
                           ),
                           Text(
                             'University of Chittagong',
@@ -328,7 +328,6 @@ class Contributors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var data = [];
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

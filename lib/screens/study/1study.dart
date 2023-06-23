@@ -4,13 +4,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '/models/profile_data.dart';
 import '/models/semester_model.dart';
-import '/screens/study/archive/library.dart';
-import '/screens/study/archive/research.dart';
-import '/screens/study/upload/semester_edit.dart';
 import '/widgets/headline.dart';
 import '2courses.dart';
 import '8course_bookmarks.dart';
-import 'upload/semester_add.dart';
+import 'archive/library.dart';
+import 'archive/research.dart';
+import 'uploader/semester_add.dart';
+import 'uploader/semester_edit.dart';
 import 'widgets/bookmark_counter.dart';
 
 class Study extends StatefulWidget {
@@ -68,7 +68,6 @@ class _StudyState extends State<Study> with AutomaticKeepAliveClientMixin {
   Widget build(BuildContext context) {
     //for automatic keep alive
     super.build(context);
-    var width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(

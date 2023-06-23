@@ -4,28 +4,26 @@ import 'package:flutter/material.dart';
 import '/models/chapter_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
-import '/screens/study/upload/chapter_add.dart';
-import '/screens/study/upload/chapter_edit.dart';
-import '5course_notes_details.dart';
+import '5course_notes_screen.dart';
+import 'uploader/chapter_add.dart';
+import 'uploader/chapter_edit.dart';
 
-class CourseNotesChapters extends StatelessWidget {
-  const CourseNotesChapters({
+class CourseChaptersScreen extends StatelessWidget {
+  const CourseChaptersScreen({
     Key? key,
     required this.profileData,
-    required this.selectedYear,
-    // required this.id,
+    required this.selectedSemester,
+    required this.selectedBatch,
     required this.courseType,
     required this.courseModel,
-    required this.selectedBatch,
     required this.batches,
   }) : super(key: key);
 
   final ProfileData profileData;
-  final String selectedYear;
-  // final String id;
+  final String selectedSemester;
+  final String selectedBatch;
   final String courseType;
   final CourseModelNew courseModel;
-  final String selectedBatch;
   final List<String> batches;
 
   @override
@@ -40,8 +38,7 @@ class CourseNotesChapters extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => AddChapter(
                       profileData: profileData,
-                      selectedYear: selectedYear,
-                      // id: id,
+                      selectedYear: selectedSemester,
                       courseModel: courseModel,
                       courseType: courseType,
                       batches: batches,
@@ -103,16 +100,16 @@ class CourseNotesChapters extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   onTap: () {
-                    // notes details
+                    // notes screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CourseNotesDetails(
+                        builder: (context) => CourseNotesScreens(
                           profileData: profileData,
-                          selectedYear: selectedYear,
-                          courseType: 'notes',
+                          selectedSemester: selectedSemester,
+                          selectedBatch: selectedBatch,
+                          courseType: 'Notes',
                           courseModel: courseModel,
-                          // id: id,
                           chapterModel: chapterModel,
                           batches: batches,
                         ),
@@ -127,7 +124,7 @@ class CourseNotesChapters extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => EditChapter(
                             profileData: profileData,
-                            selectedYear: selectedYear,
+                            selectedYear: selectedSemester,
                             courseModel: courseModel,
                             courseType: courseType,
                             batches: batches,

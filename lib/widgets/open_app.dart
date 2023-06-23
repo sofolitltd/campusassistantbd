@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,7 +13,7 @@ class OpenApp {
         mode: LaunchMode.externalApplication,
       );
     } else {
-      print('error');
+      log('error');
     }
   }
 
@@ -22,11 +23,10 @@ class OpenApp {
     if (await canLaunchUrl(url)) {
       await launchUrl(
         url,
-        mode: LaunchMode.platformDefault,
-        webOnlyWindowName: '_blank',
+        mode: LaunchMode.externalApplication,
       );
     } else {
-      print('error');
+      log('error');
     }
   }
 
@@ -41,7 +41,7 @@ class OpenApp {
           url,
         );
       } else {
-        debugPrint('error');
+        log('error');
       }
     }
   }
@@ -55,7 +55,7 @@ class OpenApp {
       try {
         await launchUrl(url);
       } catch (e) {
-        debugPrint('error');
+        log('error');
       }
     }
   }

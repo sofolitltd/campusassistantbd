@@ -347,11 +347,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           context: context,
           presentStyle: CropperPresentStyle.dialog,
           boundary: const CroppieBoundary(
-            width: 500,
-            height: 500,
+            width: 350,
+            height: 350,
           ),
           viewPort:
-              const CroppieViewPort(width: 480, height: 480, type: 'square'),
+              const CroppieViewPort(width: 350, height: 350, type: 'square'),
           enableExif: true,
           enableZoom: true,
           showZoomer: true,
@@ -438,14 +438,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
     //
     await addUserInformation(uid, downloadedUrl);
-    await updateVerificationToken(downloadedUrl);
+    await deleteVerificationToken(downloadedUrl);
   }
 
   //
-  addUserInformation(String uid, downloadUrl) async {
+  addUserInformation(String uid, image) async {
     String? token = await FirebaseMessaging.instance.getToken();
 
-    //
+    // add to user
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -457,7 +457,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           name: widget.name,
           email: _emailController.text.trim(),
           mobile: widget.mobile,
-          image: downloadUrl,
+          image: image,
           information: Information(
             batch: widget.batch,
             id: widget.id,
@@ -472,22 +472,42 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
           ),
           token: token!,
-        ).toJson())
-        .then(
-      (value) async {
-        if (!mounted) return;
-        //
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const NewHomeScreen()),
-            (route) => false);
-      },
-    );
+        ).toJson());
+
+    // update student info
+    await updateStudentInformation(image: image);
+
+    //
+    if (!mounted) return;
+    //
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const NewHomeScreen()),
+        (route) => false);
     log('Signup Successful');
   }
 
+  //update student info
+  updateStudentInformation({required String image}) async {
+    await FirebaseFirestore.instance
+        .collection('Universities')
+        .doc(widget.university)
+        .collection('Departments')
+        .doc(widget.department)
+        .collection('students')
+        .doc('batches')
+        .collection(widget.batch)
+        .doc(widget.id)
+        .update({
+      'phone': widget.mobile,
+      'hall': widget.hall,
+      'blood': widget.blood,
+      'imageUrl': image,
+    });
+  }
+
   // delete verification
-  updateVerificationToken(String downloadUrl) async {
+  deleteVerificationToken(String downloadUrl) async {
     await FirebaseFirestore.instance
         .collection('Universities')
         .doc(widget.university)

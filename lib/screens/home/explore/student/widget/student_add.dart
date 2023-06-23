@@ -1,5 +1,4 @@
 import 'dart:developer' as dev;
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/student_model.dart';
 import '/utils/constants.dart';
+import '/utils/create_verification_code.dart';
 
 class AddStudent extends StatefulWidget {
   const AddStudent({
@@ -347,8 +347,7 @@ class _AddStudentState extends State<AddStudent> {
                             setState(() => _isLoading = true);
 
                             String id = _idController.text.trim();
-                            String code = createToken(
-                                batch: widget.selectedBatch, id: id);
+                            String code = createToken();
 
                             // check student already exist
                             await ref.doc(id).get().then((value) async {
@@ -366,8 +365,7 @@ class _AddStudentState extends State<AddStudent> {
                                     .get()
                                     .then((element) {
                                   if (element.exists) {
-                                    String newCode = createToken(
-                                        batch: widget.selectedBatch, id: id);
+                                    String newCode = createToken();
                                     code = newCode;
                                     dev.log('New Code: $code');
                                   } else {
@@ -438,12 +436,4 @@ class _AddStudentState extends State<AddStudent> {
       ),
     );
   }
-}
-
-// generate code
-String createToken({required String batch, required String id}) {
-  var batchSub = batch.substring(batch.length - 2);
-  var idSub = id.substring(id.length - 2);
-  var num = Random().nextInt(9000) + 1000;
-  return '$batchSub$idSub$num';
 }

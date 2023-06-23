@@ -14,17 +14,30 @@ class AdminDashboardScreen extends StatelessWidget {
 
       //
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         children: [
-          ListTile(
+          GestureDetector(
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const Universities()));
             },
-            tileColor: Theme.of(context).cardColor,
-            title: const Text('Universities'),
+            child: Container(
+                height: 64,
+                color: Theme.of(context).cardColor,
+                alignment: Alignment.center,
+                child: Text(
+                  'Universities',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                )),
           ),
         ],
       ),

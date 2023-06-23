@@ -1,17 +1,21 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:campusassistant/screens/study/widgets/content_subtitle_widget.dart';
+import 'package:campusassistant/screens/study/widgets/path_section_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '/models/content_model.dart';
 import '/models/profile_data.dart';
+import '../widgets/progress_dialog.dart';
 
 ///Study/2nd Year/Practical Course/Psy 207/Notes/Lessons/02/sxusycT5qFMLYx91ec1Z
 
@@ -119,7 +123,7 @@ class _EditContentState extends State<EditContent> {
         ),
         children: [
           //
-          buildPathSection(
+          pathSectionWidget(
             year: widget.selectedYear,
             courseCode: widget.contentModel.courseCode,
             chapterNo: widget.contentModel.lessonNo.toString(),
@@ -195,16 +199,16 @@ class _EditContentState extends State<EditContent> {
                   maxLines: 5,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: getContentSubtitle(
+                    labelText: contentSubtitleWidget(
                         courseType:
                             widget.contentModel.contentType.toLowerCase()),
                     // widget.courseType == 'notes' ? 'Creator' : 'Year',
-                    hintText: getContentSubtitle(
+                    hintText: contentSubtitleWidget(
                         courseType:
                             widget.contentModel.contentType.toLowerCase()),
                   ),
                   validator: (value) =>
-                      value!.isEmpty ? "Enter Chapter Title" : null,
+                      value!.isEmpty ? "Enter Chapter subtitle" : null,
                 ),
 
                 const SizedBox(height: 16),
@@ -288,13 +292,14 @@ class _EditContentState extends State<EditContent> {
                           //delete old file
                           await FirebaseStorage.instance
                               .refFromURL(widget.contentModel.fileUrl)
-                              .delete();
-
-                          // put new file
-                          task = putContentOnStorage();
-                          setState(() {});
-                          if (task == null) return;
-                          progressDialog(context, task!);
+                              .delete()
+                              .then((value) {
+                            // put new file
+                            task = putContentOnStorage();
+                            setState(() {});
+                            if (task == null) return;
+                            progressDialog(context, task!);
+                          });
 
                           // download link
                           final snapshot = await task!.whenComplete(() {});
@@ -381,13 +386,17 @@ class _EditContentState extends State<EditContent> {
         return ref.putFile(_selectedMobileFile!);
       }
     } on FirebaseException catch (e) {
-      log('Content upload error: ${e.message!}');
+      log('Content update error: ${e.message!}');
       return null;
     }
   }
 
   // upload file to fire store
   updateFileToFireStore({required String fileUrl}) async {
+    //date
+    String uploadDate = DateFormat('dd MMM, yyyy').format(DateTime.now());
+
+    //ref
     var ref = FirebaseFirestore.instance
         .collection('Universities')
         .doc(widget.profileData.university)
@@ -395,192 +404,30 @@ class _EditContentState extends State<EditContent> {
         .doc(widget.profileData.department)
         .collection(widget.contentModel.contentType.toLowerCase())
         .doc(widget.contentModel.contentId);
-
     //
     await ref.update(
       {
+        'fileUrl': fileUrl,
         'contentTitle': _contentTitleController.text.trim(),
         'contentSubtitle': _contentSubtitleController.text.trim(),
+        'contentType': widget.contentModel.contentType.toLowerCase(),
         'batches': _selectedBatches,
-        'fileUrl': fileUrl,
         'status': _selectedStatus,
+        'uploadDate': fileUrl == widget.contentModel.fileUrl
+            ? widget.contentModel.uploadDate
+            : uploadDate,
+        'uploader': fileUrl == widget.contentModel.fileUrl
+            ? widget.contentModel.uploader
+            : '${widget.profileData.name.trim().split(' ').last}(${widget.profileData.information.session})',
       },
     ).then((value) {
-      Navigator.pop(context);
+      log('Successfully update: ${widget.contentModel.contentId}');
+      if (fileUrl == widget.contentModel.fileUrl) {
+        Navigator.pop(context);
+      } else {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
     });
   }
-}
-
-// show dialog
-progressDialog(BuildContext context, UploadTask task) {
-  FocusManager.instance.primaryFocus!.unfocus();
-
-  return showDialog(
-    barrierDismissible: false,
-    context: context,
-    builder: (context) => AlertDialog(
-      contentPadding: const EdgeInsets.all(12),
-      title: Stack(
-        alignment: Alignment.centerRight,
-        children: [
-          const SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Uploading File',
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-          ),
-
-          //
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.shade100,
-              ),
-              child: const Icon(
-                Icons.close_outlined,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-      titlePadding: const EdgeInsets.all(12),
-      content: StreamBuilder<TaskSnapshot>(
-          stream: task.snapshotEvents,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final snap = snapshot.data!;
-              final progress = snap.bytesTransferred / snap.totalBytes;
-              final percentage = (progress * 100).toStringAsFixed(0);
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: LinearProgressIndicator(
-                      minHeight: 16,
-                      value: progress,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.blueAccent.shade200),
-                      backgroundColor:
-                          Colors.lightBlueAccent.shade100.withOpacity(.2),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('$percentage %'),
-                  const SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: LinearProgressIndicator(
-                      minHeight: 16,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.blueAccent.shade200),
-                      backgroundColor:
-                          Colors.lightBlueAccent.shade100.withOpacity(.2),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(' '),
-                  const SizedBox(height: 8),
-                ],
-              );
-            }
-          }),
-    ),
-  );
-}
-
-// content subtitle
-getContentSubtitle({required String courseType}) {
-  switch (courseType) {
-    case 'notes':
-      {
-        return 'Creator';
-      }
-    case 'books':
-      {
-        return 'Author';
-      }
-  }
-  return 'Year';
-}
-
-//
-Widget buildPathSection(
-    {required String year,
-    required String courseType,
-    required String courseCode,
-    String? chapterNo}) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      //
-      const Padding(
-        padding: EdgeInsets.all(3),
-        child: Icon(
-          Icons.account_tree_outlined,
-          color: Colors.black87,
-          size: 20,
-        ),
-      ),
-
-      //
-      Flexible(
-        child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            // year
-            Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  border: Border.all(width: .5, color: Colors.grey),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(year)),
-
-            //courseCode
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.keyboard_arrow_right_rounded),
-                Text(courseCode),
-              ],
-            ),
-
-            //chapterNo
-            if (courseType == 'Notes')
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.keyboard_arrow_right_rounded),
-                  Text('Chapter ${chapterNo!}'),
-                ],
-              ),
-            //courseType
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.keyboard_arrow_right_rounded),
-                Text(courseType),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
 }

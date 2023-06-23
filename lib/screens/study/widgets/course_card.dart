@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
-import '/screens/study/upload/course_edit.dart';
+import '/screens/study/uploader/course_edit.dart';
 import '/screens/study/widgets/course_info.dart';
 import '../3course_type_screen.dart';
 
@@ -12,18 +12,18 @@ class CourseCard extends StatelessWidget {
   const CourseCard({
     Key? key,
     required this.profileData,
-    required this.selectedYear,
+    required this.selectedSemester,
+    required this.selectedBatch,
     required this.courseId,
     required this.courseModel,
-    required this.selectedSession,
     required this.batches,
   }) : super(key: key);
 
   final ProfileData profileData;
-  final String selectedYear;
+  final String selectedSemester;
+  final String selectedBatch;
   final String courseId;
   final CourseModelNew courseModel;
-  final String selectedSession;
   final List<String> batches;
 
   @override
@@ -41,10 +41,9 @@ class CourseCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => CourseTypeScreen(
                 profileData: profileData,
-                // id: courseId,
-                selectedYear: selectedYear,
+                selectedSemester: selectedSemester,
+                selectedBatch: selectedBatch,
                 courseModel: courseModel,
-                selectedBatch: selectedSession,
                 batches: batches,
               ),
             ),
@@ -58,7 +57,7 @@ class CourseCard extends StatelessWidget {
                 builder: (context) => EditCourse(
                   profileData: profileData,
                   courseModel: courseModel,
-                  selectedSemester: selectedYear,
+                  selectedSemester: selectedSemester,
                   courseId: courseId,
                   batches: batches,
                 ),

@@ -44,6 +44,7 @@ class Syllabus extends StatelessWidget {
 
           //
           return ListView.separated(
+            physics: const BouncingScrollPhysics(),
             itemCount: data.length,
             padding: EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width > 1000

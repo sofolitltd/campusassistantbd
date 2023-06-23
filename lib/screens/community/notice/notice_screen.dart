@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '/models/notice_model.dart';
+import '/models/profile_data.dart';
 import 'notice_screen_details.dart';
 
 enum ActionsList { edit, delete, cancel }
@@ -101,7 +101,6 @@ class NoticeScreen extends StatelessWidget {
                                     'seen': seenList,
                                   });
                                 }
-
                                 //
                                 Navigator.push(
                                   context,
@@ -165,9 +164,7 @@ class NoticeScreen extends StatelessWidget {
 
                               //time
                               subtitle: Text(
-                                TimeAgo.timeAgoSinceDate(
-                                  noticeModel.time,
-                                ),
+                                TimeAgo.timeAgoSinceDate(noticeModel.time),
                               ),
                             );
                           }),
@@ -184,6 +181,7 @@ class NoticeScreen extends StatelessWidget {
 class TimeAgo {
   static String timeAgoSinceDate(String dateString,
       {bool numericDates = true}) {
+    //
     DateTime notificationDate =
         DateFormat("dd-MM-yyyy h:mm a").parse(dateString);
     final date2 = DateTime.now();

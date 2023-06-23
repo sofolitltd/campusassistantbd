@@ -9,11 +9,11 @@ class BookmarkButton extends StatelessWidget {
   const BookmarkButton({
     Key? key,
     required this.profileData,
-    required this.courseContentModel,
+    required this.contentModel,
   }) : super(key: key);
 
   final ProfileData profileData;
-  final ContentModel courseContentModel;
+  final ContentModel contentModel;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class BookmarkButton extends StatelessWidget {
         var id = '';
         for (var element in snapshot.data!.docs) {
           id = element.id;
-          if (id == courseContentModel.contentId) {
+          if (id == contentModel.contentId) {
             return SizedBox(
               height: 40,
               width: 40,
@@ -56,7 +56,7 @@ class BookmarkButton extends StatelessWidget {
                   onPressed: () async {
                     //todo: fix ref
                     await ref
-                        .doc(courseContentModel.contentId)
+                        .doc(contentModel.contentId)
                         .delete()
                         .then((value) {
                       Fluttertoast.cancel();
@@ -75,10 +75,10 @@ class BookmarkButton extends StatelessWidget {
           child: IconButton(
             tooltip: 'Bookmark file',
             onPressed: () async {
-              ref.doc(courseContentModel.contentId).set({
+              ref.doc(contentModel.contentId).set({
                 'userEmail': profileData.email,
-                'courseType': courseContentModel.contentType.toLowerCase(),
-                'contentId': courseContentModel.contentId,
+                'courseType': contentModel.contentType.toLowerCase(),
+                'contentId': contentModel.contentId,
               }).then((value) {
                 //
                 Fluttertoast.cancel();

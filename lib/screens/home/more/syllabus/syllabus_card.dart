@@ -1,16 +1,9 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
-import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import '/screens/study/widgets/pdf_viewer_web.dart';
+import '/models/profile_data.dart';
 import '/widgets/pdf_viewer.dart';
+import '../../../../widgets/pdf_viewer_web.dart';
 
 class SyllabusCard extends StatefulWidget {
   const SyllabusCard(
@@ -24,29 +17,8 @@ class SyllabusCard extends StatefulWidget {
 }
 
 class _SyllabusCardState extends State<SyllabusCard> {
-  bool _isLoading = false;
-  double? _downloadProgress;
-  String? directoryPath;
-
-  @override
-  void initState() {
-    super.initState();
-    getPublicDirectoryPath();
-  }
-
-  Future<void> getPublicDirectoryPath() async {
-    directoryPath = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_DOCUMENTS);
-
-    log(directoryPath.toString()); // /storage/emulated/0/Download
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    String fileName =
-        '${widget.contentData.get('contentTitle').replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.contentData.id.toString().substring(0, 5)}.pdf';
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -98,6 +70,7 @@ class _SyllabusCardState extends State<SyllabusCard> {
                   //time
                   Container(
                     padding: const EdgeInsets.fromLTRB(6, 4, 10, 4),
+                    margin: const EdgeInsets.only(bottom: 6),
                     decoration: BoxDecoration(
                       color: Colors.purple.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -130,111 +103,28 @@ class _SyllabusCardState extends State<SyllabusCard> {
                     Row(
                       children: [
                         //
-                        Row(
-                          children: [
-                            //todo: download button
-                            if (directoryPath != null &&
-                                downloadFileChecker(fileName: fileName))
-                              const SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: IconButton(
-                                  onPressed: null,
-                                  icon: Icon(
-                                    Icons.check_circle_outline,
-                                    color: Colors.green,
-                                    // size: 30,
+                        SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: IconButton(
+                            tooltip: 'Preview file',
+                            onPressed: () {
+                              //
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PdfViewerWeb(
+                                    title:
+                                        widget.contentData.get('contentTitle'),
+                                    fileUrl: widget.contentData.get('fileUrl'),
                                   ),
                                 ),
-                              )
-                            else
-                              (_isLoading == false)
-                                  ? SizedBox(
-                                      height: 40,
-                                      width: 40,
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          setState(() => _isLoading = true);
-
-                                          //
-                                          await downloadFileAndroid(
-                                            url: widget.contentData
-                                                .get('fileUrl'),
-                                            fileName: fileName,
-                                          );
-
-                                          //
-                                          setState(() => _isLoading = false);
-                                        },
-                                        icon: const Icon(
-                                          Icons.downloading_rounded,
-                                          color: Colors.red,
-                                          // size: 30,
-                                        ),
-                                      ),
-                                    )
-                                  : SizedBox(
-                                      height: 40,
-                                      width: 40,
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          //
-
-                                          // cancelToken.cancel();
-                                        },
-                                        icon: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            const Icon(
-                                              // Icons.clear,
-                                              Icons.downloading_rounded,
-                                              color: Colors.grey,
-                                              size: 18,
-                                            ),
-                                            SizedBox(
-                                              height: 25,
-                                              width: 25,
-                                              child: CircularProgressIndicator(
-                                                value: _downloadProgress,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                            //
-                            SizedBox(
-                              height: 40,
-                              width: 40,
-                              child: IconButton(
-                                tooltip: 'Preview file',
-                                onPressed: () {
-                                  //
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PdfViewerWeb(
-                                        title: widget.contentData
-                                            .get('contentTitle'),
-                                        fileUrl:
-                                            widget.contentData.get('fileUrl'),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.visibility_outlined,
-                                ),
-                              ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.visibility_outlined,
                             ),
-
-                            // fav
-                            // BookmarkButton(
-                            //   userModel: widget.userModel,
-                            //   courseContentModel: widget.courseContentModel,
-                            // ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -245,56 +135,5 @@ class _SyllabusCardState extends State<SyllabusCard> {
         ),
       ),
     );
-  }
-
-// downloadFileChecker
-  downloadFileChecker({required String fileName}) {
-    final file = File('$directoryPath/$fileName');
-
-    if (file.existsSync()) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> getStoragePermission() async {
-    return await Permission.storage.request().isGranted;
-  }
-
-  // download file
-  Future<File?> downloadFileAndroid(
-      {required String url, required String fileName}) async {
-    if (await getStoragePermission()) {
-      final file = File('$directoryPath/$fileName');
-
-      // download file with dio
-      try {
-        final response = await Dio().get(
-          url,
-          // cancelToken: cancelToken,
-          options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-          ),
-          onReceiveProgress: (received, total) {
-            double progress = received / total;
-            _downloadProgress = progress;
-            setState(() {});
-          },
-        );
-
-        // store on file system
-        final ref = file.openSync(mode: FileMode.write);
-        ref.writeFromSync(response.data);
-        await ref.close();
-        Fluttertoast.showToast(msg: 'File save on: \n$directoryPath');
-
-        return file;
-      } catch (e) {
-        log('error: $e');
-        Fluttertoast.showToast(msg: e.toString());
-      }
-    }
-    return null;
   }
 }

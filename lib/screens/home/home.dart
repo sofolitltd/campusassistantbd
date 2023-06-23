@@ -66,17 +66,12 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
         ),
         actions: [
           /// notification
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NoticeScreen(
-                    profileData: widget.profileData,
-                  ),
-                ),
-              );
-            },
+          Padding(
+            padding: EdgeInsets.only(
+              right: MediaQuery.of(context).size.width > 800
+                  ? MediaQuery.of(context).size.width * .186
+                  : 0,
+            ),
             child: Stack(
               alignment: Alignment.topRight,
               children: [

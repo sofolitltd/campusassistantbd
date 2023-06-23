@@ -4,31 +4,36 @@ import 'package:flutter/material.dart';
 import '/models/content_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
-import 'upload/content_add.dart';
+import 'uploader/content_add.dart';
 import 'widgets/content_card.dart';
 
 class CourseTypesDetails extends StatelessWidget {
   const CourseTypesDetails({
     Key? key,
     required this.profileData,
-    required this.selectedYear,
+    required this.selectedSemester,
+    required this.selectedBatch,
     required this.courseType,
     required this.courseModel,
     required this.batches,
   }) : super(key: key);
 
   final ProfileData profileData;
-  final String selectedYear;
+  final String selectedSemester;
+  final String selectedBatch;
   final String courseType;
   final CourseModelNew courseModel;
   final List<String> batches;
 
   @override
   Widget build(BuildContext context) {
+    var subscriber = profileData.information.status!.subscriber;
+
     return Scaffold(
       // add content
       floatingActionButton: (profileData.information.status!.moderator! ||
-              profileData.information.status!.cr!)
+              (profileData.information.status!.cr! &&
+                  selectedBatch == profileData.information.batch))
           ? FloatingActionButton(
               onPressed: () {
                 //
@@ -37,7 +42,7 @@ class CourseTypesDetails extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => AddContent(
                       profileData: profileData,
-                      selectedYear: selectedYear,
+                      selectedSemester: selectedSemester,
                       courseType: courseType,
                       courseModel: courseModel,
                       batches: batches,
@@ -56,9 +61,9 @@ class CourseTypesDetails extends StatelessWidget {
             .collection('Departments')
             .doc(profileData.department)
             .collection(courseType.toLowerCase())
+            .where('status', whereIn: ['basic', subscriber])
             .where('courseCode', isEqualTo: courseModel.courseCode)
-            // .where('batchList', arrayContains: userModel.batch)
-            // .where('status', whereIn: ['Basic', userModel.status])
+            .where('batches', arrayContains: selectedBatch)
             // .where('lessonNo', isEqualTo: courseType.lessonNo)
             .snapshots(),
         builder: (context, snapshot) {
@@ -78,6 +83,7 @@ class CourseTypesDetails extends StatelessWidget {
 
           //
           return ListView.separated(
+            physics: const BouncingScrollPhysics(),
             itemCount: data.length,
             separatorBuilder: (BuildContext context, int index) =>
                 const SizedBox(height: 12),
@@ -92,12 +98,11 @@ class CourseTypesDetails extends StatelessWidget {
               ContentModel courseContentModel =
                   ContentModel.fromJson(data[index]);
 
-              var contentData = data[index];
-
               //
               return ContentCard(
-                selectedYear: selectedYear,
                 profileData: profileData,
+                selectedSemester: selectedSemester,
+                selectedBatch: selectedBatch,
                 contentModel: courseContentModel,
                 batches: batches,
               );

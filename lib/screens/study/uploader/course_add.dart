@@ -1,10 +1,10 @@
-import 'package:campusassistant/models/course_model_new.dart';
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
+import '/models/course_model_new.dart';
+import '/models/profile_data.dart';
 import '/utils/constants.dart';
 
 class AddCourse extends StatefulWidget {

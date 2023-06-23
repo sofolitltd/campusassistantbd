@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:campusassistant/models/profile_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 import '/models/teacher_model.dart';
 
@@ -252,7 +251,9 @@ class _TeacherAddState extends State<TeacherAdd> {
                           if (_globalKey.currentState!.validate()) {
                             setState(() => _isLoading = true);
 
-                            String id = const Uuid().v1();
+                            String id = DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString();
                             var token = Random().nextInt(9000) + 1000;
 
                             //

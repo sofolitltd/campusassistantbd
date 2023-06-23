@@ -125,7 +125,7 @@ class MoreCard extends StatelessWidget {
 
             //
             Text(
-              moreList[index].name.toString(),
+              moreList[index].name,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   // fontWeight: FontWeight.w600,
                   ),

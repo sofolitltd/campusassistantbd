@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'package:share_plus/share_plus.dart';
 
-import '/widgets/open_app.dart';
 import '/models/profile_data.dart';
+import '../../../../widgets/open_app.dart';
 
 class Emergency extends StatelessWidget {
   const Emergency({super.key, required this.profileData});
@@ -40,7 +39,7 @@ class Emergency extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Universities')
-            .doc(profileData!.university)
+            .doc(profileData.university)
             .collection('Emergency')
             .orderBy('serial')
             .snapshots(),
@@ -58,7 +57,7 @@ class Emergency extends StatelessWidget {
           return data.isEmpty
               ? const Center(child: Text('No data found'))
               : ListView.separated(
-                  // shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: MediaQuery.of(context).size.width > 800
                         ? MediaQuery.of(context).size.width * .2
@@ -134,7 +133,7 @@ class Emergency extends StatelessWidget {
                                             data[index].get('title'),
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .subtitle1,
+                                                .titleMedium,
                                           ),
                                         ],
                                       ),
@@ -144,7 +143,7 @@ class Emergency extends StatelessWidget {
                                         data[index].get('address'),
                                         style: Theme.of(context)
                                             .textTheme
-                                            .bodyText2!
+                                            .bodyMedium!
                                             .copyWith(color: Colors.grey),
                                       ),
 
@@ -185,7 +184,7 @@ class Emergency extends StatelessWidget {
                                                 data[index].get('phone'),
                                                 style: Theme.of(context)
                                                     .textTheme
-                                                    .bodyText1,
+                                                    .bodyLarge,
                                               ),
                                             ],
                                           ),

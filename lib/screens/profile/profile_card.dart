@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '/admin/admin_dashboard.dart';
 import '/auth/new_splash_screen.dart';
 import '/models/profile_data.dart';
+import '/screens/profile/moderator/moderator_dashboard.dart';
 import '../community/notice/notice_group.dart';
 import 'profile_edit.dart';
 
@@ -424,6 +425,34 @@ class ProfileCard extends StatelessWidget {
                             },
                             title: Text(
                               'Admin',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 16,
+                            ),
+                          ),
+                          const Divider(height: 1),
+                        ],
+
+                        //moderator
+                        if (profileData.information.status!.moderator ==
+                            true) ...[
+                          ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ModeratorDashboard(
+                                      profileData: profileData),
+                                ),
+                              );
+                            },
+                            title: Text(
+                              'Moderator',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!

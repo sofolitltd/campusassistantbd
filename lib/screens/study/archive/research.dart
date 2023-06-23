@@ -63,11 +63,10 @@ class Research extends StatelessWidget {
                 ContentModel courseContentModel =
                     ContentModel.fromJson(data[index]);
 
-                var contentData = data[index];
                 //
-
                 return ContentCard(
-                  selectedYear: 'Research',
+                  selectedSemester: 'Research',
+                  selectedBatch: '',
                   profileData: profileData,
                   contentModel: courseContentModel,
                   batches: batches,

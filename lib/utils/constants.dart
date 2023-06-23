@@ -23,7 +23,7 @@ const List<String> kCourseCategory = [
   'Practical Course'
 ];
 
-List kCourseType = ['chapters', 'videos', 'books', 'questions', 'syllabus'];
+List kCourseType = ['Chapters', 'Videos', 'Books', 'Questions', 'Syllabus'];
 
 List kArchive = ['Library', 'Research'];
 

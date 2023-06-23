@@ -1,5 +1,4 @@
 import 'dart:developer' as dev;
-import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '/models/profile_data.dart';
 import '/models/student_model.dart';
+import '/utils/create_verification_code.dart';
 import '/widgets/open_app.dart';
 import 'full_image.dart';
 import 'student_edit.dart';
@@ -266,7 +266,10 @@ class AllBatchCardWidget extends StatelessWidget {
                           onTap: () async {
                             //add verify code
                             await addVerificationCode(
-                                studentModel, profileData, selectedBatch);
+                                studentModel,
+                                profileData.university,
+                                profileData.department,
+                                selectedBatch);
 
                             // copy
                             Clipboard.setData(ClipboardData(text: shareToken))
@@ -319,7 +322,10 @@ class AllBatchCardWidget extends StatelessWidget {
                       onTap: () async {
                         //add verify code
                         await addVerificationCode(
-                            studentModel, profileData, selectedBatch);
+                            studentModel,
+                            profileData.university,
+                            profileData.department,
+                            selectedBatch);
 
                         // share
                         Share.share(shareToken);
@@ -363,89 +369,79 @@ class AllBatchCardWidget extends StatelessWidget {
                                   style: ElevatedButton.styleFrom(
                                       minimumSize: const Size(40, 40)),
                                   onPressed: () async {
-                                    //
+                                    String code = createToken();
+
+                                    // check code already exist
+                                    await FirebaseFirestore.instance
+                                        .collection('verifications')
+                                        .doc(code)
+                                        .get()
+                                        .then((element) {
+                                      if (element.exists) {
+                                        String newCode = createToken();
+                                        code = newCode;
+                                        dev.log('New Code: $code');
+                                      } else {
+                                        dev.log('Old Code: $code');
+                                      }
+                                    });
+
+                                    // update code in student db
                                     await FirebaseFirestore.instance
                                         .collection('Universities')
                                         .doc(profileData.university)
                                         .collection('Departments')
                                         .doc(profileData.department)
-                                        .collection('Students')
-                                        .doc('Batches')
+                                        .collection('students')
+                                        .doc('batches')
                                         .collection(selectedBatch)
                                         .doc(studentModel.id)
-                                        .update({
-                                      'token': createToken(
-                                          batch: selectedBatch,
-                                          id: studentModel.id),
-                                    }).then((value) async {
-                                      String code = createToken(
-                                          batch: selectedBatch,
-                                          id: studentModel.id);
+                                        .update({'token': code});
 
-                                      // check code already exist
-                                      await FirebaseFirestore.instance
-                                          .collection('verifications')
-                                          .where('code', isEqualTo: code)
-                                          .get()
-                                          .then((value) {
-                                        for (var element in value.docs) {
-                                          if (element.exists) {
-                                            String newCode = createToken(
-                                                batch: selectedBatch,
-                                                id: studentModel.id);
-                                            code = newCode;
-                                            print('New Code: $code');
-                                          } else {
-                                            print('Old Code: $code');
-                                          }
-                                        }
-                                      });
-
-                                      //add to /verifications
-                                      await FirebaseFirestore.instance
-                                          .collection('verifications')
-                                          .doc()
-                                          .set({
-                                        'university': profileData.university,
-                                        'department': profileData.department,
-                                        'profession': 'student',
-                                        'code': code,
-                                        'name': studentModel.name,
-                                        'information': {
-                                          'batch': studentModel.name,
-                                          'id': studentModel.id,
-                                          'session': studentModel.id,
-                                          'hall': studentModel.hall,
-                                          'blood': studentModel.blood,
-                                        }
-                                      });
-
-                                      //delete user[todo: use later]
-                                      // var ref = FirebaseFirestore.instance
-                                      //     .collection('users');
-                                      // await ref
-                                      //     .where('email',
-                                      //         isEqualTo: studentModel.email)
-                                      //     .get()
-                                      //     .then((value) {
-                                      //   for (var element in value.docs) {
-                                      //     if (element.exists) {
-                                      //       ref.doc(element.id).delete();
-                                      //     }
-                                      //   }
-                                      // });
-
-                                      //for admin
-                                      // FirebaseFirestore.instance
-                                      //     .collection('trash')
-                                      //     .doc()
-                                      //     .set({
-                                      //   'email': studentModel.email,
-                                      // });
-
-                                      //
-                                      Navigator.pop(context);
+                                    //add to /verifications
+                                    await FirebaseFirestore.instance
+                                        .collection('verifications')
+                                        .doc(code)
+                                        .set({
+                                      'university': profileData.university,
+                                      'department': profileData.department,
+                                      'profession': 'student',
+                                      'code': code,
+                                      'name': studentModel.name,
+                                      'information': {
+                                        'batch': selectedBatch,
+                                        'id': studentModel.id,
+                                        'session': studentModel.session,
+                                        'hall': studentModel.hall,
+                                        'blood': studentModel.blood,
+                                      }
                                     });
+
+                                    // add to trash
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .where('email',
+                                            isEqualTo: studentModel.email)
+                                        .get()
+                                        .then((value) {
+                                      for (var element in value.docs) {
+                                        if (element.exists) {
+                                          // delete user[todo: implement later]
+                                          // await FirebaseFirestore.instance.collection('users').doc(element.id).delete();
+
+                                          //for admin to delete later
+                                          FirebaseFirestore.instance
+                                              .collection('trash')
+                                              .doc(element.get('uid'))
+                                              .set({
+                                            'email': studentModel.email,
+                                            'uid': element.get('uid'),
+                                          });
+                                        }
+                                      }
+                                    });
+
+                                    Navigator.pop(context);
                                   },
                                   child: const Text('Generate')),
 
@@ -542,17 +538,9 @@ class AllBatchCardWidget extends StatelessWidget {
   }
 }
 
-// generate code
-String createToken({required String batch, required String id}) {
-  var batchSub = batch.substring(batch.length - 2);
-  var idSub = id.substring(id.length - 2);
-  var num = Random().nextInt(9000) + 1000;
-  return '$batchSub$idSub$num';
-}
-
 //add  verification code
-addVerificationCode(
-    StudentModel studentModel, ProfileData profileData, batch) async {
+addVerificationCode(StudentModel studentModel, String university,
+    String department, batch) async {
   // check code already exist
   await FirebaseFirestore.instance
       .collection('verifications')
@@ -567,8 +555,8 @@ addVerificationCode(
           .collection('verifications')
           .doc(studentModel.token)
           .set({
-        'university': profileData.university,
-        'department': profileData.department,
+        'university': university,
+        'department': department,
         'profession': 'student',
         'code': studentModel.token,
         'name': studentModel.name,

@@ -1,4 +1,5 @@
 import 'package:campusassistant/admin/batches_screen.dart';
+import 'package:campusassistant/admin/sessions_screen.dart';
 import 'package:campusassistant/admin/student_all_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,12 @@ class DepartmentDetails extends StatelessWidget {
 
       //
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         children: [
           ListTile(
             tileColor: Theme.of(context).cardColor,
@@ -40,6 +46,22 @@ class DepartmentDetails extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BatchesScreen(
+                    university: university,
+                    department: department,
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            tileColor: Theme.of(context).cardColor,
+            title: const Text('Sessions'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SessionsScreen(
                     university: university,
                     department: department,
                   ),
@@ -92,5 +114,3 @@ class DepartmentDetails extends StatelessWidget {
     );
   }
 }
-
-//
