@@ -1,5 +1,5 @@
 # Campus Assistant
-your smart partner
+your smart assistant
 
 ## About
 This is an application where university student can manage their task easily.
