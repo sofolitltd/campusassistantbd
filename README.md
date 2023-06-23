@@ -2,7 +2,7 @@
 your smart partner
 
 ## About
-This is application where university student can manage their task easily.
+This is an application where university student can manage their task easily.
 
 A few resources to get you started if this is your first Flutter project:
 
