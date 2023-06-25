@@ -213,9 +213,17 @@ class Universities extends StatelessWidget {
                       data: Theme.of(context)
                           .copyWith(dividerColor: Colors.transparent),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(university.images[0]),
-                        ),
+                        leading: Container(
+                            height: 48,
+                            width: 48,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(
+                                  university.images[0],
+                                ),
+                              ),
+                            )),
                         title: Text(university.name),
                         subtitle: Text(
                           '${university.faculties} Faculty ,  ${university.departments} Department',

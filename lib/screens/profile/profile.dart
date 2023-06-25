@@ -1,3 +1,4 @@
+import 'package:campusassistant/screens/profile/app_settings.dart';
 import 'package:flutter/material.dart';
 
 import '/models/profile_data.dart';
@@ -5,6 +6,7 @@ import 'profile_card.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.profileData});
+
   final ProfileData profileData;
 
   @override
@@ -40,6 +42,27 @@ class _ProfileState extends State<Profile> with AutomaticKeepAliveClientMixin {
                   ),
                 ),
               ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width > 800
+                        ? MediaQuery.of(context).size.width * .196
+                        : 0,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AppSettings()));
+                    },
+                    icon: const Icon(
+                      Icons.settings,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ];
         },

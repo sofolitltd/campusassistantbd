@@ -1,8 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:campusassistant/screens/study/widgets/content_subtitle_widget.dart';
-import 'package:campusassistant/screens/study/widgets/path_section_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,6 +13,8 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '/models/content_model.dart';
 import '/models/profile_data.dart';
+import '/screens/study/widgets/content_subtitle_widget.dart';
+import '/screens/study/widgets/path_section_widget.dart';
 import '../widgets/progress_dialog.dart';
 
 ///Study/2nd Year/Practical Course/Psy 207/Notes/Lessons/02/sxusycT5qFMLYx91ec1Z
@@ -365,7 +365,7 @@ class _EditContentState extends State<EditContent> {
   // upload file to storage
   UploadTask? putContentOnStorage() {
     var fileName =
-        '${widget.contentModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
+        '${widget.contentModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), ' ')}_${DateTime.now().microsecond}.pdf';
 
     final ref = FirebaseStorage.instance
         .ref('Universities')

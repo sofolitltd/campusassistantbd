@@ -74,7 +74,7 @@ class _AddVideoState extends State<AddVideo> {
               widget.selectedYear,
               widget.courseModel.courseCategory,
               widget.courseModel.courseCode,
-              'videos',
+              'Videos',
             ),
 
             const SizedBox(height: 16),

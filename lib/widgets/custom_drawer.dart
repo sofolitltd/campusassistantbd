@@ -35,7 +35,7 @@ class CustomDrawer extends StatelessWidget {
                         children: [
                           const SizedBox(height: 8),
                           Text(
-                            'Developed by:'.toUpperCase(),
+                            'Developer:'.toUpperCase(),
                             style: Theme.of(context)
                                 .textTheme
                                 .titleSmall!
@@ -139,7 +139,7 @@ class CustomDrawer extends StatelessWidget {
                                 //mail
                                 MaterialButton(
                                   onPressed: () {
-                                    OpenApp.withEmail(kDeveloperEmail);
+                                    OpenApp.withEmail(kAppEmail);
                                   },
                                   minWidth: 32,
                                   elevation: 4,

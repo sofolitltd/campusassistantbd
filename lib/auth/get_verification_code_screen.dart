@@ -266,7 +266,7 @@ class GetVerificationCodeScreen extends StatelessWidget {
                           //mail
                           MaterialButton(
                             onPressed: () {
-                              OpenApp.withEmail(kDeveloperEmail);
+                              OpenApp.withEmail(kAppEmail);
                             },
                             minWidth: 32,
                             elevation: 4,

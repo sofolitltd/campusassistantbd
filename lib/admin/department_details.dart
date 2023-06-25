@@ -85,30 +85,6 @@ class DepartmentDetails extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 16),
-          ListTile(
-            tileColor: Theme.of(context).cardColor,
-            title: const Text('Teachers'),
-            onTap: () {
-              // Get.to(() => Departments(university: university));
-            },
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            tileColor: Theme.of(context).cardColor,
-            title: const Text('Cr'),
-            onTap: () {
-              // Get.to(() => Departments(university: university));
-            },
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            tileColor: Theme.of(context).cardColor,
-            title: const Text('Staff'),
-            onTap: () {
-              // Get.to(() => Departments(university: university));
-            },
-          ),
         ],
       ),
     );

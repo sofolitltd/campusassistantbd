@@ -63,7 +63,7 @@ const kDeveloperId = '18608047';
 const kDeveloperBatch = 'Batch 14';
 const kDeveloperSession = 'Session: 17-18';
 const kDeveloperMobile = '01704340860';
-const kDeveloperEmail = 'campusAssistantbd@gmail.com';
+const kAppEmail = 'campusassistantbd@gmail.com';
 const kDeveloperFb = 'https://www.facebook.com/asifuzzaman.reyad';
 
 const String kNoImage =
@@ -76,3 +76,9 @@ const kFbGroup = 'https://www.facebook.com/campusassistantbd';
 const kYoutubeUrl = 'https://www.youtube.com/channel/UCVqzAAEozsLDMyXTys6Y_6g';
 const kPlayStoreUrl =
     'https://play.google.com/store/apps/details?id=com.sofolit.campusassistant';
+
+//
+const kDevLogo =
+    'https://sofolit.com/wp-content/uploads/2023/01/sofolit-logo-black.png';
+const kDevWebsite = 'www.sofolit.com';
+const kDevEmail = 'www.sofolitltd@gmail.com';

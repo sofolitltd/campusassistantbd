@@ -242,47 +242,46 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                               ? null
                               : () async {
                                   if (_globalKey.currentState!.validate()) {
-                                    if (_pickedMobileImage == null) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title:
-                                              const Text('No image selected!'),
-                                          content: const Text(
-                                              'Please choose your photo first.'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child:
-                                                  Text('cancel'.toUpperCase()),
-                                            ),
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                minimumSize:
-                                                    const Size(150, 36),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                pickImage(context);
-                                              },
-                                              child: Text(
-                                                  'Choose photo'.toUpperCase()),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    } else {
-                                      setState(() => _isLoading = true);
+                                    setState(() => _isLoading = true);
 
-                                      // register user
-                                      await createNewUser(
-                                        email: _emailController.text.trim(),
-                                        password: _passwordController.text,
-                                      );
-                                      //
+                                    //
+                                    User? user;
+                                    String downloadedUrl = '';
+
+                                    // register user
+                                    user = await createNewUser(
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text,
+                                    );
+
+                                    // with out image
+                                    if (_pickedMobileImage != null) {
+                                      downloadedUrl =
+                                          await uploadImage(user!.uid);
                                     }
+
+                                    // add student info
+                                    await addUserInformation(
+                                        user!.uid, downloadedUrl);
+
+                                    // update student info
+                                    await updateStudentInformation(
+                                        image: downloadedUrl);
+
+                                    //delete ver code
+                                    await deleteVerificationToken(
+                                        downloadedUrl);
+
+                                    //
+                                    if (!mounted) return;
+                                    //
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const NewHomeScreen()),
+                                        (route) => false);
+                                    log('Signup Successful');
                                   }
                                 },
                           child: _isLoading
@@ -378,7 +377,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   // createNewUser
-  createNewUser({required String email, required String password}) async {
+  Future<User?> createNewUser(
+      {required String email, required String password}) async {
+    User? user;
     try {
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -387,12 +388,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       );
 
       //
-      User? user = credential.user;
+      user = credential.user;
       if (user != null) {
-        //
-        await uploadImage(user.uid);
-
-        setState(() => _isLoading = false);
+        log("login uid: ${user.uid}");
       } else {
         Fluttertoast.showToast(msg: 'Sign Up failed');
         setState(() => _isLoading = false);
@@ -415,30 +413,28 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       Fluttertoast.showToast(msg: 'Some thing wrong.');
       log('signup error: $e');
     }
+    return user;
   }
 
   //upload image
-  uploadImage(String uid) async {
+  Future<String> uploadImage(String uid) async {
+    var downloadedUrl = '';
+
     //
     var ref = FirebaseStorage.instance
         .ref('Users')
         .child(widget.university)
         .child(widget.department)
         .child('${widget.id}.jpg');
-    var downloadedUrl = '';
 
     //
     if (kIsWeb) {
       await ref.putData(_webImage);
-      downloadedUrl = await ref.getDownloadURL();
     } else {
       await ref.putFile(_pickedMobileImage!);
-      downloadedUrl = await ref.getDownloadURL();
     }
-
-    //
-    await addUserInformation(uid, downloadedUrl);
-    await deleteVerificationToken(downloadedUrl);
+    downloadedUrl = await ref.getDownloadURL();
+    return downloadedUrl;
   }
 
   //
@@ -473,18 +469,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           ),
           token: token!,
         ).toJson());
-
-    // update student info
-    await updateStudentInformation(image: image);
-
-    //
-    if (!mounted) return;
-    //
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const NewHomeScreen()),
-        (route) => false);
-    log('Signup Successful');
   }
 
   //update student info
@@ -499,6 +483,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         .collection(widget.batch)
         .doc(widget.id)
         .update({
+      'email': _emailController.text.trim(),
       'phone': widget.mobile,
       'hall': widget.hall,
       'blood': widget.blood,

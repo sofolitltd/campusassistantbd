@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:campusassistant/screens/study/widgets/path_section_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,6 +15,7 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 import '/models/content_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
+import '/screens/study/widgets/path_section_widget.dart';
 import '../widgets/content_subtitle_widget.dart';
 import '../widgets/progress_dialog.dart';
 
@@ -304,7 +304,7 @@ class _AddContentState extends State<AddContent> {
   // upload file to storage
   UploadTask? putContentOnStorage() {
     var fileName =
-        '${widget.courseModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), '_')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), '_')}_${DateTime.now().microsecond}.pdf';
+        '${widget.courseModel.courseCode}_${_contentTitleController.text.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${_contentSubtitleController.text.replaceAll(RegExp('[^A-Za-z0-9]'), ' ')}_${DateTime.now().microsecond}.pdf';
 
     ///Universities/University of Chittagong/Departments/Department of Psychology
     final ref = FirebaseStorage.instance
@@ -344,7 +344,8 @@ class _AddContentState extends State<AddContent> {
       contentId: contentId,
       courseCode: widget.courseModel.courseCode,
       contentType: widget.courseType.toLowerCase(),
-      lessonNo: widget.courseType == 'notes' ? widget.chapterNo! : 1,
+      lessonNo:
+          widget.courseType.toLowerCase() == 'notes' ? widget.chapterNo! : 1,
       status: _selectedStatus,
       batches: _selectedBatches!,
       contentTitle: _contentTitleController.text.trim(),
@@ -363,6 +364,7 @@ class _AddContentState extends State<AddContent> {
         .doc(widget.profileData.department)
         .collection(widget.courseType.toLowerCase())
         .doc(contentId);
+    log(ref.toString());
 
     // add to /notes
     await ref.set(courseContentModel.toJson()).then((value) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '/models/course_model_new.dart';
+import '/models/profile_data.dart';
 import '/utils/constants.dart';
-import '../../models/profile_data.dart';
 import '4course_chapters_screen.dart';
 import '6course_types_details.dart';
 import '7course_videos.dart';
@@ -62,7 +62,7 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
               profileData: widget.profileData,
               selectedSemester: widget.selectedSemester,
               selectedBatch: widget.selectedBatch,
-              courseType: kCourseType[0].toString().toLowerCase(),
+              courseType: kCourseType[0],
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -81,7 +81,7 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
               profileData: widget.profileData,
               selectedSemester: widget.selectedSemester,
               selectedBatch: widget.selectedBatch,
-              courseType: kCourseType[2].toString().toLowerCase(),
+              courseType: kCourseType[2],
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -91,7 +91,7 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
               profileData: widget.profileData,
               selectedSemester: widget.selectedSemester,
               selectedBatch: widget.selectedBatch,
-              courseType: kCourseType[3].toString().toLowerCase(),
+              courseType: kCourseType[3],
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),
@@ -101,7 +101,7 @@ class _CourseTypeScreenState extends State<CourseTypeScreen> {
               profileData: widget.profileData,
               selectedSemester: widget.selectedSemester,
               selectedBatch: widget.selectedBatch,
-              courseType: kCourseType[4].toString().toLowerCase(),
+              courseType: kCourseType[4],
               courseModel: widget.courseModel,
               batches: widget.batches,
             ),

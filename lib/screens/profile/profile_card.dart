@@ -56,6 +56,7 @@ class ProfileCard extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         //
                         Row(
@@ -197,8 +198,14 @@ class ProfileCard extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+
+                                    //
                                     const SizedBox(height: 6),
+
+                                    //id , session
                                     Container(
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 390),
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         color: Theme.of(context)
@@ -236,7 +243,8 @@ class ProfileCard extends StatelessWidget {
                         ),
 
                         //
-                        Padding(
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 500),
                           padding: const EdgeInsets.only(top: 16, bottom: 4),
                           child: Row(
                             children: [

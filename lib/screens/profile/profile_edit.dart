@@ -165,12 +165,12 @@ class _EditProfileState extends State<EditProfile> {
                     controller: _nameController,
                     keyboardType: TextInputType.name,
                     textCapitalization: TextCapitalization.words,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Name',
                       labelText: 'Name',
-                      prefixIcon: const Icon(Icons.person_pin_outlined),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      border: OutlineInputBorder(),
                     ),
                     validator: (val) {
                       if (val!.isEmpty) {
@@ -183,24 +183,65 @@ class _EditProfileState extends State<EditProfile> {
                   const SizedBox(height: 16),
 
                   //phone
-                  TextFormField(
-                    controller: _mobileController,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter mobile no';
-                      }
-                      if (value.length != 11) {
-                        return 'Mobile no must be 11 digits';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Mobile no',
-                      labelText: 'Mobile no',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.call_outlined),
-                    ),
-                    keyboardType: TextInputType.phone,
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: TextFormField(
+                          controller: _mobileController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Enter mobile no';
+                            }
+                            if (value.length != 11) {
+                              return 'Mobile no must be 11 digits';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Mobile No',
+                            labelText: 'Mobile No',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                          ),
+                          keyboardType: TextInputType.phone,
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      //blood
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonFormField(
+                          value: _selectedBloodGroup,
+                          // isExpanded: true,
+                          decoration: const InputDecoration(
+                            hintText: 'Blood Group',
+                            labelText: 'Blood Group',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 13, horizontal: 4),
+                          ),
+                          onChanged: (String? value) {
+                            setState(() {
+                              _selectedBloodGroup = value;
+                            });
+                          },
+                          validator: (value) =>
+                              value == null ? "Select your blood group" : null,
+                          items: kBloodGroup.map((String val) {
+                            return DropdownMenuItem(
+                              value: val,
+                              child: Text(
+                                val,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 16),
@@ -213,8 +254,7 @@ class _EditProfileState extends State<EditProfile> {
                       label: Text('Hall'),
                       border: OutlineInputBorder(),
                       contentPadding:
-                          EdgeInsets.symmetric(vertical: 18, horizontal: 4),
-                      prefixIcon: Icon(Icons.home_work_outlined),
+                          EdgeInsets.symmetric(vertical: 13, horizontal: 4),
                     ),
                     onChanged: (String? value) {
                       setState(() {
@@ -229,37 +269,6 @@ class _EditProfileState extends State<EditProfile> {
                         child: Text(
                           val,
                           overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  //blood
-                  DropdownButtonFormField(
-                    value: _selectedBloodGroup,
-                    // isExpanded: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Blood Group',
-                      labelText: 'Blood Group',
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 18, horizontal: 4),
-                      prefixIcon: Icon(Icons.bloodtype_outlined),
-                    ),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedBloodGroup = value;
-                      });
-                    },
-                    validator: (value) =>
-                        value == null ? "Select your blood group" : null,
-                    items: kBloodGroup.map((String val) {
-                      return DropdownMenuItem(
-                        value: val,
-                        child: Text(
-                          val,
                         ),
                       );
                     }).toList(),
@@ -348,7 +357,7 @@ class _EditProfileState extends State<EditProfile> {
       {
         'name': _nameController.text.trim(),
         'image': image,
-        'mobile': widget.profileData.mobile,
+        'mobile': _mobileController.text.trim(),
         'information': {
           'batch': widget.profileData.information.batch,
           'id': widget.profileData.information.id,
@@ -378,7 +387,7 @@ class _EditProfileState extends State<EditProfile> {
         .collection(widget.profileData.information.batch!)
         .doc(widget.profileData.information.id)
         .update({
-      'phone': _mobileController.text,
+      'phone': _mobileController.text.trim(),
       'hall': _selectedHall,
       'blood': _selectedBloodGroup,
       'imageUrl': image,

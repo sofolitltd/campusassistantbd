@@ -142,8 +142,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                         if (_globalKey.currentState!
                                             .validate()) {
                                           setState(() => _isLoading = true);
-                                          // await Future.delayed(
-                                          //     const Duration(seconds: 1));
+
                                           //
                                           await loginWithEmail(
                                             email: _emailController.text.trim(),

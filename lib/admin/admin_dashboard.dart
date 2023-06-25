@@ -1,3 +1,4 @@
+import 'package:campusassistant/admin/users_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'universities.dart';
@@ -21,6 +22,7 @@ class AdminDashboardScreen extends StatelessWidget {
           vertical: 16,
         ),
         children: [
+          //users
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -29,11 +31,37 @@ class AdminDashboardScreen extends StatelessWidget {
                       builder: (context) => const Universities()));
             },
             child: Container(
-                height: 64,
-                color: Theme.of(context).cardColor,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.green.shade100,
+                ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Universities',
+                  'Universities'.toUpperCase(),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                )),
+          ),
+
+          const SizedBox(height: 16),
+
+          // users
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const UsersScreen()));
+            },
+            child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.blue.shade100,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Users'.toUpperCase(),
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

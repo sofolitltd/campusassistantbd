@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -322,10 +323,11 @@ class AllBatchCardWidget extends StatelessWidget {
                       onTap: () async {
                         //add verify code
                         await addVerificationCode(
-                            studentModel,
-                            profileData.university,
-                            profileData.department,
-                            selectedBatch);
+                          studentModel,
+                          profileData.university,
+                          profileData.department,
+                          selectedBatch,
+                        );
 
                         // share
                         Share.share(shareToken);
@@ -386,18 +388,6 @@ class AllBatchCardWidget extends StatelessWidget {
                                       }
                                     });
 
-                                    // update code in student db
-                                    await FirebaseFirestore.instance
-                                        .collection('Universities')
-                                        .doc(profileData.university)
-                                        .collection('Departments')
-                                        .doc(profileData.department)
-                                        .collection('students')
-                                        .doc('batches')
-                                        .collection(selectedBatch)
-                                        .doc(studentModel.id)
-                                        .update({'token': code});
-
                                     //add to /verifications
                                     await FirebaseFirestore.instance
                                         .collection('verifications')
@@ -417,28 +407,62 @@ class AllBatchCardWidget extends StatelessWidget {
                                       }
                                     });
 
+                                    // update code in student db
+                                    await FirebaseFirestore.instance
+                                        .collection('Universities')
+                                        .doc(profileData.university)
+                                        .collection('Departments')
+                                        .doc(profileData.department)
+                                        .collection('students')
+                                        .doc('batches')
+                                        .collection(selectedBatch)
+                                        .doc(studentModel.id)
+                                        .update({
+                                      'token': code,
+                                      'imageUrl': '',
+                                    });
+
+                                    //delete image
+                                    if (studentModel.imageUrl != '') {
+                                      await FirebaseStorage.instance
+                                          .refFromURL(studentModel.imageUrl)
+                                          .delete();
+                                    }
+
                                     // add to trash
+                                    String uid = '';
                                     await FirebaseFirestore.instance
                                         .collection('users')
                                         .where('email',
                                             isEqualTo: studentModel.email)
                                         .get()
-                                        .then((value) {
+                                        .then((value) async {
                                       for (var element in value.docs) {
                                         if (element.exists) {
-                                          // delete user[todo: implement later]
-                                          // await FirebaseFirestore.instance.collection('users').doc(element.id).delete();
-
-                                          //for admin to delete later
-                                          FirebaseFirestore.instance
-                                              .collection('trash')
-                                              .doc(element.get('uid'))
-                                              .set({
-                                            'email': studentModel.email,
-                                            'uid': element.get('uid'),
-                                          });
+                                          uid = await element.get('uid');
+                                          dev.log('uid exist: $uid');
+                                        } else {
+                                          dev.log('no email found');
                                         }
                                       }
+                                    });
+
+                                    // for admin to delete later
+                                    await FirebaseFirestore.instance
+                                        .collection('trash')
+                                        .doc(studentModel.email)
+                                        .set({
+                                      'email': studentModel.email,
+                                      'uid': uid,
+                                    });
+
+                                    // delete user
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(uid)
+                                        .delete()
+                                        .then((value) {
+                                      // Navigator.pop(context);
                                     });
 
                                     Navigator.pop(context);
