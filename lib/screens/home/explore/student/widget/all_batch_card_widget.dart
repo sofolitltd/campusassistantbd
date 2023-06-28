@@ -32,7 +32,7 @@ class AllBatchCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     String shareToken = 'Name: ${studentModel.name}'
         '\nID: ${studentModel.id}'
-        '\nBatch: ${profileData.information.batch}'
+        '\nBatch: $selectedBatch'
         '\n\nYour verification code is: \n${studentModel.token}'
         '\n\nFor Android - https://play.google.com/store/apps/details?id=com.sofolit.campusassistant'
         '\n\nFor Apple device or Website - https://campusassistantbd.web.app';

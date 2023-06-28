@@ -475,31 +475,30 @@ class ProfileCard extends StatelessWidget {
                         ],
 
                         // notice
-                        if (profileData.information.status!.admin != true) ...[
-                          ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      NoticeGroup(profileData: profileData),
-                                ),
-                              );
-                            },
-                            title: Text(
-                              'Notice Group',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              size: 16,
-                            ),
+
+                        ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NoticeGroup(profileData: profileData),
+                              ),
+                            );
+                          },
+                          title: Text(
+                            'Notice Group',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.w600),
                           ),
-                          const Divider(height: 1),
-                        ],
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            size: 16,
+                          ),
+                        ),
+                        const Divider(height: 1),
                       ],
                     ),
                   ),

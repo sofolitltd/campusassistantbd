@@ -33,7 +33,12 @@ class _ChangePasswordState extends State<ChangePassword> {
       body: Form(
         key: _globalKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width > 800
+                ? MediaQuery.of(context).size.width * .2
+                : 16,
+            vertical: 16,
+          ),
           children: [
             // title
             Padding(

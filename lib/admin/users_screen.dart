@@ -258,7 +258,7 @@ class _UsersScreenState extends State<UsersScreen> {
               ),
 
               //badge
-              if (profile['information']['status']['.subscriber'] == 'pro')
+              if (profile['information']['status']['subscriber'] == 'pro')
                 const Row(
                   children: [
                     //
@@ -313,18 +313,8 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
 
                 //
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.mail_outline_rounded,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(profile['email']),
-                  ],
-                ),
+                const SizedBox(height: 2),
+                Text('~ ${profile['email']}'),
 
                 //
                 const SizedBox(height: 2),
@@ -386,6 +376,7 @@ class _UsersScreenState extends State<UsersScreen> {
             ),
           ),
 
+          //
           PopupMenuButton(
             itemBuilder: (context) => [
               //admin
@@ -410,6 +401,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -430,6 +423,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -461,6 +456,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'admin': profile['information']['status']['admin'],
                           'moderator': false,
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -480,6 +477,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'admin': profile['information']['status']['admin'],
                           'moderator': true,
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -512,6 +511,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': false,
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -532,6 +533,8 @@ class _UsersScreenState extends State<UsersScreen> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': true,
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -540,6 +543,60 @@ class _UsersScreenState extends State<UsersScreen> {
                 child: (profile['information']['status']['cr'])
                     ? const Text('Remove as CR')
                     : const Text('Add as CR'),
+              ),
+
+              //pro/basic
+              PopupMenuItem(
+                value: 4,
+                onTap: () async {
+                  // cr
+                  if (profile['information']['status']['subscriber'] == 'pro') {
+                    //remove as moderator
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': profile['information']['status']['admin'],
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': 'basic',
+                        }
+                      },
+                    });
+                  } else {
+                    //add as admin
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': profile['information']['status']['admin'],
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': 'pro',
+                        }
+                      },
+                    });
+                  }
+                },
+                child: (profile['information']['status']['subscriber'] == 'pro')
+                    ? const Text('Remove as Pro')
+                    : const Text('Add as Pro'),
               ),
             ],
           ),

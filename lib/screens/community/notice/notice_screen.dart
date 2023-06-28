@@ -56,7 +56,7 @@ class NoticeScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(
                     horizontal: MediaQuery.of(context).size.width > 1000
                         ? MediaQuery.of(context).size.width * .2
-                        : 0,
+                        : 16,
                     vertical: 0,
                   ),
                   separatorBuilder: (context, index) =>

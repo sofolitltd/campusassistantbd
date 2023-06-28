@@ -440,7 +440,7 @@ class _BatchAllUserState extends State<BatchAllUser> {
               ),
 
               //badge
-              if (profile['information']['status']['.subscriber'] == 'pro')
+              if (profile['information']['status']['subscriber'] == 'pro')
                 const Row(
                   children: [
                     //
@@ -495,18 +495,8 @@ class _BatchAllUserState extends State<BatchAllUser> {
                 ),
 
                 //
-                // const SizedBox(height: 2),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Icon(
-                      Icons.mail_outline_rounded,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(profile['email']),
-                  ],
-                ),
+                const SizedBox(height: 2),
+                Text('~ ${profile['email']}'),
 
                 //
                 const SizedBox(height: 2),
@@ -568,11 +558,68 @@ class _BatchAllUserState extends State<BatchAllUser> {
             ),
           ),
 
+          //
           PopupMenuButton(
             itemBuilder: (context) => [
-              //moderator
+              //admin
               PopupMenuItem(
                 value: 1,
+                onTap: () async {
+                  //
+                  if (profile['information']['status']['admin']) {
+                    //remove as moderator
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': false,
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
+                        }
+                      },
+                    });
+                  } else {
+                    //add as admin
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': true,
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
+                        }
+                      },
+                    });
+                  }
+                },
+                child: (profile['information']['status']['admin'])
+                    ? const Text('Remove as Admin')
+                    : const Text('Add as Admin'),
+              ),
+
+              //moderator
+              PopupMenuItem(
+                value: 2,
                 onTap: () async {
                   //
                   if (profile['information']['status']['moderator']) {
@@ -591,6 +638,8 @@ class _BatchAllUserState extends State<BatchAllUser> {
                           'admin': profile['information']['status']['admin'],
                           'moderator': false,
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -610,6 +659,8 @@ class _BatchAllUserState extends State<BatchAllUser> {
                           'admin': profile['information']['status']['admin'],
                           'moderator': true,
                           'cr': profile['information']['status']['cr'],
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -620,9 +671,9 @@ class _BatchAllUserState extends State<BatchAllUser> {
                     : const Text('Add as Moderator'),
               ),
 
-              //moderator
+              //cr
               PopupMenuItem(
-                value: 1,
+                value: 3,
                 onTap: () async {
                   // cr
                   if (profile['information']['status']['cr']) {
@@ -642,6 +693,8 @@ class _BatchAllUserState extends State<BatchAllUser> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': false,
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -662,6 +715,8 @@ class _BatchAllUserState extends State<BatchAllUser> {
                           'moderator': profile['information']['status']
                               ['moderator'],
                           'cr': true,
+                          'subscriber': profile['information']['status']
+                              ['subscriber'],
                         }
                       },
                     });
@@ -670,6 +725,60 @@ class _BatchAllUserState extends State<BatchAllUser> {
                 child: (profile['information']['status']['cr'])
                     ? const Text('Remove as CR')
                     : const Text('Add as CR'),
+              ),
+
+              //pro/basic
+              PopupMenuItem(
+                value: 4,
+                onTap: () async {
+                  // cr
+                  if (profile['information']['status']['subscriber'] == 'pro') {
+                    //remove as moderator
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': profile['information']['status']['admin'],
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': 'basic',
+                        }
+                      },
+                    });
+                  } else {
+                    //add as admin
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(profile['uid'])
+                        .update({
+                      'information': {
+                        'batch': profile['information']['batch'],
+                        'id': profile['information']['id'],
+                        'session': profile['information']['session'],
+                        'hall': profile['information']['hall'],
+                        'blood': profile['information']['blood'],
+                        'status': {
+                          'admin': profile['information']['status']['admin'],
+                          'moderator': profile['information']['status']
+                              ['moderator'],
+                          'cr': profile['information']['status']['cr'],
+                          'subscriber': 'pro',
+                        }
+                      },
+                    });
+                  }
+                },
+                child: (profile['information']['status']['subscriber'] == 'pro')
+                    ? const Text('Remove as Pro')
+                    : const Text('Add as Pro'),
               ),
             ],
           ),

@@ -35,7 +35,12 @@ class NoticeScreenDetails extends StatelessWidget {
       //
       body: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 0,
+          vertical: 16,
+        ),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -255,6 +260,12 @@ class SeenListScreen extends StatelessWidget {
       body: ListView.builder(
         physics: const BouncingScrollPhysics(),
         itemCount: seenList.length,
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         itemBuilder: (context, index) {
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance

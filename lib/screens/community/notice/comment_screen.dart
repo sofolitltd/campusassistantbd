@@ -57,67 +57,70 @@ class _CommentScreenState extends State<CommentScreen> {
                   shrinkWrap: true,
                   itemCount: data.length,
                   separatorBuilder: (context, index) => const Divider(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width > 800
+                        ? MediaQuery.of(context).size.width * .2
+                        : 16,
+                    vertical: 16,
+                  ),
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(data[index].get('image')),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        data[index].get('name'),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall!
-                                            .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(data[index].get('image')),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      data[index].get('name'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
-                                    if (data[index].get('uid') ==
-                                        widget.profileData.uid)
-                                      Padding(
-                                        padding: const EdgeInsets.all(4),
-                                        child: InkWell(
-                                            onTap: () async {
-                                              await ref
-                                                  .doc(data[index].id)
-                                                  .delete()
-                                                  .then((value) {
-                                                Fluttertoast.showToast(
-                                                    msg:
-                                                        'Delete comment successfully');
-                                              });
-                                            },
-                                            child: const Icon(
-                                              Icons.delete,
-                                              size: 16,
-                                              color: Colors.grey,
-                                            )),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  data[index].get('message'),
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
+                                  ),
+                                  if (data[index].get('uid') ==
+                                      widget.profileData.uid)
+                                    Padding(
+                                      padding: const EdgeInsets.all(4),
+                                      child: InkWell(
+                                          onTap: () async {
+                                            await ref
+                                                .doc(data[index].id)
+                                                .delete()
+                                                .then((value) {
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      'Delete comment successfully');
+                                            });
+                                          },
+                                          child: const Icon(
+                                            Icons.delete,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          )),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                data[index].get('message'),
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 );
@@ -127,11 +130,11 @@ class _CommentScreenState extends State<CommentScreen> {
 
           //
           Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              bottom: 8,
-              right: 8,
-              top: 16,
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width > 800
+                  ? MediaQuery.of(context).size.width * .2
+                  : 16,
+              vertical: 16,
             ),
             child: MessageField(
               ref: ref,

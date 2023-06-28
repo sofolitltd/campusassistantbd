@@ -20,7 +20,12 @@ class AppSettings extends StatelessWidget {
 
       //
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width > 800
+              ? MediaQuery.of(context).size.width * .2
+              : 16,
+          vertical: 16,
+        ),
         children: [
           // pass change
           Text(
@@ -118,11 +123,9 @@ class AppSettings extends StatelessWidget {
                     'Facebook Page',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  title: FittedBox(
-                    child: Text(
-                      kFbGroup,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                  title: Text(
+                    kFbGroup,
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                   leading: CircleAvatar(
                     backgroundColor: Colors.blue.shade50,
