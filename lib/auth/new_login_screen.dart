@@ -185,15 +185,15 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                   padding: const EdgeInsets.only(
                                     bottom: 4,
                                   ),
-                                  decoration: const BoxDecoration(
+                                  decoration:  BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
-                                        color: Colors.black54,
+                                        color: Colors.grey.shade300,
                                       ),
                                     ),
                                   ),
                                   child: const Text(
-                                    'Forgot Password ?',
+                                    ' Forgot Password ?',
                                     style: TextStyle(),
                                   ),
                                 ),
@@ -225,8 +225,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                     .titleSmall!
                                     .copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black54,
-                                    ),
+                                  color: Colors.grey,
+                                ),
                               ),
                               const SizedBox(height: 16),
 

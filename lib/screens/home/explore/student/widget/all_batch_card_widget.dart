@@ -270,12 +270,16 @@ class AllBatchCardWidget extends StatelessWidget {
                                 studentModel,
                                 profileData.university,
                                 profileData.department,
-                                selectedBatch);
+                                selectedBatch,
+                            );
 
                             // copy
                             Clipboard.setData(ClipboardData(text: shareToken))
                                 .then((value) => Fluttertoast.showToast(
-                                    msg: 'Copy to clipboard'));
+                              backgroundColor: Colors.blue.shade200,
+                                    msg: 'Copy to clipboard\n\n'
+                                        '$shareToken'),
+                            );
                           },
                           child: Container(
                             decoration: BoxDecoration(

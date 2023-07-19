@@ -19,7 +19,7 @@ class RoutineDetails extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              String shareableText = data.get('imageUrl');
+              String shareableText = data.get('image');
 
               //
               await Share.share(shareableText, subject: 'Routine');

@@ -68,7 +68,7 @@ class _NewVerificationScreenState extends State<NewVerificationScreen> {
                                 .titleSmall!
                                 .copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black54,
+                              color: Colors.grey,
                                 ),
                           ),
                           const Divider(height: 8),
@@ -293,7 +293,7 @@ class _NewVerificationScreenState extends State<NewVerificationScreen> {
                                 .titleSmall!
                                 .copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black54,
+                              color: Colors.grey,
                                 ),
                           ),
 

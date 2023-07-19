@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../auth/new_splash_screen.dart';
+
 class ChangePassword extends StatefulWidget {
   const ChangePassword({Key? key}) : super(key: key);
 
@@ -133,8 +135,8 @@ class _ChangePasswordState extends State<ChangePassword> {
 
                         //
                         await changePassword(
-                          oldPassword: _oldPasswordController.text.trim(),
-                          newPassword: _newPasswordController.text.trim(),
+                          oldPassword: _oldPasswordController.text,
+                          newPassword: _newPasswordController.text,
                         );
                       }
                     },
@@ -156,35 +158,45 @@ class _ChangePasswordState extends State<ChangePassword> {
     //
     var currentUser = FirebaseAuth.instance.currentUser;
 
-    //
-    var credential = EmailAuthProvider.credential(
-        email: currentUser!.email.toString(), password: oldPassword);
-
-    //
-    await currentUser.reauthenticateWithCredential(credential).then((value) {
-      // change
-      currentUser.updatePassword(newPassword);
-      Fluttertoast.showToast(msg: 'Password change successfully');
-
-      // login again
-      loginWithEmail(
-          email: currentUser.email.toString(), password: newPassword);
-    }).catchError((error) {
-      log(error.toString());
-    });
-  }
-
-  // user login
-  loginWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    //
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((value) {
+    if (oldPassword == newPassword) {
+      Fluttertoast.showToast(
+          msg: 'Old and New Password are same. Please change it');
       setState(() => _isLoading = false);
-      Navigator.pop(context);
-    });
+    } else {
+      //
+      try {
+        var credential = EmailAuthProvider.credential(
+            email: currentUser!.email.toString(), password: oldPassword);
+
+        //
+        await currentUser
+            .reauthenticateWithCredential(credential)
+            .then((value) {
+          // change
+          currentUser.updatePassword(newPassword);
+          Fluttertoast.showToast(msg: 'Password change successfully');
+
+          //
+          FirebaseAuth.instance.signOut().then((value) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NewSplashScreen()),
+                (route) => false);
+          });
+        });
+      } on FirebaseAuthException catch (e) {
+        log(e.code);
+        setState(() => _isLoading = false);
+        Fluttertoast.showToast(
+            msg: 'Old password is invalid, Enter valid one!',
+            toastLength: Toast.LENGTH_LONG);
+      } catch (e) {
+        log(e.toString());
+        setState(() => _isLoading = false);
+        Fluttertoast.showToast(
+            msg: 'Error: $e', toastLength: Toast.LENGTH_LONG);
+      }
+    }
   }
 }

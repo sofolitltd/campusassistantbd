@@ -20,6 +20,7 @@ class PdfViewer extends StatelessWidget {
       ),
       body: const PDF(
         autoSpacing: false,
+        pageFling: false,
         nightMode: false,
       ).cachedFromUrl(
         fileUrl,

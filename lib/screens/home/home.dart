@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:upgrader/upgrader.dart';
 
 import '/models/profile_data.dart';
@@ -23,6 +27,40 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
+  // init
+  @override
+  void initState() {
+    super.initState();
+    initBannerAd();
+  }
+
+  // banner ad
+  late BannerAd bannerAd;
+  bool _isAdLoaded = false;
+  // String adUnitId = 'ca-app-pub-3940256099942544/6300978111'; //test id
+  String adUnitId = 'ca-app-pub-2392427719761726/4292099927'; //real id
+
+  initBannerAd() {
+    bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: adUnitId,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          log('ad error: ${error.message}');
+        },
+      ),
+      request: const AdRequest(),
+    );
+    bannerAd.load();
+  }
+
+  // widget
   @override
   Widget build(BuildContext context) {
     //for automatic keep alive
@@ -30,6 +68,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     var width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      //app bar
       appBar: AppBar(
         centerTitle: width < 800 ? true : false,
         title: Padding(
@@ -107,6 +146,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           const SizedBox(width: 12),
         ],
       ),
+      // drawer
       drawer: width < 800 ? const CustomDrawer() : null,
 
       //
@@ -118,29 +158,37 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       //   child: const Icon(Icons.add),
       // ),
 
-      //
-      body: UpgradeAlert(
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            vertical: 12,
-          ),
-          children: [
-            //banner
-            // HomeBanner(profileData: widget.profileData),
-            Header(userName: widget.profileData.name),
-
-            // const SizedBox(height: 16),
-
-            //more
-            More(profileData: widget.profileData),
-
-            const SizedBox(height: 8),
-
-            // Explore
-            Explore(profileData: widget.profileData),
-          ],
+      //body
+      body: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(
+          vertical: 12,
         ),
+        children: [
+          //banner
+          // HomeBanner(profileData: widget.profileData),
+          Header(userName: widget.profileData.name),
+
+          //more
+          More(profileData: widget.profileData),
+
+          const SizedBox(height: 8),
+
+          //banner ad
+          if (!kIsWeb && _isAdLoaded
+              // && widget.profileData.information.status!.subscriber != 'pro'
+          ) ...[
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              height: bannerAd.size.height.toDouble(),
+              width: bannerAd.size.width.toDouble(),
+              child: AdWidget(ad: bannerAd),
+            )
+          ],
+
+          // Explore
+          Explore(profileData: widget.profileData),
+        ],
       ),
     );
   }

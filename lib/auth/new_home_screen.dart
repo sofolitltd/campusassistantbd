@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:upgrader/upgrader.dart';
 
 import '/models/profile_data.dart';
 import '/screens/home/home.dart';
@@ -11,7 +12,6 @@ import '/widgets/custom_drawer.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({Key? key}) : super(key: key);
-  static const routeName = '/dashboard';
 
   @override
   State<NewHomeScreen> createState() => _NewHomeScreenState();
@@ -52,68 +52,70 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
   Widget build(BuildContext context) {
     bool isSmallScreen = MediaQuery.of(context).size.width < 800;
 
-    return Scaffold(
-      drawer: const CustomDrawer(),
-      bottomNavigationBar: isSmallScreen ? newBottomNav() : null,
-      body: Row(
-        children: [
-          if (!isSmallScreen)
-            NavigationRail(
-              labelType: NavigationRailLabelType.all,
-              unselectedLabelTextStyle:
-                  TextStyle(color: Colors.blueGrey.shade400),
-              selectedLabelTextStyle:
-                  TextStyle(color: Colors.blueAccent.shade200),
-              groupAlignment: 0,
-              // backgroundColor: Colors.blueAccent.shade100.withOpacity(.08),
-              indicatorColor: Colors.blueAccent.shade100.withOpacity(.2),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: (index) =>
-                  setState(() => _currentIndex = index),
+    return UpgradeAlert(
+      child: Scaffold(
+        drawer: const CustomDrawer(),
+        bottomNavigationBar: isSmallScreen ? newBottomNav() : null,
+        body: Row(
+          children: [
+            if (!isSmallScreen)
+              NavigationRail(
+                labelType: NavigationRailLabelType.all,
+                unselectedLabelTextStyle:
+                    TextStyle(color: Colors.blueGrey.shade400),
+                selectedLabelTextStyle:
+                    TextStyle(color: Colors.blueAccent.shade200),
+                groupAlignment: 0,
+                // backgroundColor: Colors.blueAccent.shade100.withOpacity(.08),
+                indicatorColor: Colors.blueAccent.shade100.withOpacity(.2),
+                selectedIndex: _currentIndex,
+                onDestinationSelected: (index) =>
+                    setState(() => _currentIndex = index),
 
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home_outlined,
-                      color: Colors.blueGrey.shade400),
-                  selectedIcon: Icon(
-                    Icons.home,
-                    color: Colors.blueAccent.shade200,
-                  ),
-                  label: const Text('Home'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.school_outlined,
-                      color: Colors.blueGrey.shade400),
-                  selectedIcon: Icon(
-                    Icons.school,
-                    color: Colors.blueAccent.shade200,
-                  ),
-                  label: const Text('Study'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.person_outline,
-                      color: Colors.blueGrey.shade400),
-                  selectedIcon: Icon(
-                    Icons.person,
-                    color: Colors.blueAccent.shade200,
-                  ),
-                  label: const Text('Profile'),
-                ),
-              ],
-            ),
-
-          //
-          Expanded(
-            child: profileData == null
-                ? Center(
-                    child: SpinKitFoldingCube(
-                      size: 64,
-                      color: Colors.blueAccent.shade100,
+                destinations: [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home_outlined,
+                        color: Colors.blueGrey.shade400),
+                    selectedIcon: Icon(
+                      Icons.home,
+                      color: Colors.blueAccent.shade200,
                     ),
-                  )
-                : screensList![_currentIndex],
-          ),
-        ],
+                    label: const Text('Home'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.school_outlined,
+                        color: Colors.blueGrey.shade400),
+                    selectedIcon: Icon(
+                      Icons.school,
+                      color: Colors.blueAccent.shade200,
+                    ),
+                    label: const Text('Study'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.person_outline,
+                        color: Colors.blueGrey.shade400),
+                    selectedIcon: Icon(
+                      Icons.person,
+                      color: Colors.blueAccent.shade200,
+                    ),
+                    label: const Text('Profile'),
+                  ),
+                ],
+              ),
+
+            //
+            Expanded(
+              child: profileData == null
+                  ? Center(
+                      child: SpinKitFoldingCube(
+                        size: 64,
+                        color: Colors.blueAccent.shade100,
+                      ),
+                    )
+                  : screensList![_currentIndex],
+            ),
+          ],
+        ),
       ),
     );
   }

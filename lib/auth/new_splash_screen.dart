@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '/auth/new_home_screen.dart';
 import '/auth/new_login_screen.dart';
-import '../widgets/app_logo.dart';
+import '/widgets/app_logo.dart';
 
 class NewSplashScreen extends StatefulWidget {
   const NewSplashScreen({super.key});
@@ -63,7 +63,7 @@ class _NewSplashScreenState extends State<NewSplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       body: Center(
         child: ScaleTransition(
           scale: _animation,

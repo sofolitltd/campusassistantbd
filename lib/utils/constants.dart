@@ -80,5 +80,6 @@ const kPlayStoreUrl =
 //
 const kDevLogo =
     'https://sofolit.com/wp-content/uploads/2023/01/sofolit-logo-black.png';
-const kDevWebsite = 'www.sofolit.com';
-const kDevEmail = 'www.sofolitltd@gmail.com';
+const kDevWebsite = 'https://sofolit.com';
+const kDevEmail = 'sofolitltd@gmail.com';
+const kDevYoutube = 'https://youtube.com/@sofolitltd';

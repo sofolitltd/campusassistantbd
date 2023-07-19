@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 import 'auth/new_splash_screen.dart';
@@ -11,6 +13,19 @@ import 'utils/theme.dart';
 void main() async {
   // init firebase
   WidgetsFlutterBinding.ensureInitialized();
+
+  // test devices
+  List<String> devices = ["51FE053E52184B1F4740F5EE7C51E10B"];
+  //admob init
+  if (!kIsWeb) {
+   await MobileAds.instance.initialize();
+   RequestConfiguration requestConfiguration = RequestConfiguration(
+     testDeviceIds: devices,
+   );
+   MobileAds.instance.updateRequestConfiguration(requestConfiguration);
+  }
+
+  //firebase init
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

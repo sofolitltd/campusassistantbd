@@ -38,7 +38,7 @@ class BookmarkCounter extends StatelessWidget {
           var data = snapshot.data!.size;
 
           if (data == 0) {
-            return const Text('0');
+            return  Container();
           }
           //
           return GestureDetector(

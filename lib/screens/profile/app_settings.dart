@@ -1,8 +1,9 @@
-import 'package:campusassistant/utils/constants.dart';
+import '/utils/constants.dart';
+import '/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 import '/screens/profile/change_password.dart';
-import '../../widgets/open_app.dart';
+import '/widgets/open_app.dart';
 
 class AppSettings extends StatelessWidget {
   const AppSettings({Key? key}) : super(key: key);
@@ -217,6 +218,7 @@ class AppSettings extends StatelessWidget {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: ExpansionTile(
+              initiallyExpanded: true,
               tilePadding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
               title: Text(
@@ -239,23 +241,7 @@ class AppSettings extends StatelessWidget {
                 ),
               ),
               children: [
-                const Divider(height: 8),
-                //call
-                ListTile(
-                  onTap: () {
-                    OpenApp.withNumber(kDeveloperMobile);
-                  },
-                  visualDensity: const VisualDensity(vertical: -4),
-                  title: const Text(kDeveloperMobile),
-                  subtitle: const Text('call now'),
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue.shade50,
-                    child: Icon(
-                      (Icons.call),
-                      color: Colors.green.shade400,
-                    ),
-                  ),
-                ),
+
 
                 const Divider(height: 8),
 
@@ -275,6 +261,24 @@ class AppSettings extends StatelessWidget {
                     ),
                   ),
                 ),
+                const Divider(height: 8),
+
+                //call
+                ListTile(
+                  onTap: () {
+                    OpenApp.withNumber(kDeveloperMobile);
+                  },
+                  visualDensity: const VisualDensity(vertical: -4),
+                  title: const Text(kDeveloperMobile),
+                  subtitle: const Text('call now'),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade50,
+                    child: Icon(
+                      (Icons.call),
+                      color: Colors.green.shade400,
+                    ),
+                  ),
+                ),
 
                 const Divider(height: 8),
 
@@ -289,8 +293,28 @@ class AppSettings extends StatelessWidget {
                   subtitle: const Text('email address'),
                   leading: CircleAvatar(
                     backgroundColor: Colors.blue.shade50,
-                    child: Icon(
+                    child: const Icon(
                       (Icons.email),
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+
+                const Divider(height: 8),
+
+                // youtube
+                ListTile(
+                  visualDensity: const VisualDensity(vertical: -4),
+                  onTap: () {
+                    //
+                    OpenApp.withUrl(kDevYoutube);
+                  },
+                  title: const Text(kDevYoutube),
+                  subtitle: const Text('youtube channel'),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade50,
+                    child: Icon(
+                      (Icons.play_arrow),
                       color: Colors.red.shade400,
                     ),
                   ),

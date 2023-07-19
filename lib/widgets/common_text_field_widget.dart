@@ -84,7 +84,8 @@ class _CommonTextFieldWidgetState extends State<CommonTextFieldWidget> {
                       _obscureText!
                           ? Icons.visibility_off_outlined
                           : Icons.remove_red_eye_outlined,
-                      color: Colors.black54,
+                      color: Colors.grey,
+
                     ),
                   )
                 : null,
