@@ -99,7 +99,7 @@ class MoreCard extends StatelessWidget {
         }
       },
       child: Container(
-        width: 80,
+       constraints: const BoxConstraints(minWidth: 80),
         padding: const EdgeInsets.symmetric(
           vertical: 4,
           horizontal: 4,
@@ -125,8 +125,8 @@ class MoreCard extends StatelessWidget {
 
             //
             Text(
-              moreList[index].name,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              '${moreList[index].name}'.toUpperCase(),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   // fontWeight: FontWeight.w600,
                   ),
             ),

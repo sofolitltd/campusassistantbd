@@ -561,61 +561,61 @@ class _BatchAllUserState extends State<BatchAllUser> {
           //
           PopupMenuButton(
             itemBuilder: (context) => [
-              //admin
-              PopupMenuItem(
-                value: 1,
-                onTap: () async {
-                  //
-                  if (profile['information']['status']['admin']) {
-                    //remove as moderator
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(profile['uid'])
-                        .update({
-                      'information': {
-                        'batch': profile['information']['batch'],
-                        'id': profile['information']['id'],
-                        'session': profile['information']['session'],
-                        'hall': profile['information']['hall'],
-                        'blood': profile['information']['blood'],
-                        'status': {
-                          'admin': false,
-                          'moderator': profile['information']['status']
-                              ['moderator'],
-                          'cr': profile['information']['status']['cr'],
-                          'subscriber': profile['information']['status']
-                              ['subscriber'],
-                        }
-                      },
-                    });
-                  } else {
-                    //add as admin
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(profile['uid'])
-                        .update({
-                      'information': {
-                        'batch': profile['information']['batch'],
-                        'id': profile['information']['id'],
-                        'session': profile['information']['session'],
-                        'hall': profile['information']['hall'],
-                        'blood': profile['information']['blood'],
-                        'status': {
-                          'admin': true,
-                          'moderator': profile['information']['status']
-                              ['moderator'],
-                          'cr': profile['information']['status']['cr'],
-                          'subscriber': profile['information']['status']
-                              ['subscriber'],
-                        }
-                      },
-                    });
-                  }
-                },
-                child: (profile['information']['status']['admin'])
-                    ? const Text('Remove as Admin')
-                    : const Text('Add as Admin'),
-              ),
+              // //admin
+              // PopupMenuItem(
+              //   value: 1,
+              //   onTap: () async {
+              //     //
+              //     if (profile['information']['status']['admin']) {
+              //       //remove as moderator
+              //       FirebaseFirestore.instance
+              //           .collection('users')
+              //           .doc(profile['uid'])
+              //           .update({
+              //         'information': {
+              //           'batch': profile['information']['batch'],
+              //           'id': profile['information']['id'],
+              //           'session': profile['information']['session'],
+              //           'hall': profile['information']['hall'],
+              //           'blood': profile['information']['blood'],
+              //           'status': {
+              //             'admin': false,
+              //             'moderator': profile['information']['status']
+              //                 ['moderator'],
+              //             'cr': profile['information']['status']['cr'],
+              //             'subscriber': profile['information']['status']
+              //                 ['subscriber'],
+              //           }
+              //         },
+              //       });
+              //     } else {
+              //       //add as admin
+              //       FirebaseFirestore.instance
+              //           .collection('users')
+              //           .doc(profile['uid'])
+              //           .update({
+              //         'information': {
+              //           'batch': profile['information']['batch'],
+              //           'id': profile['information']['id'],
+              //           'session': profile['information']['session'],
+              //           'hall': profile['information']['hall'],
+              //           'blood': profile['information']['blood'],
+              //           'status': {
+              //             'admin': true,
+              //             'moderator': profile['information']['status']
+              //                 ['moderator'],
+              //             'cr': profile['information']['status']['cr'],
+              //             'subscriber': profile['information']['status']
+              //                 ['subscriber'],
+              //           }
+              //         },
+              //       });
+              //     }
+              //   },
+              //   child: (profile['information']['status']['admin'])
+              //       ? const Text('Remove as Admin')
+              //       : const Text('Add as Admin'),
+              // ),
 
               //moderator
               PopupMenuItem(

@@ -24,9 +24,9 @@ class Header extends StatelessWidget {
         children: [
           //welcome
           Text(
-            'Welcome back ,'.toUpperCase(),
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.w500,
+            'Welcome back, '.toUpperCase(),
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
           ),
 

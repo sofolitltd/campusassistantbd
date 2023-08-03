@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 import '/models/notice_model.dart';
 import '/models/profile_data.dart';
@@ -159,8 +160,8 @@ class _UploadNoticeState extends State<NoticeEdit> {
 
   //
   editMessage() {
-    // var time = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
-    var time = DateTime.now().toString();
+    var time = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
+    // var time = DateTime.now().toString();
 
     NoticeModel noticeModel = NoticeModel(
       uploader: widget.noticeModel.uploader,

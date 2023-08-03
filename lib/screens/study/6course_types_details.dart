@@ -42,8 +42,8 @@ class _CourseTypesDetailsState extends State<CourseTypesDetails> {
   }
 
   // banner ad
-  late BannerAd bannerAd;
-  bool _isAdLoaded = false;
+  BannerAd? bannerAd;
+  // bool _isAdLoaded = false;
   // String adUnitId = 'ca-app-pub-3940256099942544/6300978111'; //test id
   String adUnitId = 'ca-app-pub-2392427719761726/6294434973'; //real id
 
@@ -53,9 +53,10 @@ class _CourseTypesDetailsState extends State<CourseTypesDetails> {
       adUnitId: adUnitId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          setState(() {
-            _isAdLoaded = true;
-          });
+          // setState(() {
+          //   _isAdLoaded = true;
+          // });
+          log('ad load: ${ad.adUnitId}');
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
@@ -64,7 +65,7 @@ class _CourseTypesDetailsState extends State<CourseTypesDetails> {
       ),
       request: const AdRequest(),
     );
-    bannerAd.load();
+    bannerAd!.load();
   }
 
   //
@@ -162,14 +163,16 @@ class _CourseTypesDetailsState extends State<CourseTypesDetails> {
           ),
 
           //banner ad
-          if (!kIsWeb && _isAdLoaded
+          if (!kIsWeb &&
+          bannerAd != null
+              // _isAdLoaded
           // && widget.profileData.information.status!.subscriber != 'pro'
           ) ...[
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
-              height: bannerAd.size.height.toDouble(),
-              width: bannerAd.size.width.toDouble(),
-              child: AdWidget(ad: bannerAd),
+              height: bannerAd!.size.height.toDouble(),
+              width: bannerAd!.size.width.toDouble(),
+              child: AdWidget(ad: bannerAd!),
             )
           ],
         ],

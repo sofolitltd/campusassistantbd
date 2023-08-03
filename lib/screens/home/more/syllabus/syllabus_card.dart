@@ -1,35 +1,60 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '/models/profile_data.dart';
 import '/widgets/pdf_viewer.dart';
-import '../../../../widgets/pdf_viewer_web.dart';
+import '/widgets/pdf_viewer_web.dart';
 
 class SyllabusCard extends StatefulWidget {
   const SyllabusCard(
-      {super.key, required this.profileData, required this.contentData});
+      {super.key, required this.profileData, required this.contentModel});
 
   final ProfileData profileData;
-  final DocumentSnapshot contentData;
+  final DocumentSnapshot contentModel;
 
   @override
   State<SyllabusCard> createState() => _SyllabusCardState();
 }
 
 class _SyllabusCardState extends State<SyllabusCard> {
+  bool _isLoading = false;
+  double? _downloadProgress = 0;
+
   @override
   Widget build(BuildContext context) {
+    //
+    // String fileName =
+    //     '${widget.contentModel.get('courseCode')}-${widget.contentModel.get('lessonNo')} ${widget.contentModel.get('contentTitle').replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.contentModel.contentSubtitle}_${widget.contentModel.contentId.toString().substring(0, 5)}.pdf';
+
+    String fileName = '${widget.contentModel.get('contentTitle')}.pdf';
+
+    //
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PdfViewer(
-              title: widget.contentData.get('contentTitle'),
-              fileUrl: widget.contentData.get('fileUrl'),
-            ),
-          ),
-        );
+      onTap: () async {
+        if (!File('/storage/emulated/0/Download/Campus Assistant/$fileName')
+            .existsSync()) {
+          setState(() => _isLoading = true);
+
+          //
+          await downloadFileAndroid(
+            url: widget.contentModel.get('fileUrl'),
+            fileName: fileName,
+          );
+
+          //
+          setState(() => _isLoading = false);
+        }
+
+        //
+        await openFileAndroid(fileName: fileName);
       },
 
       //
@@ -53,7 +78,7 @@ class _SyllabusCardState extends State<SyllabusCard> {
 
                   //
                   Text(
-                    widget.contentData.get('contentTitle'),
+                    widget.contentModel.get('contentTitle'),
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -87,7 +112,7 @@ class _SyllabusCardState extends State<SyllabusCard> {
 
                         // time
                         Text(
-                          widget.contentData.get('uploadDate'),
+                          widget.contentModel.get('uploadDate'),
                           style:
                               Theme.of(context).textTheme.titleSmall!.copyWith(
                                     color: Colors.black,
@@ -102,6 +127,81 @@ class _SyllabusCardState extends State<SyllabusCard> {
                       widget.profileData.information.status!.cr!)
                     Row(
                       children: [
+                        //if already download
+                        if (File(
+                            '/storage/emulated/0/Download/Campus Assistant/$fileName')
+                            .existsSync())
+                          SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: IconButton(
+                              onPressed: () async {
+                                //open file
+                                await openFileAndroid(fileName: fileName);
+                              },
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                                // size: 30,
+                              ),
+                            ),
+                          )
+                        else
+                          (_isLoading == false)
+                              ? SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: IconButton(
+                              onPressed: () async {
+                                setState(() => _isLoading = true);
+
+                                //
+                                await downloadFileAndroid(
+                                  url: widget.contentModel.get('fileUrl'),
+                                  fileName: fileName,
+                                );
+
+                                //
+                                setState(() => _isLoading = false);
+                              },
+                              icon: const Icon(
+                                Icons.downloading_rounded,
+                                color: Colors.red,
+                                // size: 30,
+                              ),
+                            ),
+                          )
+                              : SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: IconButton(
+                              onPressed: () async {},
+                              icon: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  //text
+                                  Text(
+                                    (_downloadProgress! * 100)
+                                        .toStringAsFixed(0),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: _downloadProgress == 0
+                                        ? const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    )
+                                        : CircularProgressIndicator(
+                                      value: _downloadProgress,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
                         //
                         SizedBox(
                           height: 40,
@@ -115,8 +215,8 @@ class _SyllabusCardState extends State<SyllabusCard> {
                                 MaterialPageRoute(
                                   builder: (context) => PdfViewerWeb(
                                     title:
-                                        widget.contentData.get('contentTitle'),
-                                    fileUrl: widget.contentData.get('fileUrl'),
+                                        widget.contentModel.get('contentTitle'),
+                                    fileUrl: widget.contentModel.get('fileUrl'),
                                   ),
                                 ),
                               );
@@ -135,5 +235,65 @@ class _SyllabusCardState extends State<SyllabusCard> {
         ),
       ),
     );
+  }
+
+// download file
+  downloadFileAndroid({required String url, required String fileName}) async {
+    //per
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      // If not, request permission
+      await Permission.storage.request();
+    }
+
+    //
+    Directory directory = Directory("");
+    if (Platform.isAndroid) {
+      // Redirects it to download folder in android
+      directory = Directory("/storage/emulated/0/Download/Campus Assistant");
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+
+    final exPath = directory.path;
+    print("Saved Path: $exPath");
+    await Directory(exPath).create(recursive: true);
+
+    final file = File('$exPath/$fileName');
+
+    // download file with dio
+    try {
+      final response = await Dio().get(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+        ),
+        onReceiveProgress: (received, total) {
+          double progress = received / total;
+          _downloadProgress = progress;
+          setState(() {});
+        },
+      );
+
+      // store on file system
+      final ref = file.openSync(mode: FileMode.write);
+      ref.writeFromSync(response.data);
+      await ref.close();
+      await Fluttertoast.showToast(
+          msg: 'File save on: \nDownload/Campus Assistant',
+          toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      log('error: $e');
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+//open file
+  openFileAndroid({required String fileName}) async {
+    Directory? downloadDir =
+        Directory('/storage/emulated/0/Download/Campus Assistant');
+    String filePath = '${downloadDir.path}/$fileName';
+    await OpenFile.open(filePath);
   }
 }

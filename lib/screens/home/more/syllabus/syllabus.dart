@@ -63,7 +63,7 @@ class Syllabus extends StatelessWidget {
 
               //for mobile
               return SyllabusCard(
-                  profileData: profileData, contentData: contentData);
+                  profileData: profileData, contentModel: contentData);
             },
           );
         },

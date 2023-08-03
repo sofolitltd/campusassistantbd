@@ -1,7 +1,15 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:campusassistant/widgets/pdf_viewer_local.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import 'package:open_file_plus/open_file_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '/widgets/open_app.dart';
 import 'package:flutter/foundation.dart';
@@ -35,452 +43,604 @@ class ContentCard extends StatefulWidget {
 }
 
 class _ContentCardState extends State<ContentCard> {
+  bool _isLoading = false;
+  double? _downloadProgress = 0;
+
   // init
   @override
   void initState() {
     super.initState();
+
     initInterstitialAd();
   }
+
+
 
   // interstitial ad
   late InterstitialAd interstitialAd;
   bool _isAdLoaded = false;
-  // String adUnitId = 'ca-app-pub-3940256099942544/1033173712'; //test id
-  String adUnitId = 'ca-app-pub-2392427719761726/7253073672'; //real id
+
+  String adUnitId = 'ca-app-pub-3940256099942544/1033173712'; //test id
+  // String adUnitId = 'ca-app-pub-2392427719761726/7253073672'; //real id
 
   initInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: adUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (ad){
-            interstitialAd = ad;
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          interstitialAd = ad;
+          setState(() {
+            _isAdLoaded = true;
+          });
+          interstitialAd.fullScreenContentCallback =
+              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
+            ad.dispose();
+
             setState(() {
-              _isAdLoaded = true;
+              _isAdLoaded = false;
             });
-            interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-              onAdDismissedFullScreenContent: (ad){
-                ad.dispose();
-
-                setState(() {
-                  _isAdLoaded = false;
-                });
-                // download file
-                log('start download');
-                OpenApp.openPdf(widget.contentModel.fileUrl);
-              },
-              onAdFailedToShowFullScreenContent: (ad, error){
-                ad.dispose();
-                log('ad error: ${error.message}');
-              }
-            );
-
-          }, onAdFailedToLoad: (error){
+            // download file
+            log('start download');
+          }, onAdFailedToShowFullScreenContent: (ad, error) {
+            ad.dispose();
+            log('ad error: ${error.message}');
+          });
+        },
+        onAdFailedToLoad: (error) {
           interstitialAd.dispose();
           log('ad error: ${error.message}');
-        },),
+        },
+      ),
     );
   }
-
 
   //
   @override
   Widget build(BuildContext context) {
+    //
     List<String> batches = widget.contentModel.batches;
     batches.sort((a, b) {
       //sorting in ascending order
       return b.compareTo(a);
     });
 
+    //
+    String fileName =
+        '${widget.contentModel.courseCode}-${widget.contentModel.lessonNo} ${widget.contentModel.contentTitle.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.contentModel.contentSubtitle}_${widget.contentModel.contentId.toString().substring(0, 5)}.pdf';
+
+    //
+    Future<bool> checkInternetConnectivity() async {
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      return connectivityResult != ConnectivityResult.none;
+    }
+
+    //
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 4,
-      margin: const EdgeInsets.all(0),
-      child: Column(
-        children: [
-          //r1
-          InkWell(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8),
-              topRight: Radius.circular(8),
-            ),
-            // view pdf
-            onTap: () {
-              if (kIsWeb) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PdfViewerWeb(
-                          title: widget.contentModel.contentTitle,
-                          fileUrl: widget.contentModel.fileUrl,
-                        ),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PdfViewer(
-                          title: widget.contentModel.contentTitle,
-                          fileUrl: widget.contentModel.fileUrl,
-                        ),
-                  ),
-                );
-              }
-            },
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            elevation: 4,
+            margin: const EdgeInsets.all(0),
+            child: Column(
+              children: [
+                //
 
-            //edit
-            onLongPress: () {
-              if (widget.profileData.information.status!.moderator! ||
-                  (widget.profileData.information.status!.cr! &&
-                      widget.selectedBatch ==
-                          widget.profileData.information.batch)) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EditContent(
-                          selectedYear: widget.selectedSemester,
-                          profileData: widget.profileData,
-                          contentModel: widget.contentModel,
-                          batches: widget.batches,
-                        ),
+                //r1
+                InkWell(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
                   ),
-                );
-              }
-            },
-
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  // image
-                  Stack(
-                    alignment: Alignment.topLeft,
-                    children: [
-                      //
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Container(
-                          width: 72,
-                          height: 72,
-                          color: Colors.blueAccent.shade100.withOpacity(.1),
-                          child: widget.contentModel.imageUrl == ''
-                              ? SizedBox(
-                            child: Image.asset(
-                              'assets/images/placeholder.jpg',
-                              fit: BoxFit.fitHeight,
-                            ),
-                          )
-                              : Image.network(
-                            widget.contentModel.imageUrl,
-                            fit: BoxFit.contain,
+                  // view pdf
+                  onTap: () async {
+                    if (kIsWeb) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PdfViewerWeb(
+                            title: widget.contentModel.contentTitle,
+                            fileUrl: widget.contentModel.fileUrl,
                           ),
                         ),
-                      ),
+                      );
+                    } else {
 
-                      //
-                      if (widget.contentModel.status == 'pro')
-                        const Icon(
-                          Icons.workspace_premium_outlined,
-                          color: Colors.blue,
-                          size: 24,
-                        )
-                    ],
-                  ),
+                      if (File(
+                              '/storage/emulated/0/Download/Campus Assistant/$fileName')
+                          .existsSync()) {
 
-                  const SizedBox(width: 10),
+                        await openFileAndroid(fileName: fileName);}
+                      else {
 
-                  //
-                  Expanded(
-                    child: SizedBox(
-                      height: 72,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          //code
-                          Text(
-                            widget.contentModel.contentType.toLowerCase() ==
-                                "notes"
-                                ? '${widget.contentModel.courseCode
-                                .toUpperCase()}: ${widget.contentModel
-                                .lessonNo}'
-                                : widget.contentModel.courseCode.toUpperCase(),
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueGrey,
-                            ),
+                        //show ads
+                        if (_isAdLoaded) {
+                          await interstitialAd.show();
+
+                          setState(() => _isLoading = true);
+
+                          //
+                          await downloadFileAndroid(
+                            url: widget.contentModel.fileUrl,
+                            fileName: fileName,
+                          );
+
+                          //
+                          setState(() => _isLoading = false);
+                        }else{
+                          Fluttertoast.showToast(msg: 'Slow internet connection\nPlease wait & try again');
+                        }
+
+                        //
+                      }
+
+
+                    }
+                  },
+
+                  //edit
+                  onLongPress: () {
+                    if (widget.profileData.information.status!.moderator! ||
+                        (widget.profileData.information.status!.cr! &&
+                            widget.selectedBatch ==
+                                widget.profileData.information.batch)) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditContent(
+                            selectedYear: widget.selectedSemester,
+                            profileData: widget.profileData,
+                            contentModel: widget.contentModel,
+                            batches: widget.batches,
                           ),
+                        ),
+                      );
+                    }
+                  },
 
-                          const SizedBox(height: 1),
-
-                          //title
-                          Text(
-                            widget.contentModel.contentTitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                fontWeight: FontWeight.bold, height: 1.2),
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          // const Spacer(),
-
-                          // creator/writer
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${widget.contentModel.contentSubtitleType}:  ',
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                  fontSize: 12,
-                                ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: [
+                        // image
+                        Stack(
+                          alignment: Alignment.topLeft,
+                          children: [
+                            //
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                width: 72,
+                                height: 72,
+                                color:
+                                    Colors.blueAccent.shade100.withOpacity(.1),
+                                child: widget.contentModel.imageUrl == ''
+                                    ? SizedBox(
+                                        child: Image.asset(
+                                          'assets/images/placeholder.jpg',
+                                          fit: BoxFit.fitHeight,
+                                        ),
+                                      )
+                                    : Image.network(
+                                        widget.contentModel.imageUrl,
+                                        fit: BoxFit.contain,
+                                      ),
                               ),
-                              Flexible(
-                                child: Text(
-                                  widget.contentModel.contentSubtitle,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme
-                                      .of(context)
+                            ),
+
+                            //
+                            if (widget.contentModel.status == 'pro')
+                              const Icon(
+                                Icons.workspace_premium_outlined,
+                                color: Colors.blue,
+                                size: 24,
+                              )
+                          ],
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        //
+                        Expanded(
+                          child: SizedBox(
+                            height: 72,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                //code
+                                Text(
+                                  widget.contentModel.contentType
+                                              .toLowerCase() ==
+                                          "notes"
+                                      ? '${widget.contentModel.courseCode.toUpperCase()}: ${widget.contentModel.lessonNo}'
+                                      : widget.contentModel.courseCode
+                                          .toUpperCase(),
+                                  style: Theme.of(context)
                                       .textTheme
                                       .labelMedium!
                                       .copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueGrey,
+                                      ),
                                 ),
+
+                                const SizedBox(height: 1),
+
+                                //title
+                                Text(
+                                  widget.contentModel.contentTitle,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2),
+                                ),
+
+                                const SizedBox(height: 4),
+
+                                // const Spacer(),
+
+                                // creator/writer
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.contentModel.contentSubtitleType}:  ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        widget.contentModel.contentSubtitle,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const Divider(height: 1),
+                const SizedBox(height: 4),
+
+                //r2
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 4, 4),
+                  child: Stack(
+                    children: [
+                      //on, by
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // on
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Upload on: ',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      fontSize: 12,
+                                    ),
+                              ),
+
+                              //time
+                              Text(
+                                widget.contentModel.uploadDate,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium!
+                                    .copyWith(),
                               ),
                             ],
                           ),
+                          //
+                          const SizedBox(
+                            height: 24,
+                            width: 20,
+                            child: VerticalDivider(thickness: 1),
+                          ),
+
+                          // by
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Upload by:',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(fontSize: 12),
+                              ),
+
+                              //uploader
+                              Text(
+                                widget.contentModel.uploader,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium!
+                                    .copyWith(),
+                              ),
+                            ],
+                          ),
+
+                          //
+                          const Spacer(),
                         ],
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
 
-          const Divider(height: 1),
-          const SizedBox(height: 4),
+                      // download, view , bookmark
+                      Positioned(
+                        right: 0,
+                        bottom: -6,
+                        child: Row(
+                          children: [
+                            // todo: open for now, but change later
+                            // if (widget.profileData.information.status!.subscriber ==
+                            //         'pro' ||
+                            //     widget.profileData.information.status!.moderator! ==
+                            //         true ||
+                            //     widget.profileData.information.status!.cr! ==
+                            //         true)
 
-          //r2
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 4, 4),
-            child: Stack(
-              children: [
-                //on, by
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // on
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Upload on: ',
-                          style:
-                          Theme
-                              .of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                            fontSize: 12,
-                          ),
-                        ),
+                            //if already download
+                            if (File(
+                                    '/storage/emulated/0/Download/Campus Assistant/$fileName')
+                                .existsSync())
+                              SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    //open file
+                                    await openFileAndroid(fileName: fileName);
+                                  },
+                                  icon: const Icon(
+                                    Icons.check_circle_outline,
+                                    color: Colors.green,
+                                    // size: 30,
+                                  ),
+                                ),
+                              )
+                            else
+                              (_isLoading == false)
+                                  ? SizedBox(
+                                      height: 40,
+                                      width: 40,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          // show ad
+                                          if (_isAdLoaded) {
+                                            await interstitialAd.show();
+                                          //load
+                                          setState(() => _isLoading = true);
 
-                        //time
-                        Text(
-                          widget.contentModel.uploadDate,
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .labelMedium!
-                              .copyWith(),
-                        ),
-                      ],
-                    ),
-                    //
-                    const SizedBox(
-                      height: 24,
-                      width: 20,
-                      child: VerticalDivider(thickness: 1),
-                    ),
 
-                    // by
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Upload by:',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(fontSize: 12),
-                        ),
+                                          //
+                                          await downloadFileAndroid(
+                                          url: widget.contentModel.fileUrl,
+                                          fileName: fileName,
+                                          );
 
-                        //uploader
-                        Text(
-                          widget.contentModel.uploader,
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .labelMedium!
-                              .copyWith(),
-                        ),
-                      ],
-                    ),
+                                          //
+                                          setState(() => _isLoading = false);
+                                          }else{
+                                            Fluttertoast.showToast(msg: 'Slow internet connection\nPlease wait & try again');
+                                          }
 
-                    //
-                    const Spacer(),
-                  ],
-                ),
-
-                // download, view , bookmark
-                Positioned(
-                  right: 0,
-                  bottom: -6,
-                  child: Row(
-                    children: [
-                      // todo: open for now, but change later
-                      // if (widget.profileData.information.status!.subscriber ==
-                      //         'pro' ||
-                      //     widget.profileData.information.status!.moderator! ==
-                      //         true ||
-                      //     widget.profileData.information.status!.cr! ==
-                      //         true)
-
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: IconButton(
-                          onPressed: () async {
-                            if(_isAdLoaded){
-                              interstitialAd.show();
-                            }else{
-                              Fluttertoast.showToast(msg: 'Already downloaded');
-                            }
-                          },
-                          tooltip: 'Download',
-                          icon: const Icon(
-                            Icons.downloading,
-                            // color: Colors.red,
-                            size: 22,
-                          ),
-                        ),
-                      ),
-                      // preview
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: IconButton(
-                          onPressed: () async {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PdfViewerWeb(
-                                      title: widget.contentModel.contentTitle,
-                                      fileUrl: widget.contentModel.fileUrl,
+                                        },
+                                        icon: const Icon(
+                                          Icons.downloading_rounded,
+                                          color: Colors.red,
+                                          // size: 30,
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      height: 40,
+                                      width: 40,
+                                      child: IconButton(
+                                        onPressed: () async {},
+                                        icon: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            //text
+                                            Text(
+                                              (_downloadProgress! * 100)
+                                                  .toStringAsFixed(0),
+                                              style:
+                                                  const TextStyle(fontSize: 12),
+                                            ),
+                                            SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: _downloadProgress == 0
+                                                  ? const CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    )
+                                                  : CircularProgressIndicator(
+                                                      value: _downloadProgress,
+                                                      strokeWidth: 2,
+                                                    ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                              ),
-                            );
-                          },
-                          tooltip: 'Preview',
-                          icon: const Icon(
-                            Icons.remove_red_eye_outlined,
-                            // color: Colors.red,
-                            // size: 30,
-                          ),
-                        ),
-                      ),
 
-                      // bookmark
-                      BookmarkButton(
-                        profileData: widget.profileData,
-                        contentModel: widget.contentModel,
+                            // preview
+                            SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: IconButton(
+                                onPressed: () async {
+                                  //
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PdfViewerWeb(
+                                        title: widget.contentModel.contentTitle,
+                                        fileUrl: widget.contentModel.fileUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                tooltip: 'Preview',
+                                icon: const Icon(
+                                  Icons.remove_red_eye_outlined,
+                                  // color: Colors.red,
+                                  // size: 30,
+                                ),
+                              ),
+                            ),
+
+                            // bookmark
+                            BookmarkButton(
+                              profileData: widget.profileData,
+                              contentModel: widget.contentModel,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
 
-          // batches
-          if (widget.profileData.information.status!.moderator! ||
-              widget.profileData.information.status!.cr!) ...[
-            // const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              height: 20,
-              width: double.infinity,
-              alignment: Alignment.centerLeft,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.arrow_right,
-                    size: 18,
-                    color: Colors.grey.shade600,
-                  ),
+                // batches
+                if (widget.profileData.information.status!.moderator! ||
+                    widget.profileData.information.status!.cr!) ...[
+                  // const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    height: 20,
+                    width: double.infinity,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.arrow_right,
+                          size: 18,
+                          color: Colors.grey.shade600,
+                        ),
 
-                  //list
-                  Expanded(
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) =>
-                          Text(
-                            ' , ',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                              fontSize: 12,
-                              height: 1.4,
+                        //list
+                        Expanded(
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) => Text(
+                              ' , ',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    fontSize: 12,
+                                    height: 1.4,
+                                  ),
+                            ),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: batches.length,
+                            itemBuilder: (context, index) => Text(
+                              batches[index],
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    fontSize: 12,
+                                    height: 1.4,
+                                  ),
                             ),
                           ),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: batches.length,
-                      itemBuilder: (context, index) =>
-                          Text(
-                            batches[index],
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                              fontSize: 12,
-                              height: 1.4,
-                            ),
-                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 3),
                 ],
-              ),
+              ],
             ),
-            const SizedBox(height: 3),
-          ],
-        ],
-      ),
-    );
+          );
+  }
+
+  // download file
+  downloadFileAndroid({required String url, required String fileName}) async {
+    //per
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      // If not, request permission
+      await Permission.storage.request();
+    }
+
+    //
+    Directory directory = Directory("");
+    if (Platform.isAndroid) {
+      // Redirects it to download folder in android
+      directory = Directory("/storage/emulated/0/Download/Campus Assistant");
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+
+    final exPath = directory.path;
+    print("Saved Path: $exPath");
+    await Directory(exPath).create(recursive: true);
+
+    final file = File('$exPath/$fileName');
+
+    // download file with dio
+    try {
+      final response = await Dio().get(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+        ),
+        onReceiveProgress: (received, total) {
+          double progress = received / total;
+          _downloadProgress = progress;
+          setState(() {});
+        },
+      );
+
+      // store on file system
+      final ref = file.openSync(mode: FileMode.write);
+      ref.writeFromSync(response.data);
+      await ref.close();
+      await Fluttertoast.showToast(
+          msg: 'File save on: \nDownload/Campus Assistant',
+          toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      log('error: $e');
+      Fluttertoast.showToast(msg: 'Please wait a moment and try again! ');
+    }
+  }
+
+  //open file
+  openFileAndroid({required String fileName}) async {
+    Directory? downloadDir =
+        Directory('/storage/emulated/0/Download/Campus Assistant');
+    String filePath = '${downloadDir.path}/$fileName';
+    await OpenFile.open(filePath);
   }
 }
