@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:campusassistant/widgets/pdf_viewer_local.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -55,13 +54,12 @@ class _ContentCardState extends State<ContentCard> {
   }
 
 
-
   // interstitial ad
   late InterstitialAd interstitialAd;
   bool _isAdLoaded = false;
 
-  String adUnitId = 'ca-app-pub-3940256099942544/1033173712'; //test id
-  // String adUnitId = 'ca-app-pub-2392427719761726/7253073672'; //real id
+  // String adUnitId = 'ca-app-pub-3940256099942544/1033173712'; //test idF
+  String adUnitId = 'ca-app-pub-2392427719761726/7253073672'; //real id
 
   initInterstitialAd() {
     InterstitialAd.load(
@@ -109,11 +107,6 @@ class _ContentCardState extends State<ContentCard> {
     String fileName =
         '${widget.contentModel.courseCode}-${widget.contentModel.lessonNo} ${widget.contentModel.contentTitle.replaceAll(RegExp('[^A-Za-z0-9]', dotAll: true), ' ')}_${widget.contentModel.contentSubtitle}_${widget.contentModel.contentId.toString().substring(0, 5)}.pdf';
 
-    //
-    Future<bool> checkInternetConnectivity() async {
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      return connectivityResult != ConnectivityResult.none;
-    }
 
     //
     return Card(
@@ -276,10 +269,11 @@ class _ContentCardState extends State<ContentCard> {
                                       .titleMedium!
                                       .copyWith(
                                           fontWeight: FontWeight.bold,
-                                          height: 1.2),
+                                          height: 1,
+                                  ),
                                 ),
 
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 2),
 
                                 // const Spacer(),
 
@@ -294,7 +288,9 @@ class _ContentCardState extends State<ContentCard> {
                                           .bodySmall!
                                           .copyWith(
                                             fontSize: 12,
-                                          ),
+                                        height: 1,
+
+                                      ),
                                     ),
                                     Flexible(
                                       child: Text(
@@ -306,7 +302,9 @@ class _ContentCardState extends State<ContentCard> {
                                             .labelMedium!
                                             .copyWith(
                                               fontWeight: FontWeight.w500,
-                                            ),
+                                          height: 1,
+
+                                        ),
                                       ),
                                     ),
                                   ],

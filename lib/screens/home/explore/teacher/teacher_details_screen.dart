@@ -8,7 +8,6 @@ import '/models/teacher_model.dart';
 import '/widgets/open_app.dart';
 
 class TeacherDetailsScreen extends StatelessWidget {
-  static const routeName = '/teacher_details_screen';
 
   const TeacherDetailsScreen({
     Key? key,
@@ -150,7 +149,7 @@ class TeacherDetailsScreen extends StatelessWidget {
                                             } else {
                                               Fluttertoast.cancel();
                                               Fluttertoast.showToast(
-                                                  msg: 'No publication found');
+                                                  msg: 'No publications found');
                                             }
                                           },
                                           // color: Colors.black,
@@ -162,7 +161,7 @@ class TeacherDetailsScreen extends StatelessWidget {
                                           child: const Padding(
                                             padding: EdgeInsets.all(13),
                                             child: Text(
-                                              "Publication",
+                                              "Publications",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 // color: Colors.white,
