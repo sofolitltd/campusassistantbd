@@ -16,6 +16,7 @@ import 'explore/explore.dart';
 enum Profession { student, teacher }
 
 class Home extends StatefulWidget {
+
   const Home({Key? key, required this.profileData}) : super(key: key);
   final ProfileData profileData;
 
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   // banner ad
   late BannerAd bannerAd;
   bool _isAdLoaded = false;
+
   // String adUnitId = 'ca-app-pub-3940256099942544/6300978111'; //test id
   String adUnitId = 'ca-app-pub-2392427719761726/4292099927'; //real id
 
@@ -121,9 +123,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NoticeScreen(
-                          profileData: widget.profileData,
-                        ),
+                        builder: (context) => const NoticeScreen(),
                       ),
                     );
                   },
@@ -177,7 +177,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           //banner ad
           if (!kIsWeb && _isAdLoaded
               // && widget.profileData.information.status!.subscriber != 'pro'
-          ) ...[
+              ) ...[
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               height: bannerAd.size.height.toDouble(),

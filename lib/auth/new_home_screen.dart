@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:upgrader/upgrader.dart';
@@ -11,6 +14,8 @@ import '/screens/study/1study.dart';
 import '/widgets/custom_drawer.dart';
 
 class NewHomeScreen extends StatefulWidget {
+  static const routeName = '/home';
+
   const NewHomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -37,6 +42,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         .snapshots()
         .forEach((data) {
       profileData = ProfileData.fromJson(data.data());
+
+      var topicSource = '${profileData!.university} ${profileData!.department} ${profileData!.information.batch!}';
+      var topic = topicSource.replaceAll(' ', '_').toLowerCase();
+      log('topic: $topic');
+
+      FirebaseMessaging.instance.subscribeToTopic(topic);
 
       //
       screensList = [

@@ -185,7 +185,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                   padding: const EdgeInsets.only(
                                     bottom: 4,
                                   ),
-                                  decoration:  BoxDecoration(
+                                  decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
                                         color: Colors.grey.shade300,
@@ -225,8 +225,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                     .titleSmall!
                                     .copyWith(
                                       fontWeight: FontWeight.w600,
-                                  color: Colors.grey,
-                                ),
+                                      color: Colors.grey,
+                                    ),
                               ),
                               const SizedBox(height: 16),
 
@@ -279,12 +279,15 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
       if (user != null) {
         // todo: use when work on notification
+
         await FirebaseMessaging.instance.getToken().then(
           (token) async {
             await FirebaseFirestore.instance
                 .collection('users')
                 .doc(user.uid)
-                .update({'token': token});
+                .update({
+              'token': token,
+            });
           },
         );
 

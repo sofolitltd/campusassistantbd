@@ -10,22 +10,41 @@ import 'notice_screen_details.dart';
 
 enum ActionsList { edit, delete, cancel }
 
-class NoticeScreen extends StatelessWidget {
-  final ProfileData profileData;
+class NoticeScreen extends StatefulWidget {
+  static const routeName = '/notifications';
 
   const NoticeScreen({
     Key? key,
-    required this.profileData,
   }) : super(key: key);
 
   @override
+  State<NoticeScreen> createState() => _NoticeScreenState();
+}
+
+class _NoticeScreenState extends State<NoticeScreen> {
+  ProfileData? profileData;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  //
+  getUserData() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .snapshots()
+        .forEach((data) {
+      profileData = ProfileData.fromJson(data.data());
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ref = FirebaseFirestore.instance
-        .collection('Universities')
-        .doc(profileData.university)
-        .collection('Departments')
-        .doc(profileData.department)
-        .collection('notices');
+
 
     return Scaffold(
       appBar: AppBar(
@@ -33,10 +52,14 @@ class NoticeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: ref
-            .where('batch', arrayContains: profileData.information.batch)
-            .orderBy('time', descending: true)
+      body:profileData == null ? const Center(child: CircularProgressIndicator()) : StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Universities')
+            .doc(profileData!.university)
+            .collection('Departments')
+            .doc(profileData!.department)
+            .collection('notices')
+            .where('batch', arrayContains: profileData!.information.batch)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -50,127 +73,137 @@ class NoticeScreen extends StatelessWidget {
           var data = snapshot.data!.docs;
           return snapshot.data!.size == 0
               ? const Center(child: Text('No notice found'))
-              : ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: data.length,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width > 1000
-                        ? MediaQuery.of(context).size.width * .2
-                        : 16,
-                    vertical: 0,
-                  ),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 2),
-                  itemBuilder: (BuildContext context, int index) {
-                    //
-                    var notice = data[index];
-                    NoticeModel noticeModel = NoticeModel.fromJson(notice);
+              : Align(
+            alignment: Alignment.topCenter,
+            child: ListView.separated(
+                    reverse: true,
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: data.length,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width > 1000
+                          ? MediaQuery.of(context).size.width * .2
+                          : 0,
+                      vertical: 8,
+                    ),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      //
+                      var notice = data[index];
+                      NoticeModel noticeModel = NoticeModel.fromJson(notice);
 
-                    var uid = FirebaseAuth.instance.currentUser!.uid;
+                      var uid = FirebaseAuth.instance.currentUser!.uid;
 
-                    return Card(
-                      margin: EdgeInsets.zero,
-                      elevation: 0,
-                      child: StreamBuilder<DocumentSnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(noticeModel.uploader)
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return const Center(child: Text(''));
-                            }
+                      return Card(
+                        margin: EdgeInsets.zero,
+                        elevation: 0,
+                        child: StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(noticeModel.uploader)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return const Center(child: Text(''));
+                              }
 
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
 
-                            var uploader = snapshot.data;
+                              var uploader = snapshot.data;
 
-                            return ListTile(
-                              onTap: () async {
-                                //
-                                if (!noticeModel.seen.contains(uid)) {
-                                  var seenList = noticeModel.seen;
-                                  seenList.add(uid);
-
+                              return ListTile(
+                                onTap: () async {
                                   //
-                                  await ref.doc(notice.id).update({
-                                    'seen': seenList,
-                                  });
-                                }
-                                //
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NoticeScreenDetails(
-                                      noticeId: notice.id,
-                                      profileData: profileData,
-                                      noticeModel: noticeModel,
-                                      uploader: uploader,
+                                  if (!noticeModel.seen.contains(uid)) {
+                                    var seenList = noticeModel.seen;
+                                    seenList.add(uid);
+
+                                    //
+                                    await FirebaseFirestore.instance
+                                        .collection('Universities')
+                                        .doc(profileData!.university)
+                                        .collection('Departments')
+                                        .doc(profileData!.department)
+                                        .collection('notices').doc(notice.id).update({
+                                      'seen': seenList,
+                                    });
+                                  }
+                                  //
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NoticeScreenDetails(
+                                        noticeId: notice.id,
+                                        profileData: profileData!,
+                                        noticeModel: noticeModel,
+                                        uploader: uploader,
+                                      ),
                                     ),
+                                  );
+                                },
+                                selected:
+                                    noticeModel.seen.contains(uid) ? false : true,
+                                selectedTileColor:
+                                    Colors.blueAccent.shade100.withOpacity(.2),
+                                // image
+                                leading: CachedNetworkImage(
+                                  imageUrl: uploader!.get('image'),
+                                  fadeInDuration:
+                                      const Duration(milliseconds: 500),
+                                  imageBuilder: (context, imageProvider) =>
+                                      CircleAvatar(
+                                    backgroundImage: imageProvider,
+                                    // radius: 120,
                                   ),
-                                );
-                              },
-                              selected:
-                                  noticeModel.seen.contains(uid) ? false : true,
-                              selectedTileColor:
-                                  Colors.blueAccent.shade100.withOpacity(.2),
-                              // image
-                              leading: CachedNetworkImage(
-                                imageUrl: uploader!.get('image'),
-                                fadeInDuration:
-                                    const Duration(milliseconds: 500),
-                                imageBuilder: (context, imageProvider) =>
-                                    CircleAvatar(
-                                  backgroundImage: imageProvider,
-                                  // radius: 120,
+                                  progressIndicatorBuilder: (context, url,
+                                          downloadProgress) =>
+                                      const CircleAvatar(
+                                          // radius: 120,
+                                          backgroundImage: AssetImage(
+                                              'assets/images/pp_placeholder.png')),
+                                  errorWidget: (context, url, error) =>
+                                      const CircleAvatar(
+                                          // radius: 120,
+                                          backgroundImage: AssetImage(
+                                              'assets/images/pp_placeholder.png')),
                                 ),
-                                progressIndicatorBuilder: (context, url,
-                                        downloadProgress) =>
-                                    const CircleAvatar(
-                                        // radius: 120,
-                                        backgroundImage: AssetImage(
-                                            'assets/images/pp_placeholder.png')),
-                                errorWidget: (context, url, error) =>
-                                    const CircleAvatar(
-                                        // radius: 120,
-                                        backgroundImage: AssetImage(
-                                            'assets/images/pp_placeholder.png')),
-                              ),
 
-                              //name
-                              title: RichText(
-                                text: TextSpan(
-                                  text: uploader.get('name'),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .copyWith(
-                                        fontWeight: FontWeight.bold,
+                                //name
+                                title: RichText(
+                                  text: TextSpan(
+                                    text: uploader.get('name'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                    children: const [
+                                      TextSpan(
+                                        text: ' added a new post.',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
-                                  children: const [
-                                    TextSpan(
-                                      text: ' added a new post.',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
 
-                              //time
-                              subtitle: Text(
-                                TimeAgo.timeAgoSinceDate(noticeModel.time),
-                              ),
-                            );
-                          }),
-                    );
-                  },
-                );
+                                //time
+                                subtitle: Text(
+                                  TimeAgo.timeAgoSinceDate(noticeModel.time),
+                                ),
+                              );
+                            }),
+                      );
+                    },
+                  ),
+              );
         },
       ),
     );

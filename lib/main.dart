@@ -1,3 +1,8 @@
+
+import '/auth/new_home_screen.dart';
+import '/screens/community/notice/notice_screen.dart';
+
+import '/services/firebase_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +14,8 @@ import 'auth/new_splash_screen.dart';
 import 'services/firebase_options.dart';
 import 'utils/constants.dart';
 import 'utils/theme.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   // init firebase
@@ -25,10 +32,15 @@ void main() async {
    MobileAds.instance.updateRequestConfiguration(requestConfiguration);
   }
 
+
   //firebase init
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // fcm
+  await FirebaseApi().initNotifications();
+
 
   //status bar transparent
   SystemChrome.setSystemUIOverlayStyle(
@@ -41,6 +53,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+
 //
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -52,7 +65,13 @@ class MyApp extends StatelessWidget {
       title: kAppName,
       darkTheme: darkThemeData(context),
       theme: lightThemeData(context),
+      navigatorKey: navigatorKey,
+      routes: {
+        NoticeScreen.routeName: (context) => const NoticeScreen(),
+        NewHomeScreen.routeName: (context) => const NewHomeScreen(),
+      },
       home: const NewSplashScreen(),
     );
   }
+
 }

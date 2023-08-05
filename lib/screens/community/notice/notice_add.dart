@@ -240,6 +240,11 @@ class _NoticeAddState extends State<NoticeAdd> {
       time: time,
     );
 
+    var topicSource =
+        '${widget.profileData.university} ${widget.profileData.department} ${widget.profileData.information.batch!}';
+    var topic = topicSource.replaceAll(' ', '_').toLowerCase();
+    log('topic: $topic');
+
     //
     FirebaseFirestore.instance
         .collection('Universities')
@@ -247,27 +252,15 @@ class _NoticeAddState extends State<NoticeAdd> {
         .collection('Departments')
         .doc(widget.profileData.department)
         .collection('notices')
-        .add(noticeModel.toJson())
+        .doc(DateTime.now().microsecondsSinceEpoch.toString())
+        .set(noticeModel.toJson())
         .then((value) async {
-      //todo: check fcm
-      // await FirebaseFirestore.instance
-      //     .collection("users")
-      //     .where('batch', isEqualTo: widget.profileData.information.batch)
-      //     .get()
-      //     .then((value) async {
-      //   for (var element in value.docs) {
-      //     var token = element.get('token');
-      //     log(token);
-      //
-      //     //
-      //     await sendPushMessage(
-      //       token: token,
-      //       title: widget.profileData.name,
-      //       body: _messageController.text,
-      //     );
-      //   }
-      // });
-
+      //push notifications
+      await sendPushMessage(
+        topic: topic,
+        title: widget.profileData.information.batch!,
+        body: _messageController.text,
+      );
       //
       Fluttertoast.showToast(msg: 'Post notice successfully');
       if (!mounted) return;
@@ -277,14 +270,13 @@ class _NoticeAddState extends State<NoticeAdd> {
 
   //
   sendPushMessage({
-    required String token,
+    required String topic,
     required String title,
     required String body,
   }) async {
     try {
       await http.post(
-        Uri.parse(
-            'https://fcm.googleapis.com/v1/projects/campusassistantbd/messages:send'),
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization':
@@ -292,14 +284,17 @@ class _NoticeAddState extends State<NoticeAdd> {
         },
         body: jsonEncode(
           <String, dynamic>{
-            'notification': <String, dynamic>{'title': title, 'body': body},
+            'notification': <String, dynamic>{
+              'title': title,
+              'body': body,
+
+            },
             'priority': 'high',
             'data': <String, dynamic>{
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': '1',
-              'status': 'done'
+              'type': 'notice',
+              'status': 'done',
             },
-            "to": token,
+            "to": '/topics/$topic',
           },
         ),
       );

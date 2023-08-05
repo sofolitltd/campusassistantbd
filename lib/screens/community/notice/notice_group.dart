@@ -86,7 +86,6 @@ class NoticeGroup extends StatelessWidget {
                         .collection('notices')
                         .where('batch',
                             arrayContains: profileData.information.batch)
-                        .orderBy('time', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
@@ -111,6 +110,7 @@ class NoticeGroup extends StatelessWidget {
                               child:
                                   const Center(child: Text('No notice found!')))
                           : ListView.separated(
+                              reverse: true,
                               itemCount: data.length,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
