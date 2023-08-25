@@ -1,4 +1,3 @@
-
 import '/auth/new_home_screen.dart';
 import '/screens/community/notice/notice_screen.dart';
 
@@ -25,13 +24,12 @@ void main() async {
   List<String> devices = ["51FE053E52184B1F4740F5EE7C51E10B"];
   //admob init
   if (!kIsWeb) {
-   await MobileAds.instance.initialize();
-   RequestConfiguration requestConfiguration = RequestConfiguration(
-     testDeviceIds: devices,
-   );
-   MobileAds.instance.updateRequestConfiguration(requestConfiguration);
+    await MobileAds.instance.initialize();
+    RequestConfiguration requestConfiguration = RequestConfiguration(
+      testDeviceIds: devices,
+    );
+    MobileAds.instance.updateRequestConfiguration(requestConfiguration);
   }
-
 
   //firebase init
   await Firebase.initializeApp(
@@ -39,8 +37,9 @@ void main() async {
   );
 
   // fcm
-  await FirebaseApi().initNotifications();
-
+  if (!kIsWeb) {
+    await FirebaseApi().initNotifications();
+  }
 
   //status bar transparent
   SystemChrome.setSystemUIOverlayStyle(
@@ -52,7 +51,6 @@ void main() async {
   // run main app
   runApp(const MyApp());
 }
-
 
 //
 class MyApp extends StatelessWidget {
@@ -73,5 +71,4 @@ class MyApp extends StatelessWidget {
       home: const NewSplashScreen(),
     );
   }
-
 }

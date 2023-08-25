@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:upgrader/upgrader.dart';
@@ -43,11 +44,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> {
         .forEach((data) {
       profileData = ProfileData.fromJson(data.data());
 
-      var topicSource = '${profileData!.university} ${profileData!.department} ${profileData!.information.batch!}';
+      var topicSource =
+          '${profileData!.university} ${profileData!.department} ${profileData!.information.batch!}';
       var topic = topicSource.replaceAll(' ', '_').toLowerCase();
       log('topic: $topic');
 
-      FirebaseMessaging.instance.subscribeToTopic(topic);
+      if (!kIsWeb) {
+        FirebaseMessaging.instance.subscribeToTopic(topic);
+      }
 
       //
       screensList = [

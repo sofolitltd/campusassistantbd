@@ -254,34 +254,38 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                       password: _passwordController.text,
                                     );
 
-                                    // with out image
-                                    if (_pickedMobileImage != null) {
-                                      downloadedUrl =
-                                          await uploadImage(user!.uid);
+                                    if (user?.uid != null) {
+                                      // with out image
+                                      if (_pickedMobileImage != null) {
+                                        downloadedUrl =
+                                            await uploadImage(user!.uid);
+                                      }
+
+                                      // add student info
+                                      await addUserInformation(
+                                          user!.uid, downloadedUrl);
+
+                                      // update student info
+                                      await updateStudentInformation(
+                                          image: downloadedUrl);
+
+                                      //delete ver code
+                                      await deleteVerificationToken(
+                                          downloadedUrl);
+
+                                      //
+                                      if (!mounted) return;
+                                      //
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const NewHomeScreen()),
+                                          (route) => false);
+                                      log('Signup Successful');
                                     }
-
-                                    // add student info
-                                    await addUserInformation(
-                                        user!.uid, downloadedUrl);
-
-                                    // update student info
-                                    await updateStudentInformation(
-                                        image: downloadedUrl);
-
-                                    //delete ver code
-                                    await deleteVerificationToken(
-                                        downloadedUrl);
-
-                                    //
-                                    if (!mounted) return;
-                                    //
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const NewHomeScreen()),
-                                        (route) => false);
-                                    log('Signup Successful');
+                                  } else {
+                                    log('No user');
                                   }
                                 },
                           child: _isLoading
@@ -392,7 +396,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       if (user != null) {
         log("login uid: ${user.uid}");
       } else {
-        Fluttertoast.showToast(msg: 'Sign Up failed');
+        await Fluttertoast.showToast(msg: 'Sign Up failed');
         setState(() => _isLoading = false);
       }
 
@@ -439,7 +443,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   //
   addUserInformation(String uid, image) async {
-    String? token = await FirebaseMessaging.instance.getToken();
+    String? token = '';
+    if (!kIsWeb) {
+       token = await FirebaseMessaging.instance.getToken();
+    }
 
     // add to user
     await FirebaseFirestore.instance
