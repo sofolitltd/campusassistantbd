@@ -140,7 +140,7 @@ class _EditChapterState extends State<EditChapter> {
                             },
                             validator: (value) =>
                                 value == null ? "Choose Chapter No" : null,
-                            items: List.generate(15, (index) => 1 + index++)
+                            items: List.generate(40, (index) => 0 + index++)
                                 .map((int value) {
                               return DropdownMenuItem(
                                 alignment: Alignment.center,

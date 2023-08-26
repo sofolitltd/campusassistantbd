@@ -389,6 +389,7 @@ class _ContentCardState extends State<ContentCard> {
                       //         true)
 
                       //if already download
+                      if(!kIsWeb)
                       if (File(
                               '/storage/emulated/0/Download/Campus Assistant/$fileName')
                           .existsSync())
