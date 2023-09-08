@@ -23,7 +23,7 @@ class OpenApp {
     if (await canLaunchUrl(url)) {
       await launchUrl(
         url,
-        mode: LaunchMode.externalApplication,
+        mode: LaunchMode.platformDefault,
       );
     } else {
       log('error');

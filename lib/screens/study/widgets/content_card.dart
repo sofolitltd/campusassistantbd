@@ -475,6 +475,7 @@ class _ContentCardState extends State<ContentCard> {
                               ),
 
                       // preview
+                      if(!kIsWeb)
                       SizedBox(
                         height: 40,
                         width: 40,
@@ -495,6 +496,25 @@ class _ContentCardState extends State<ContentCard> {
                           icon: const Icon(
                             Icons.remove_red_eye_outlined,
                             // color: Colors.red,
+                            // size: 30,
+                          ),
+                        ),
+                      ),
+
+                      // web download
+                      if(kIsWeb)
+                      SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: IconButton(
+                          onPressed: () async {
+                            //
+                            OpenApp.openPdf(widget.contentModel.fileUrl);
+                          },
+                          tooltip: 'Download',
+                          icon: const Icon(
+                            Icons.downloading_outlined,
+                            color: Colors.red,
                             // size: 30,
                           ),
                         ),
