@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import '/models/course_model_new.dart';
@@ -9,11 +15,11 @@ import '/utils/constants.dart';
 
 class AddCourse extends StatefulWidget {
   const AddCourse({
-    Key? key,
+    super.key,
     required this.profileData,
     required this.semester,
     required this.batches,
-  }) : super(key: key);
+  });
 
   final ProfileData profileData;
   final String semester;
@@ -34,8 +40,10 @@ class _AddCourseState extends State<AddCourse> {
 
   String? _selectedCourseCategory;
   List<String>? _selectedBatches;
-
   bool _isLoading = false;
+
+  File? _pickedMobileImage;
+  Uint8List _webImage = Uint8List(8);
 
   @override
   void initState() {
@@ -192,6 +200,82 @@ class _AddCourseState extends State<AddCourse> {
 
                   const SizedBox(height: 16),
 
+                  _pickedMobileImage == null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: GestureDetector(
+                            onTap: () async {
+                              await pickImage(context);
+                            },
+                            child: Container(
+                              height: 64,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey.shade200,
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'No image selected',
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () async {
+                            await pickImage(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  //
+                                  Container(
+                                    height: 64,
+                                    width: 64,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: Colors.blueGrey.shade100),
+                                      image: kIsWeb
+                                          ? DecorationImage(
+                                              fit: BoxFit.fitHeight,
+                                              image: MemoryImage(_webImage),
+                                            )
+                                          : DecorationImage(
+                                              fit: BoxFit.fitHeight,
+                                              image: FileImage(
+                                                  _pickedMobileImage!),
+                                            ),
+                                    ),
+                                  ),
+
+                                  //
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 24),
+                                    child: Text(
+                                      'One image selected ',
+                                      style: TextStyle(
+                                          color: Colors.green, fontSize: 18),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                  const SizedBox(height: 16),
+
                   // session list
                   MultiSelectDialogField(
                     decoration: BoxDecoration(
@@ -240,6 +324,15 @@ class _AddCourseState extends State<AddCourse> {
                               if (_formState.currentState!.validate()) {
                                 setState(() => _isLoading = true);
 
+                                String downloadedUrl = '';
+
+                                // upload new image
+                                if (_pickedMobileImage != null) {
+                                  downloadedUrl = await uploadImage(
+                                      widget.profileData,
+                                      pathName: 'courses');
+                                }
+
                                 //
                                 CourseModelNew courseModel = CourseModelNew(
                                   courseYear: widget.semester,
@@ -254,7 +347,7 @@ class _AddCourseState extends State<AddCourse> {
                                   courseMarks:
                                       _courseMarksController.text.trim(),
                                   batches: _selectedBatches!,
-                                  image: '',
+                                  image: downloadedUrl,
                                 );
 
                                 // add course
@@ -314,5 +407,90 @@ class _AddCourseState extends State<AddCourse> {
         const Text('Add Course Information'),
       ],
     );
+  }
+
+  //add image
+  pickImage(context) async {
+    // Pick an image
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    //
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 40,
+      cropStyle: CropStyle.rectangle,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        //android
+        AndroidUiSettings(
+          toolbarTitle: 'image Customization',
+          toolbarColor: ThemeData().cardColor,
+          toolbarWidgetColor: Colors.deepOrange,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+
+        //web
+        WebUiSettings(
+          context: context,
+          presentStyle: CropperPresentStyle.dialog,
+          boundary: const CroppieBoundary(
+            width: 350,
+            height: 350,
+          ),
+          viewPort:
+              const CroppieViewPort(width: 350, height: 350, type: 'square'),
+          enableExif: true,
+          enableZoom: true,
+          showZoomer: true,
+        ),
+      ],
+    );
+
+    if (!kIsWeb) {
+      if (croppedImage != null) {
+        var selectedMobileImage = File(croppedImage.path);
+        setState(() {
+          _pickedMobileImage = selectedMobileImage;
+        });
+      }
+    } else if (kIsWeb) {
+      if (croppedImage != null) {
+        var selectedWebImage = await croppedImage.readAsBytes();
+        setState(() {
+          _webImage = selectedWebImage;
+          _pickedMobileImage = File('');
+        });
+      }
+    }
+  }
+
+  //upload image
+  Future<String> uploadImage(ProfileData profileData,
+      {required String pathName}) async {
+    String downloadedUrl = '';
+
+    String imageUid = DateTime.now().microsecondsSinceEpoch.toString();
+    //
+    Reference ref = FirebaseStorage.instance
+        .ref(
+            'Universities/${profileData.university}/${profileData.department}/$pathName')
+        .child('$imageUid.jpg');
+
+    //
+    if (kIsWeb) {
+      await ref.putData(_webImage);
+    } else {
+      await ref.putFile(_pickedMobileImage!);
+    }
+    downloadedUrl = await ref.getDownloadURL();
+    return downloadedUrl;
   }
 }

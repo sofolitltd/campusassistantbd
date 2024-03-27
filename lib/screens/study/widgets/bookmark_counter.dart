@@ -1,15 +1,15 @@
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../8course_bookmarks.dart';
+import '../8_course_bookmarks.dart';
+import '/models/profile_data.dart';
 
 class BookmarkCounter extends StatelessWidget {
   const BookmarkCounter({
-    Key? key,
+    super.key,
     required this.profileData,
     required this.batches,
-  }) : super(key: key);
+  });
 
   final ProfileData profileData;
   final List<String> batches;
@@ -38,7 +38,7 @@ class BookmarkCounter extends StatelessWidget {
           var data = snapshot.data!.size;
 
           if (data == 0) {
-            return  Container();
+            return Container();
           }
           //
           return GestureDetector(

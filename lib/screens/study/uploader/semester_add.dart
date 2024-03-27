@@ -1,4 +1,3 @@
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:campusassistant/models/semester_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +6,14 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 class AddSemester extends StatefulWidget {
-  const AddSemester(
-      {Key? key, required this.profileData, required this.batches})
-      : super(key: key);
-  final ProfileData profileData;
+  const AddSemester({
+    super.key,
+    required this.university,
+    required this.department,
+    required this.batches,
+  });
+  final String university;
+  final String department;
   final List<String> batches;
 
   @override
@@ -225,9 +228,9 @@ class _AddSemesterState extends State<AddSemester> {
 
                               var ref = FirebaseFirestore.instance
                                   .collection('Universities')
-                                  .doc(widget.profileData.university)
+                                  .doc(widget.university)
                                   .collection('Departments')
-                                  .doc(widget.profileData.department)
+                                  .doc(widget.department)
                                   .collection('semesters');
 
                               await ref

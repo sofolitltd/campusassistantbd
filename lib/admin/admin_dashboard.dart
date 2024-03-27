@@ -1,7 +1,7 @@
 import 'package:campusassistant/admin/users_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'universities.dart';
+import 'university/universities.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);

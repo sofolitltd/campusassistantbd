@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // light
 ThemeData lightThemeData(BuildContext context) {
-  return ThemeData.light().copyWith(
+  return ThemeData.light(useMaterial3: false).copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     primaryColor: Theme.of(context).cardColor,
     // scaffoldBackgroundColor: Colors.grey.shade100,
@@ -45,7 +45,7 @@ ThemeData lightThemeData(BuildContext context) {
 
 // dark
 ThemeData darkThemeData(BuildContext context) {
-  return ThemeData.dark().copyWith(
+  return ThemeData.dark(useMaterial3: false).copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     appBarTheme: const AppBarTheme(
       elevation: 0,

@@ -1,9 +1,9 @@
+import 'package:campusassistant/screens/home/more/blood/blood.dart';
 import 'package:flutter/material.dart';
 
 import '/models/profile_data.dart';
 import '/screens/home/more/clubs/clubs.dart';
 import '/screens/home/more/emergency/emergency.dart';
-import '/screens/home/more/syllabus/syllabus.dart';
 import 'routine/routine.dart';
 import 'transport/transport.dart';
 
@@ -55,10 +55,10 @@ class MoreCard extends StatelessWidget {
   final int index;
 
   const MoreCard({
-    Key? key,
+    super.key,
     required this.index,
     required this.profileData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,20 +77,19 @@ class MoreCard extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Syllabus(profileData: profileData)));
+                    builder: (context) => Emergency(profileData: profileData)));
             break;
           case 2:
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Emergency(profileData: profileData)));
+                    builder: (context) => Transport(profileData: profileData)));
             break;
           case 3:
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Transport(profileData: profileData)));
-            break;
+                    builder: (context) => BloodBank(profileData: profileData)));
           case 4:
             Navigator.push(
                 context,
@@ -99,7 +98,7 @@ class MoreCard extends StatelessWidget {
         }
       },
       child: Container(
-       constraints: const BoxConstraints(minWidth: 80),
+        constraints: const BoxConstraints(minWidth: 80),
         padding: const EdgeInsets.symmetric(
           vertical: 4,
           horizontal: 4,
@@ -145,12 +144,6 @@ List moreList = [
     color: 0xff012544,
   ),
   MoreModel(
-    name: 'Syllabus',
-    route: 'syllabus',
-    imageUrl: 'assets/images/syllabus.png',
-    color: 0xff012544,
-  ),
-  MoreModel(
       name: 'Emergency',
       route: 'emergency',
       imageUrl: 'assets/images/emergency.png',
@@ -159,6 +152,12 @@ List moreList = [
     name: 'Transports',
     route: 'transports',
     imageUrl: 'assets/images/transports.png',
+    color: 0xff012544,
+  ),
+  MoreModel(
+    name: 'Blood',
+    route: 'blood',
+    imageUrl: 'assets/images/syllabus.png',
     color: 0xff012544,
   ),
   MoreModel(

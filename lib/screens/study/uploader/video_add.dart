@@ -10,13 +10,17 @@ import '/models/profile_data.dart';
 
 class AddVideo extends StatefulWidget {
   const AddVideo({
-    Key? key,
+    super.key,
+    required this.university,
+    required this.department,
     required this.profileData,
     required this.selectedYear,
     required this.courseModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
   final String selectedYear;
   final CourseModelNew courseModel;
@@ -249,9 +253,9 @@ class _AddVideoState extends State<AddVideo> {
                               //
                               await FirebaseFirestore.instance
                                   .collection('Universities')
-                                  .doc(widget.profileData.university)
+                                  .doc(widget.university)
                                   .collection('Departments')
-                                  .doc(widget.profileData.department)
+                                  .doc(widget.department)
                                   .collection('videos')
                                   .doc()
                                   .set({

@@ -2,22 +2,28 @@ import 'package:campusassistant/models/course_model_new.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '/widgets/headline.dart';
 import '../../../models/profile_data.dart';
+import '/widgets/headline.dart';
 import 'course_card.dart';
 
 class CourseCategoryCard extends StatelessWidget {
   const CourseCategoryCard({
-    Key? key,
-    required this.profileData,
+    super.key,
     required this.courseCategory,
+    required this.university,
+    required this.department,
+    required this.profileData,
+    required this.screenFor,
     required this.selectedSemester,
     required this.selectedBatch,
     required this.batches,
-  }) : super(key: key);
+  });
 
-  final ProfileData profileData;
   final String courseCategory;
+  final String university;
+  final String department;
+  final ProfileData profileData;
+  final String screenFor;
   final String selectedSemester;
   final String selectedBatch;
   final List<String> batches;
@@ -30,9 +36,9 @@ class CourseCategoryCard extends StatelessWidget {
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Universities')
-              .doc(profileData.university)
+              .doc(university)
               .collection('Departments')
-              .doc(profileData.department)
+              .doc(department)
               .collection('courses')
               .orderBy('courseCode')
               .where('courseYear', isEqualTo: selectedSemester)
@@ -82,7 +88,10 @@ class CourseCategoryCard extends StatelessWidget {
                           CourseModelNew.fromJson(data[index]);
                       //
                       return CourseCard(
+                        university: university,
+                        department: department,
                         profileData: profileData,
+                        screenFor: screenFor,
                         selectedSemester: selectedSemester,
                         selectedBatch: selectedBatch,
                         courseId: data[index].id,

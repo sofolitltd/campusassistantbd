@@ -2,24 +2,30 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../3_course_type_screen.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
 import '/screens/study/uploader/course_edit.dart';
 import '/screens/study/widgets/course_info.dart';
-import '../3course_type_screen.dart';
 
 class CourseCard extends StatelessWidget {
   const CourseCard({
-    Key? key,
+    super.key,
+    required this.university,
+    required this.department,
     required this.profileData,
+    required this.screenFor,
     required this.selectedSemester,
     required this.selectedBatch,
     required this.courseId,
     required this.courseModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
+  final String screenFor;
   final String selectedSemester;
   final String selectedBatch;
   final String courseId;
@@ -40,7 +46,10 @@ class CourseCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => CourseTypeScreen(
+                university: university,
+                department: department,
                 profileData: profileData,
+                screenFor: screenFor,
                 selectedSemester: selectedSemester,
                 selectedBatch: selectedBatch,
                 courseModel: courseModel,
@@ -55,7 +64,8 @@ class CourseCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => EditCourse(
-                  profileData: profileData,
+                  university: university,
+                  department: department,
                   courseModel: courseModel,
                   selectedSemester: selectedSemester,
                   courseId: courseId,

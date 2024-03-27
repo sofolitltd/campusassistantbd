@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import '/screens/community/notice/notice_screen.dart';
-
-import '/auth/new_home_screen.dart';
-import '/main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '/main.dart';
+import '/screens/auth/new_home_screen.dart';
+import '/screens/community/notice/notice_screen.dart';
 
 //
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -46,7 +46,7 @@ class FirebaseApi {
 
     if (message.data['type'] == 'notice') {
       navigatorKey.currentState?.pushNamed(NoticeScreen.routeName);
-    }else{
+    } else {
       navigatorKey.currentState?.pushNamed(NewHomeScreen.routeName);
     }
   }

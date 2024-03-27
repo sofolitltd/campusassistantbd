@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:campusassistant/models/profile_data.dart';
 import 'package:campusassistant/models/semester_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +9,16 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 class EditSemester extends StatefulWidget {
   const EditSemester({
-    Key? key,
-    required this.profileData,
+    super.key,
+    required this.university,
+    required this.department,
     required this.batches,
     required this.semester,
     required this.semesterId,
-  }) : super(key: key);
-  final ProfileData profileData;
+  });
+
+  final String university;
+  final String department;
   final List<String> batches;
   final SemesterModel semester;
   final String semesterId;
@@ -49,9 +51,9 @@ class _EditSemesterState extends State<EditSemester> {
   Widget build(BuildContext context) {
     var ref = FirebaseFirestore.instance
         .collection('Universities')
-        .doc(widget.profileData.university)
+        .doc(widget.university)
         .collection('Departments')
-        .doc(widget.profileData.department)
+        .doc(widget.department)
         .collection('semesters');
 
     return Scaffold(

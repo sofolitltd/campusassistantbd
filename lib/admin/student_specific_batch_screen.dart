@@ -8,12 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '/models/student_model.dart';
-import '/screens/home/explore/student/widget/all_batch_card_widget.dart';
-import '/screens/home/explore/student/widget/full_image.dart';
-import '/screens/home/explore/student/widget/student_add.dart';
+import '../screens/home/explore/student/widget/all_batch_card_widget.dart';
 import '../screens/home/explore/student/widget/student_edit.dart';
 import '../utils/create_verification_code.dart';
+import '/models/student_model.dart';
+import '/screens/home/explore/student/widget/full_image.dart';
+import '/screens/home/explore/student/widget/student_add.dart';
 
 class SpecificBatchScreen extends StatelessWidget {
   const SpecificBatchScreen({

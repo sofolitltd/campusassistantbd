@@ -11,7 +11,7 @@ import '/models/profile_data.dart';
 import '/utils/constants.dart';
 
 class EditProfile extends StatefulWidget {
-  const EditProfile({Key? key, required this.profileData}) : super(key: key);
+  const EditProfile({super.key, required this.profileData});
   final ProfileData profileData;
 
   @override
@@ -139,7 +139,7 @@ class _EditProfileState extends State<EditProfile> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _pickedMobileImage == null
-                                      ? Colors.red
+                                      ? Colors.orange
                                       : Colors.green,
                                 ),
                                 onPressed: () async {

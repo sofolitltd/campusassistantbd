@@ -3,21 +3,27 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:upgrader/upgrader.dart';
 
-import '/models/profile_data.dart';
-import '/screens/home/header.dart';
-import '/screens/home/more/more.dart';
-import '/widgets/custom_drawer.dart';
 import '../community/notice/notice_screen.dart';
 import '../community/notice/notification_badge.dart';
+import '/models/profile_data.dart';
+import '/screens/home/more/more.dart';
+import '/widgets/custom_drawer.dart';
 import 'explore/explore.dart';
+import 'header/header.dart';
 
 enum Profession { student, teacher }
 
 class Home extends StatefulWidget {
+  const Home({
+    super.key,
+    required this.university,
+    required this.department,
+    required this.profileData,
+  });
 
-  const Home({Key? key, required this.profileData}) : super(key: key);
+  final String university;
+  final String department;
   final ProfileData profileData;
 
   @override
@@ -187,7 +193,11 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           ],
 
           // Explore
-          Explore(profileData: widget.profileData),
+          Explore(
+            university: widget.university,
+            department: widget.department,
+            profileData: widget.profileData,
+          ),
         ],
       ),
     );

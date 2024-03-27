@@ -1,25 +1,32 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
-import '/utils/constants.dart';
 import '../../../models/course_model_new.dart';
-import '../../../models/profile_data.dart';
+import '/utils/constants.dart';
 
 class EditCourse extends StatefulWidget {
   const EditCourse({
-    Key? key,
-    required this.profileData,
+    super.key,
+    required this.university,
+    required this.department,
     required this.selectedSemester,
     required this.courseId,
     required this.courseModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
-  final ProfileData profileData;
+  final String university;
+  final String department;
   final String selectedSemester;
   final String courseId;
   final CourseModelNew courseModel;
@@ -40,8 +47,10 @@ class _EditCourseState extends State<EditCourse> {
 
   String? _selectedCourseCategory;
   List<String>? _selectedBatches;
-
   bool _isLoading = false;
+
+  File? _pickedMobileImage;
+  Uint8List _webImage = Uint8List(8);
 
   @override
   void initState() {
@@ -75,9 +84,9 @@ class _EditCourseState extends State<EditCourse> {
             onPressed: () async {
               var ref = FirebaseFirestore.instance
                   .collection('Universities')
-                  .doc(widget.profileData.university)
+                  .doc(widget.university)
                   .collection('Departments')
-                  .doc(widget.profileData.department)
+                  .doc(widget.department)
                   .collection('courses')
                   .doc(widget.courseId);
 
@@ -224,6 +233,96 @@ class _EditCourseState extends State<EditCourse> {
 
                   const SizedBox(height: 16),
 
+                  _pickedMobileImage == null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: GestureDetector(
+                            onTap: () async {
+                              await pickImage(context);
+                            },
+                            child: Container(
+                              height: 64,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey.shade200,
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              alignment: widget.courseModel.image.isNotEmpty
+                                  ? Alignment.centerLeft
+                                  : Alignment.center,
+                              child: widget.courseModel.image.isNotEmpty
+                                  ? Row(
+                                      children: [
+                                        Image.network(widget.courseModel.image),
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 24),
+                                          child: Text(
+                                            'Tap to change image',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  : const Text(
+                                      'No image selected',
+                                      textAlign: TextAlign.center,
+                                    ),
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () async {
+                            await pickImage(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  //
+                                  Container(
+                                    height: 64,
+                                    width: 64,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: Colors.blueGrey.shade100),
+                                      image: kIsWeb
+                                          ? DecorationImage(
+                                              fit: BoxFit.fitHeight,
+                                              image: MemoryImage(_webImage),
+                                            )
+                                          : DecorationImage(
+                                              fit: BoxFit.fitHeight,
+                                              image: FileImage(
+                                                  _pickedMobileImage!),
+                                            ),
+                                    ),
+                                  ),
+
+                                  //
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 24),
+                                    child: Text(
+                                      'One image selected ',
+                                      style: TextStyle(
+                                          color: Colors.green, fontSize: 18),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(height: 16),
+
                   // batches
                   MultiSelectDialogField(
                     decoration: BoxDecoration(
@@ -273,6 +372,26 @@ class _EditCourseState extends State<EditCourse> {
                                 setState(() => _isLoading = true);
 
                                 //
+                                String downloadedUrl = '';
+                                downloadedUrl = widget.courseModel.image;
+
+                                // upload new image
+                                if (_pickedMobileImage != null) {
+                                  downloadedUrl =
+                                      await uploadImage(pathName: 'courses');
+
+                                  // delete old image
+                                  if (widget.courseModel.image != "") {
+                                    await FirebaseStorage.instance
+                                        .refFromURL(widget.courseModel.image)
+                                        .delete()
+                                        .whenComplete(() =>
+                                            Fluttertoast.showToast(
+                                                msg: 'Delete image ...'));
+                                  }
+                                }
+
+                                //
                                 CourseModelNew courseModel = CourseModelNew(
                                   courseYear: widget.selectedSemester,
                                   courseCategory: _selectedCourseCategory!,
@@ -284,15 +403,15 @@ class _EditCourseState extends State<EditCourse> {
                                   courseMarks:
                                       _courseMarksController.text.trim(),
                                   batches: _selectedBatches!,
-                                  image: widget.courseModel.image,
+                                  image: downloadedUrl,
                                 );
 
                                 // add course
                                 await FirebaseFirestore.instance
                                     .collection('Universities')
-                                    .doc(widget.profileData.university)
+                                    .doc(widget.university)
                                     .collection('Departments')
-                                    .doc(widget.profileData.department)
+                                    .doc(widget.department)
                                     .collection('courses')
                                     .doc(widget.courseId)
                                     .update(courseModel.toJson());
@@ -344,5 +463,88 @@ class _EditCourseState extends State<EditCourse> {
         const Text('Course Information'),
       ],
     );
+  }
+
+  //add image
+  pickImage(context) async {
+    // Pick an image
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    //
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 40,
+      cropStyle: CropStyle.rectangle,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        //android
+        AndroidUiSettings(
+          toolbarTitle: 'image Customization',
+          toolbarColor: ThemeData().cardColor,
+          toolbarWidgetColor: Colors.deepOrange,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+
+        //web
+        WebUiSettings(
+          context: context,
+          presentStyle: CropperPresentStyle.dialog,
+          boundary: const CroppieBoundary(
+            width: 350,
+            height: 350,
+          ),
+          viewPort:
+              const CroppieViewPort(width: 350, height: 350, type: 'square'),
+          enableExif: true,
+          enableZoom: true,
+          showZoomer: true,
+        ),
+      ],
+    );
+
+    if (!kIsWeb) {
+      if (croppedImage != null) {
+        var selectedMobileImage = File(croppedImage.path);
+        setState(() {
+          _pickedMobileImage = selectedMobileImage;
+        });
+      }
+    } else if (kIsWeb) {
+      if (croppedImage != null) {
+        var selectedWebImage = await croppedImage.readAsBytes();
+        setState(() {
+          _webImage = selectedWebImage;
+          _pickedMobileImage = File('');
+        });
+      }
+    }
+  }
+
+  //upload image
+  Future<String> uploadImage({required String pathName}) async {
+    String downloadedUrl = '';
+
+    String imageUid = DateTime.now().microsecondsSinceEpoch.toString();
+    //
+    Reference ref = FirebaseStorage.instance
+        .ref('Universities/${widget.university}/${widget.department}/$pathName')
+        .child('$imageUid.jpg');
+
+    //
+    if (kIsWeb) {
+      await ref.putData(_webImage);
+    } else {
+      await ref.putFile(_pickedMobileImage!);
+    }
+    downloadedUrl = await ref.getDownloadURL();
+    return downloadedUrl;
   }
 }

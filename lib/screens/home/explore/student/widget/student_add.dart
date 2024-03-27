@@ -401,7 +401,7 @@ class _AddStudentState extends State<AddStudent> {
                                     .doc(id)
                                     .set(studentModel.toJson())
                                     .then((value) async {
-                                  //add to /verifications
+                                  //add to ->verifications
                                   await FirebaseFirestore.instance
                                       .collection('verifications')
                                       .doc(code)

@@ -59,4 +59,22 @@ class OpenApp {
       }
     }
   }
+
+  static withEmailNew(String email, {String? subject, String? message}) async {
+    if (email.isEmpty) {
+      Fluttertoast.showToast(msg: 'No email found');
+    } else {
+      var uri = Uri(
+        scheme: 'mailto',
+        path: email,
+        query: 'subject= $subject&body=$message',
+      );
+      try {
+        await launchUrl(uri);
+      } catch (e) {
+        print('Error: $e');
+        Fluttertoast.showToast(msg: 'Error launching email client');
+      }
+    }
+  }
 }

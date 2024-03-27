@@ -1,8 +1,8 @@
-import 'package:campusassistant/screens/profile/app_settings.dart';
 import 'package:flutter/material.dart';
 
 import '/models/profile_data.dart';
-import 'profile_card.dart';
+import '/screens/profile/app_settings.dart';
+import 'components/profile_card.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.profileData});

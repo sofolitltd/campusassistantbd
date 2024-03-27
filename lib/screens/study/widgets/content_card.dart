@@ -1,35 +1,31 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:campusassistant/widgets/pdf_viewer_local.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import '/widgets/open_app.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '/models/content_model.dart';
 import '/models/profile_data.dart';
 import '/screens/study/uploader/content_edit.dart';
 import '/screens/study/widgets/bookmark_button.dart';
-import '/widgets/pdf_viewer.dart';
+import '/widgets/open_app.dart';
 import '/widgets/pdf_viewer_web.dart';
 
 class ContentCard extends StatefulWidget {
   const ContentCard({
-    Key? key,
+    super.key,
     required this.profileData,
     required this.selectedSemester,
     required this.selectedBatch,
     required this.contentModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
   final ProfileData profileData;
   final String selectedSemester;
@@ -152,8 +148,7 @@ class _ContentCardState extends State<ContentCard> {
                     await interstitialAd.show();
                   } else {
                     Fluttertoast.showToast(
-                        msg:
-                            'Loading...\nPlease wait & try again');
+                        msg: 'Loading...\nPlease wait & try again');
                   }
 
                   //
@@ -389,136 +384,135 @@ class _ContentCardState extends State<ContentCard> {
                       //         true)
 
                       //if already download
-                      if(!kIsWeb)
-                      if (File(
-                              '/storage/emulated/0/Download/Campus Assistant/$fileName')
-                          .existsSync())
+                      if (!kIsWeb)
+                        if (File(
+                                '/storage/emulated/0/Download/Campus Assistant/$fileName')
+                            .existsSync())
+                          SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: IconButton(
+                              onPressed: () async {
+                                //open file
+                                await openFileAndroid(fileName: fileName);
+                              },
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                                // size: 30,
+                              ),
+                            ),
+                          )
+                        else
+                          (_isLoading == false)
+                              ? SizedBox(
+                                  height: 40,
+                                  width: 40,
+                                  child: IconButton(
+                                    onPressed: () async {
+                                      setState(() => _isLoading = true);
+
+                                      //
+                                      await downloadFileAndroid(
+                                        url: widget.contentModel.fileUrl,
+                                        fileName: fileName,
+                                      );
+
+                                      //show ads
+                                      if (_isAdLoaded) {
+                                        await interstitialAd.show();
+                                      } else {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                                'Loading...\nPlease wait & try again');
+                                      }
+
+                                      //
+                                      setState(() => _isLoading = false);
+                                    },
+                                    icon: const Icon(
+                                      Icons.downloading_rounded,
+                                      color: Colors.red,
+                                      // size: 30,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 40,
+                                  width: 40,
+                                  child: IconButton(
+                                    onPressed: () async {},
+                                    icon: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        //text
+                                        Text(
+                                          (_downloadProgress! * 100)
+                                              .toStringAsFixed(0),
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: _downloadProgress == 0
+                                              ? const CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                )
+                                              : CircularProgressIndicator(
+                                                  value: _downloadProgress,
+                                                  strokeWidth: 2,
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                      // preview
+                      if (!kIsWeb)
                         SizedBox(
                           height: 40,
                           width: 40,
                           child: IconButton(
                             onPressed: () async {
-                              //open file
-                              await openFileAndroid(fileName: fileName);
+                              //
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PdfViewerWeb(
+                                    title: widget.contentModel.contentTitle,
+                                    fileUrl: widget.contentModel.fileUrl,
+                                  ),
+                                ),
+                              );
                             },
+                            tooltip: 'Preview',
                             icon: const Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.green,
+                              Icons.remove_red_eye_outlined,
+                              // color: Colors.red,
                               // size: 30,
                             ),
                           ),
-                        )
-                      else
-                        (_isLoading == false)
-                            ? SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: IconButton(
-                                  onPressed: () async {
-                                    setState(() => _isLoading = true);
-
-                                    //
-                                    await downloadFileAndroid(
-                                      url: widget.contentModel.fileUrl,
-                                      fileName: fileName,
-                                    );
-
-                                    //show ads
-                                    if (_isAdLoaded) {
-                                      await interstitialAd.show();
-                                    } else {
-                                      Fluttertoast.showToast(
-                                          msg:
-                                          'Loading...\nPlease wait & try again');
-                                    }
-
-                                    //
-                                    setState(() => _isLoading = false);
-
-                                  },
-                                  icon: const Icon(
-                                    Icons.downloading_rounded,
-                                    color: Colors.red,
-                                    // size: 30,
-                                  ),
-                                ),
-                              )
-                            : SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: IconButton(
-                                  onPressed: () async {},
-                                  icon: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      //text
-                                      Text(
-                                        (_downloadProgress! * 100)
-                                            .toStringAsFixed(0),
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                      SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: _downloadProgress == 0
-                                            ? const CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              )
-                                            : CircularProgressIndicator(
-                                                value: _downloadProgress,
-                                                strokeWidth: 2,
-                                              ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                      // preview
-                      if(!kIsWeb)
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: IconButton(
-                          onPressed: () async {
-                            //
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PdfViewerWeb(
-                                  title: widget.contentModel.contentTitle,
-                                  fileUrl: widget.contentModel.fileUrl,
-                                ),
-                              ),
-                            );
-                          },
-                          tooltip: 'Preview',
-                          icon: const Icon(
-                            Icons.remove_red_eye_outlined,
-                            // color: Colors.red,
-                            // size: 30,
-                          ),
                         ),
-                      ),
 
                       // web download
-                      if(kIsWeb)
-                      SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: IconButton(
-                          onPressed: () async {
-                            //
-                            OpenApp.openPdf(widget.contentModel.fileUrl);
-                          },
-                          tooltip: 'Download',
-                          icon: const Icon(
-                            Icons.downloading_outlined,
-                            color: Colors.red,
-                            // size: 30,
+                      if (kIsWeb)
+                        SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: IconButton(
+                            onPressed: () async {
+                              //
+                              OpenApp.openPdf(widget.contentModel.fileUrl);
+                            },
+                            tooltip: 'Download',
+                            icon: const Icon(
+                              Icons.downloading_outlined,
+                              color: Colors.red,
+                              // size: 30,
+                            ),
                           ),
                         ),
-                      ),
 
                       // bookmark
                       BookmarkButton(

@@ -12,16 +12,18 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
+import '../widgets/content_subtitle_widget.dart';
+import '../widgets/progress_dialog.dart';
 import '/models/content_model.dart';
 import '/models/course_model_new.dart';
 import '/models/profile_data.dart';
 import '/screens/study/widgets/path_section_widget.dart';
-import '../widgets/content_subtitle_widget.dart';
-import '../widgets/progress_dialog.dart';
 
 class AddContent extends StatefulWidget {
   const AddContent({
     super.key,
+    required this.university,
+    required this.department,
     required this.profileData,
     required this.selectedSemester,
     required this.courseType,
@@ -30,6 +32,8 @@ class AddContent extends StatefulWidget {
     this.chapterNo,
   });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
   final String selectedSemester;
   final String courseType;
@@ -309,8 +313,8 @@ class _AddContentState extends State<AddContent> {
     ///Universities/University of Chittagong/Departments/Department of Psychology
     final ref = FirebaseStorage.instance
         .ref('Universities')
-        .child(widget.profileData.university)
-        .child(widget.profileData.department)
+        .child(widget.university)
+        .child(widget.department)
         .child(widget.courseType.toLowerCase())
         .child(fileName);
 
@@ -359,9 +363,9 @@ class _AddContentState extends State<AddContent> {
     );
     var ref = FirebaseFirestore.instance
         .collection('Universities')
-        .doc(widget.profileData.university)
+        .doc(widget.university)
         .collection('Departments')
-        .doc(widget.profileData.department)
+        .doc(widget.department)
         .collection(widget.courseType.toLowerCase())
         .doc(contentId);
     log(ref.toString());

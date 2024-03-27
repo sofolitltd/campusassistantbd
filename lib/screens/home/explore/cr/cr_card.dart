@@ -2,19 +2,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../../../models/profile_data.dart';
+import '../../../../widgets/open_app.dart';
 import '/models/cr_model.dart';
 import '/widgets/headline.dart';
-import '/widgets/open_app.dart';
-import '../../../../models/profile_data.dart';
+import 'cr_edit.dart';
 
 class CrCard extends StatelessWidget {
   const CrCard({
-    Key? key,
+    super.key,
     required this.profileData,
     required this.year,
     required this.ref,
-  }) : super(key: key);
+  });
 
   final ProfileData profileData;
   final String year;
@@ -54,134 +56,291 @@ class CrCard extends StatelessWidget {
 
                   //
                   return GestureDetector(
+                    //edit cr
+                    onLongPress: profileData.information.status!.moderator!
+                        ? () async {
+                            List<String> batchList = [];
+                            await FirebaseFirestore.instance
+                                .collection('Universities')
+                                .doc(profileData.university)
+                                .collection('Departments')
+                                .doc(profileData.department)
+                                .collection('batches')
+                                .orderBy('name')
+                                .get()
+                                .then(
+                              (QuerySnapshot snapshot) {
+                                for (var batch in snapshot.docs) {
+                                  batchList.add(batch.get('name'));
+                                }
+                              },
+                            ).then(
+                              (value) {
+                                //
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => EditCR(
+                                      docID: data[index].id,
+                                      profileData: profileData,
+                                      crModel: crModel,
+                                      batchList: batchList,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        : null,
                     child: Card(
                       margin: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                       elevation: 0,
-                      child: Theme(
-                        data: Theme.of(context)
-                            .copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          tilePadding: const EdgeInsets.all(8),
-
-                          //image
-                          leading: CachedNetworkImage(
-                            imageUrl: crModel.imageUrl,
-                            fadeInDuration: const Duration(milliseconds: 500),
-                            imageBuilder: (context, imageProvider) =>
-                                CircleAvatar(
-                              backgroundImage: imageProvider,
-                              radius: 32,
-                            ),
-                            progressIndicatorBuilder:
-                                (context, url, downloadProgress) =>
-                                    const CircleAvatar(
-                              radius: 32,
-                              backgroundImage: AssetImage(
-                                  'assets/images/pp_placeholder.png'),
-                              child: CupertinoActivityIndicator(),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const CircleAvatar(
-                              radius: 32,
-                              backgroundImage: AssetImage(
-                                  'assets/images/pp_placeholder.png'),
-                            ),
-                          ),
-
-                          //
-                          title: Text(
-                            crModel.name,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          subtitle: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 3,
-                                ),
-                                margin: const EdgeInsets.only(top: 4),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
-                                  color: Colors.orange[100],
-                                ),
-                                child: Text(
-                                  crModel.batch,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black),
-                                ),
-                              ),
-                              const Expanded(child: Text('')),
-                            ],
-                          ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ListTileTheme(
-                              horizontalTitleGap: 0,
+                            //
+                            Expanded(
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //
-                                  Container(
-                                    height: .5,
-                                    width: double.infinity,
-                                    color: Theme.of(context).dividerColor,
-                                  ),
-//phone
-                                  if (crModel.phone.isNotEmpty)
-                                    ListTile(
-                                      onTap: () {
-                                        OpenApp.withNumber(crModel.phone);
-                                      },
-                                      title: Text(crModel.phone),
-                                      trailing: const Icon(
-                                        Icons.call_outlined,
-                                        color: Colors.green,
-                                      ),
+                                  SizedBox(
+                                    height: 60,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          crModel.name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                        // const SizedBox(height: 8),
+
+                                        //batch, email, fb
+                                        Row(
+                                          children: [
+                                            //batch
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 8),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      8, 4, 12, 4),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                color: Colors.orange[100],
+                                              ),
+                                              child: Text(crModel.batch),
+                                            ),
+
+                                            if (crModel.email.isNotEmpty)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  OpenApp.withEmail(
+                                                      crModel.email);
+                                                },
+                                                child: Container(
+                                                  margin: const EdgeInsets.only(
+                                                      right: 8),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          8, 4, 12, 4),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    color: Colors.red[100],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.alternate_email,
+                                                        color: Colors.black,
+                                                        size: 16,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text('Email'
+                                                          .toUpperCase()),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+
+                                            // fb
+                                            if (crModel.fb.isNotEmpty)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  OpenApp.withUrl(crModel.fb);
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          8, 4, 12, 4),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    color: Colors.blue[100],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.facebook_rounded,
+                                                        color: Colors.black,
+                                                        size: 16,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        'Fb'.toUpperCase(),
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyLarge,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-
-                                  //
-                                  Container(
-                                    height: .5,
-                                    width: double.infinity,
-                                    color: Theme.of(context).dividerColor,
                                   ),
 
-                                  //mail
-                                  if (crModel.email.isNotEmpty)
-                                    ListTile(
-                                      onTap: () {
-                                        OpenApp.withEmail(crModel.email);
-                                      },
-                                      title: Text(crModel.email),
-                                      trailing: const Icon(
-                                        Icons.email_outlined,
-                                        color: Colors.redAccent,
-                                      ),
-                                    ),
+                                  const SizedBox(height: 12),
 
-                                  //
-                                  Container(
-                                    height: .5,
-                                    width: double.infinity,
-                                    color: Theme.of(context).dividerColor,
+                                  // ph, share
+                                  Row(
+                                    children: [
+                                      // call
+                                      if (crModel.phone.isNotEmpty)
+                                        GestureDetector(
+                                          onTap: () {
+                                            OpenApp.withNumber(crModel.phone);
+                                          },
+                                          child: Container(
+                                            margin:
+                                                const EdgeInsets.only(right: 8),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                10, 4, 16, 4),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Theme.of(context)
+                                                    .dividerColor,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.call_outlined,
+                                                  color: Colors.green,
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  crModel.phone,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                      //share
+                                      GestureDetector(
+                                        onTap: () async {
+                                          String shareableText =
+                                              '${crModel.name}\n\n${crModel.fb}\n\nPhone:\n+88${crModel.phone}\n';
+
+                                          //
+                                          await Share.share(shareableText,
+                                              subject: crModel.name);
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 4, 16, 4),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .dividerColor,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              //
+                                              const Icon(
+                                                Icons.share_outlined,
+                                                size: 16,
+                                              ),
+
+                                              const SizedBox(width: 8),
+                                              //
+                                              Text(
+                                                'Share'.toUpperCase(),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-
-                                  //fb
-                                  if (crModel.fb.isNotEmpty)
-                                    ListTile(
-                                      onTap: () {
-                                        OpenApp.withUrl(crModel.fb);
-                                      },
-                                      title: Text(crModel.fb),
-                                      trailing: const Icon(
-                                        Icons.facebook_outlined,
-                                        color: Colors.blueAccent,
-                                      ),
-                                    ),
                                 ],
+                              ),
+                            ),
+                            //
+                            const SizedBox(width: 16),
+                            //
+                            SizedBox(
+                              height: 60,
+                              width: 60,
+                              child: CachedNetworkImage(
+                                imageUrl: crModel.imageUrl,
+                                fadeInDuration:
+                                    const Duration(milliseconds: 500),
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: imageProvider,
+                                  )),
+                                ),
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        Container(
+                                  decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage(
+                                        'assets/images/pp_placeholder.png'),
+                                  )),
+                                  child: const CupertinoActivityIndicator(),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage(
+                                        'assets/images/pp_placeholder.png'),
+                                  )),
+                                ),
                               ),
                             ),
                           ],

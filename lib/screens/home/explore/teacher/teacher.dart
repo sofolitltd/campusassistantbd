@@ -5,12 +5,20 @@ import 'package:flutter/material.dart';
 
 import '/models/profile_data.dart';
 import '/models/teacher_model.dart';
-import '/screens/home/explore/teacher/teacher_add.dart';
-import '/screens/home/explore/teacher/teacher_details_screen.dart';
+import '/screens/home/explore/teacher/teacher_edit.dart';
+import 'teacher_add.dart';
+import 'teacher_details_screen.dart';
 
 class Teacher extends StatelessWidget {
-  const Teacher({super.key, required this.profileData});
+  const Teacher({
+    super.key,
+    required this.university,
+    required this.department,
+    required this.profileData,
+  });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
 
   @override
@@ -36,10 +44,17 @@ class Teacher extends StatelessWidget {
         body: TabBarView(
           children: [
             // present
-            TeacherListView(profileData: profileData, isPresent: true),
+            TeacherListView(
+              university: university,
+              department: department,
+              profileData: profileData,
+              isPresent: true,
+            ),
 
             //study leave
             TeacherListView(
+              university: university,
+              department: department,
               profileData: profileData,
               isPresent: false,
             ),
@@ -53,11 +68,15 @@ class Teacher extends StatelessWidget {
 // teacher list view
 class TeacherListView extends StatelessWidget {
   const TeacherListView({
-    Key? key,
+    super.key,
+    required this.university,
+    required this.department,
     required this.profileData,
     required this.isPresent,
-  }) : super(key: key);
+  });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
   final bool isPresent;
 
@@ -88,9 +107,9 @@ class TeacherListView extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Universities')
-            .doc(profileData.university)
+            .doc(university)
             .collection('Departments')
-            .doc(profileData.department)
+            .doc(department)
             .collection('Teachers')
             .where('present', isEqualTo: isPresent)
             .orderBy('serial')
@@ -107,128 +126,204 @@ class TeacherListView extends StatelessWidget {
           var data = snapshot.data!.docs;
           return snapshot.data!.size == 0
               ? const Center(child: Text('No data found'))
-              : Scrollbar(
-                  radius: const Radius.circular(8),
-                  interactive: true,
-                  child: ListView.separated(
-                    // shrinkWrap: true,
-                    itemCount: data.length,
+              : GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: .72,
+                  ),
+                  shrinkWrap: true,
+                  itemCount: data.length,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width > 1000
+                        ? MediaQuery.of(context).size.width * .2
+                        : 16,
+                    vertical: 16,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    //
+                    TeacherModel teacherModel =
+                        TeacherModel.formJson(data[index]);
 
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width > 1000
-                          ? MediaQuery.of(context).size.width * .2
-                          : 16,
-                      vertical: 16,
-                    ),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (BuildContext context, int index) {
-                      //
-                      TeacherModel teacherModel =
-                          TeacherModel.formJson(data[index]);
-
-                      //
-                      return Card(
-                        elevation: 2,
-                        margin: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        child: ListTile(
-                          horizontalTitleGap: 8,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeacherDetailsScreen(
-                                teacherModel: teacherModel,
-                              ),
+                    //
+                    return Card(
+                      elevation: 2,
+                      margin: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      child: GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeacherDetailsScreen(
+                              teacherModel: teacherModel,
+                              university: university,
+                              department: department,
+                              profileData: profileData,
                             ),
                           ),
+                        ),
 
-                          leading: Hero(
-                            tag: teacherModel.name,
-                            child: CachedNetworkImage(
-                              imageUrl: teacherModel.imageUrl,
-                              fadeInDuration: const Duration(milliseconds: 500),
-                              imageBuilder: (context, imageProvider) =>
-                                  CircleAvatar(
-                                backgroundImage: imageProvider,
-                                radius: 32,
-                              ),
-                              progressIndicatorBuilder: (context, url,
-                                      downloadProgress) =>
-                                  const CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/pp_placeholder.png'),
-                                      child: CupertinoActivityIndicator()),
-                              errorWidget: (context, url, error) =>
-                                  const CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/pp_placeholder.png')),
-                            ),
-                          ),
-
-                          //
-                          title: Row(
-                            children: [
-                              //
-                              Flexible(
-                                child: Text(
-                                  teacherModel.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        //
+                        onLongPress: () {
+                          if (profileData.information.status!.moderator!) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TeacherEdit(
+                                  university: university,
+                                  department: department,
+                                  profileData: profileData,
+                                  present: isPresent,
+                                  teacherModel: teacherModel,
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          }
+                        },
 
-                          //
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //post
-                              Text(teacherModel.post, style: const TextStyle()),
-
-                              // is chairman
-                              if (teacherModel.chairman)
-                                const SizedBox(height: 4),
-
-                              //
-                              if (teacherModel.chairman)
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.greenAccent.shade100,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 1,
-                                  ),
-                                  child: Text(
-                                    'Chairman',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: ThemeData()
-                                          .textTheme
-                                          .titleLarge!
-                                          .color,
+                        child: Column(
+                          children: [
+                            // img
+                            Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                //img
+                                Hero(
+                                  tag: teacherModel.name,
+                                  child: Container(
+                                    margin: const EdgeInsets.fromLTRB(
+                                      16,
+                                      14,
+                                      16,
+                                      10,
+                                    ),
+                                    height: 140,
+                                    child: CachedNetworkImage(
+                                      imageUrl: teacherModel.imageUrl,
+                                      fadeInDuration:
+                                          const Duration(milliseconds: 500),
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                              8), // Apply rounded corners
+                                          image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                      progressIndicatorBuilder:
+                                          (context, url, downloadProgress) =>
+                                              Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          image: const DecorationImage(
+                                            image: AssetImage(
+                                                'assets/images/pp_placeholder.png'),
+                                          ),
+                                        ),
+                                        child: const Center(
+                                            child:
+                                                CupertinoActivityIndicator()),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          image: const DecorationImage(
+                                            image: AssetImage(
+                                                'assets/images/pp_placeholder.png'),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                            ],
-                          ),
+
+                                // is chairman
+                                if (teacherModel.chairman)
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: Colors.greenAccent.shade100,
+                                    ),
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 3, 8, 5),
+                                    child: Text(
+                                      'Chairman'.toUpperCase(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ),
+
+                                // serial
+                                if (profileData.information.status!.moderator!)
+                                  Positioned(
+                                    top: 12,
+                                    right: 0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.blueGrey.shade200,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          bottomLeft: Radius.circular(16),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('${teacherModel.serial}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            height: 1,
+                                          )),
+                                    ),
+                                  ),
+                              ],
+                            ),
+
+                            // const SizedBox(height: 4), // name
+
+                            // name
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                  teacherModel.name,
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                  maxLines: 2,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.2,
+                                      ),
+                                ),
+                              ),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                teacherModel.post,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 );
         },
       ),

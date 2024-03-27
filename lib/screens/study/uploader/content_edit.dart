@@ -11,22 +11,22 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
+import '../widgets/progress_dialog.dart';
 import '/models/content_model.dart';
 import '/models/profile_data.dart';
 import '/screens/study/widgets/content_subtitle_widget.dart';
 import '/screens/study/widgets/path_section_widget.dart';
-import '../widgets/progress_dialog.dart';
 
 ///Study/2nd Year/Practical Course/Psy 207/Notes/Lessons/02/sxusycT5qFMLYx91ec1Z
 
 class EditContent extends StatefulWidget {
   const EditContent({
-    key,
+    super.key,
     required this.selectedYear,
     required this.profileData,
     required this.contentModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
   final String selectedYear;
   final ProfileData profileData;

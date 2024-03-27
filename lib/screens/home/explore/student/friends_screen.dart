@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import '/models/profile_data.dart';
 import '/models/student_model.dart';
-import '/screens/home/explore/student/widget/all_batch_card_widget.dart';
 import 'all_batch_screen.dart';
+import 'widget/all_batch_card_widget.dart';
 import 'widget/student_add.dart';
 
 class FriendsScreen extends StatelessWidget {

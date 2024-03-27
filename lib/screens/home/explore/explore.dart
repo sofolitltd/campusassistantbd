@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../more/about/about.dart';
 import '/models/profile_data.dart';
-import '/screens/home/explore/student/friends_screen.dart';
 import '/widgets/headline.dart';
-import 'about/about.dart';
 import 'cr/cr.dart';
 import 'staff/staff.dart';
 import 'student/all_batch_screen.dart';
+import 'student/friends_screen.dart';
 import 'teacher/teacher.dart';
 import 'university/university.dart';
 
 class Explore extends StatelessWidget {
   const Explore({
-    Key? key,
+    super.key,
+    required this.university,
+    required this.department,
     required this.profileData,
-  }) : super(key: key);
+  });
 
+  final String university;
+  final String department;
   final ProfileData profileData;
 
   @override
@@ -170,8 +174,11 @@ class Explore extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  Teacher(profileData: profileData),
+                              builder: (context) => Teacher(
+                                university: university,
+                                department: department,
+                                profileData: profileData,
+                              ),
                             ),
                           );
                         },
@@ -359,8 +366,11 @@ class Explore extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  Staff(profileData: profileData),
+                              builder: (context) => Staff(
+                                university: university,
+                                department: department,
+                                profileData: profileData,
+                              ),
                             ),
                           );
                         },

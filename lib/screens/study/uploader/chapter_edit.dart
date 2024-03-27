@@ -9,21 +9,22 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '/models/chapter_model.dart';
 import '/models/course_model_new.dart';
-import '/models/profile_data.dart';
 
 class EditChapter extends StatefulWidget {
   const EditChapter({
-    Key? key,
-    required this.profileData,
+    super.key,
+    required this.university,
+    required this.department,
     required this.selectedYear,
     required this.chapterId,
     required this.courseModel,
     required this.courseType,
     required this.chapterModel,
     required this.batches,
-  }) : super(key: key);
+  });
 
-  final ProfileData profileData;
+  final String university;
+  final String department;
   final String selectedYear;
   final String chapterId;
   final CourseModelNew courseModel;
@@ -71,9 +72,9 @@ class _EditChapterState extends State<EditChapter> {
                 //
                 await FirebaseFirestore.instance
                     .collection('Universities')
-                    .doc(widget.profileData.university)
+                    .doc(widget.university)
                     .collection('Departments')
-                    .doc(widget.profileData.department)
+                    .doc(widget.department)
                     .collection('chapters')
                     .doc(widget.chapterId)
                     .delete()
@@ -222,9 +223,9 @@ class _EditChapterState extends State<EditChapter> {
                             //
                             await FirebaseFirestore.instance
                                 .collection('Universities')
-                                .doc(widget.profileData.university)
+                                .doc(widget.university)
                                 .collection('Departments')
-                                .doc(widget.profileData.department)
+                                .doc(widget.department)
                                 .collection('chapters')
                                 .doc(widget.chapterId)
                                 .update(chapterModel.toJson())
